@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>AMOREPACIFIC Commerce Insight — 서비스 소개 v2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css');
+    body { font-family: Pretendard, -apple-system, sans-serif; background: #F7F3EE; color: #1A2B4A; }
+    .navy  { color: #1A2B4A; }
+    .rose  { color: #C8748A; }
+    .bg-navy  { background: #1A2B4A; }
+    .bg-rose  { background: #C8748A; }
+    .bg-cream { background: #F7F3EE; }
+    .border-navy { border-color: #1A2B4A; }
+    .border-rose { border-color: #C8748A; }
+    .section-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #1A2B4A; color: #C8748A; font-size: 12px; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .tab-chip {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      background: #1A2B4A; color: #fff; font-size: 11px; font-weight: 700;
+      margin-right: 6px; vertical-align: middle;
+    }
+    .sub-chip {
+      display: inline-block; padding: 2px 8px; border-radius: 12px;
+      background: #EEF3FF; color: #1A2B4A; font-size: 11px; font-weight: 600;
+      margin-right: 4px; border: 1px solid #C8D8F0;
+    }
+    .feature-tag {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      background: #F0EBF4; color: #C8748A; font-size: 11px; font-weight: 600;
+      border: 1px solid #E8C4CE;
+    }
+    .page-card {
+      background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(26,43,74,0.07);
+      overflow: hidden; margin-bottom: 28px;
+    }
+    .page-card-header {
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid #F0EBF0;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .page-card-body { padding: 24px 28px; }
+    .feature-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 0; border-bottom: 1px solid #F5F0EE;
+    }
+    .feature-row:last-child { border-bottom: none; }
+    .feature-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+      background: #F7F3EE;
+    }
+    .subtab-block {
+      background: #F7F3EE; border-radius: 10px; padding: 14px 16px;
+      margin-bottom: 10px; border-left: 3px solid #C8748A;
+    }
+    .subtab-block:last-child { margin-bottom: 0; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #C8748A; border-radius: 3px; }
+    .divider { height: 1px; background: linear-gradient(to right, #C8748A33, transparent); margin: 36px 0; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- 표지 -->
+  <div class="bg-navy text-white py-16 px-8 text-center">
+    <p class="text-xs tracking-widest mb-2" style="color:#C8748A">AMOREPACIFIC · INTERNAL</p>
+    <h1 class="text-3xl font-black tracking-widest mb-2">COMMERCE INSIGHT</h1>
+    <p class="text-sm text-gray-300 mb-2">이커머스 채널 인텔리전스 대시보드 · 서비스 소개</p>
+    <p class="text-xs mb-8" style="color:#C8748A; letter-spacing:.1em">ver.2 · 2026-04-06 업데이트</p>
+    <div class="flex justify-center gap-6 text-xs text-gray-400 flex-wrap">
+      <span>📅 2026년 4월 기준</span>
+      <span>·</span>
+      <span>🛒 7개 채널 모니터링</span>
+      <span>·</span>
+      <span>🌸 16개 아모레 브랜드</span>
+      <span>·</span>
+      <span>👥 내부 직원 전용</span>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-6 py-12">
+
+    <!-- 서비스 개요 -->
+    <div class="page-card">
+      <div class="page-card-header">
+        <span class="section-num">0</span>
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">서비스 개요</p>
+          <h2 class="text-base font-bold navy">이 대시보드는 무엇인가요?</h2>
+        </div>
+      </div>
+      <div class="page-card-body">
+        <p class="text-sm text-gray-600 leading-relaxed mb-5">
+          아모레퍼시픽 내부 직원이 <strong class="navy">네이버·쿠팡·올리브영·지마켓·11번가·카카오·옥션</strong> 7개 이커머스 채널의 화장품 데이터를 한 화면에서 확인할 수 있는 인텔리전스 대시보드입니다.
+          아모레 브랜드의 성과를 모니터링하고, 경쟁사 동향을 파악하며, 트렌딩 상품을 빠르게 발견할 수 있습니다.
+        </p>
+        <div class="grid grid-cols-4 gap-4 mb-5">
+          <div class="rounded-xl p-4 text-center" style="background:#EEF3FF">
+            <p class="text-2xl font-black navy">7개</p>
+            <p class="text-xs text-gray-500 mt-1">모니터링 채널</p>
+          </div>
+          <div class="rounded-xl p-4 text-center" style="background:#FDF0F3">
+            <p class="text-2xl font-black" style="color:#C8748A">16개</p>
+            <p class="text-xs text-gray-500 mt-1">아모레 브랜드</p>
+          </div>
+          <div class="rounded-xl p-4 text-center" style="background:#EEF3FF">
+            <p class="text-2xl font-black navy">일 1회</p>
+            <p class="text-xs text-gray-500 mt-1">데이터 갱신</p>
+          </div>
+          <div class="rounded-xl p-4 text-center" style="background:#FDF0F3">
+            <p class="text-2xl font-black navy">4개</p>
+            <p class="text-xs text-gray-500 mt-1">메인 탭</p>
+          </div>
+        </div>
+        <!-- 탭 구조 안내 -->
+        <div class="rounded-xl p-4" style="background:#F7F3EE; border: 1px solid #E8C4CE;">
+          <p class="text-xs font-bold navy mb-3 uppercase tracking-wider">화면 구성 (4개 탭)</p>
+          <div class="flex gap-2 flex-wrap">
+            <span class="tab-chip">Overview</span>
+            <span style="color:#C8748A; align-self:center; font-size:14px;">→</span>
+            <span class="tab-chip">성과 분석</span>
+            <span style="color:#9AA8BB; font-size:11px; align-self:center;">채널별 / 브랜드별 / 카테고리별</span>
+            <span style="color:#C8748A; align-self:center; font-size:14px;">→</span>
+            <span class="tab-chip">경쟁사</span>
+            <span style="color:#C8748A; align-self:center; font-size:14px;">→</span>
+            <span class="tab-chip">트렌딩</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 화면 구성 안내 -->
+    <div class="flex items-center gap-3 mb-6">
+      <div style="height:2px; flex:1; background:#E8C4CE;"></div>
+      <p class="text-xs font-bold tracking-widest text-gray-400 uppercase">화면별 소개</p>
+      <div style="height:2px; flex:1; background:#E8C4CE;"></div>
+    </div>
+
+    <!-- 1. Overview -->
+    <div class="page-card">
+      <div class="page-card-header" style="background:#F7F3EE">
+        <span class="section-num">1</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="tab-chip">Overview</span>
+            <p class="text-base font-bold navy">전체 현황 한눈에 보기</p>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">대시보드에 접속하면 가장 먼저 보이는 화면입니다</p>
+        </div>
+      </div>
+      <div class="page-card-body">
+        <p class="text-sm text-gray-600 leading-relaxed mb-6">
+          지금 이 순간 가장 중요한 숫자를 요약해서 보여주는 홈 화면입니다. 각 KPI 카드를 클릭하면 해당 세부 화면으로 바로 이동합니다.
+        </p>
+        <div class="feature-row">
+          <div class="feature-icon">📊</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">핵심 지표 4개 (KPI 카드)</p>
+            <p class="text-xs text-gray-500 leading-relaxed">화장품 전체 상품 수 · 아모레 상품 수 · 총 리뷰 수 · 아모레 채널 점유율을 한 줄로 요약합니다. 클릭하면 관련 세부 화면으로 이동합니다 (전체 상품 카드 제외).</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">📈</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">채널별 상품 분포</p>
+            <p class="text-xs text-gray-500 leading-relaxed">아모레 상품이 7개 채널에 어떻게 분포되어 있는지 막대 그래프로 확인합니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🌸</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">아모레 브랜드 현황</p>
+            <p class="text-xs text-gray-500 leading-relaxed">16개 브랜드 중 상위 브랜드의 상품 수를 비율로 보여줍니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🔥</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">리뷰 급증 TOP 5</p>
+            <p class="text-xs text-gray-500 leading-relaxed">최근 7일 기준으로 전 채널 합산 리뷰가 가장 많이 늘어난 상품 TOP 5를 확인합니다. 상품 이름을 클릭하면 상세 정보 팝업이 열립니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">⚠️</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">경쟁사 주요 동향 <span class="feature-tag">자동 감지</span></p>
+            <p class="text-xs text-gray-500 leading-relaxed">경쟁사 탭에서 '주시' 배지가 달린 브랜드를 최대 4개 자동으로 선별해 요약합니다. 취급 상품 수·리뷰·점유율 데이터를 기반으로 매일 자동 계산됩니다.</p>
+            <p class="text-xs text-gray-400 mt-1">경쟁사 탭 전체 분석은 <strong>경쟁사</strong> 탭에서 확인하세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 성과 분석 -->
+    <div class="page-card">
+      <div class="page-card-header" style="background:#F7F3EE">
+        <span class="section-num">2</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="tab-chip">성과 분석</span>
+            <p class="text-base font-bold navy">채널·브랜드·카테고리 통합 분석</p>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">채널별 / 브랜드별 / 카테고리별 3개 서브탭으로 구성됩니다</p>
+        </div>
+      </div>
+      <div class="page-card-body">
+        <p class="text-sm text-gray-600 leading-relaxed mb-6">
+          아모레퍼시픽의 이커머스 성과를 채널·브랜드·카테고리 3가지 관점에서 심층 분석하는 통합 화면입니다. 상단 서브탭으로 관점을 전환하며 확인합니다.
+        </p>
+
+        <!-- 채널별 -->
+        <div class="subtab-block">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="sub-chip">채널별</span>
+            <p class="text-sm font-semibold navy">7개 채널 성과 비교</p>
+          </div>
+          <div class="feature-row" style="padding-top:0">
+            <div class="feature-icon">🏆</div>
+            <div>
+              <p class="text-sm font-semibold navy mb-1">채널 전체 비교표</p>
+              <p class="text-xs text-gray-500 leading-relaxed">7개 채널의 아모레 성과를 한 테이블에서 비교합니다. 상품 수·리뷰 점유율·총 리뷰·평균 판매가·평균 할인율을 채널 간 나란히 볼 수 있습니다.</p>
+              <p class="text-xs text-gray-400 mt-1">※ 리뷰 점유율 = 해당 채널 전체 화장품 리뷰 중 아모레 상품이 차지하는 비율</p>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-icon">🔍</div>
+            <div>
+              <p class="text-sm font-semibold navy mb-1">개별 채널 상세 — 아모레 브랜드 순위</p>
+              <p class="text-xs text-gray-500 leading-relaxed">상단에서 특정 채널(예: 쿠팡)을 선택하면 해당 채널 기준의 아모레 브랜드별 성과 순위를 확인할 수 있습니다. 전월 대비 변화량도 함께 표시됩니다.</p>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-icon">↔️</div>
+            <div>
+              <p class="text-sm font-semibold navy mb-1">크로스채널 비교</p>
+              <p class="text-xs text-gray-500 leading-relaxed">채널별 탭 하단에서 상품명을 검색하면 해당 상품이 각 채널에서 어떤 가격으로 판매되고 있는지 한눈에 비교할 수 있습니다.</p>
+              <p class="text-xs text-gray-400 mt-1">예) "설화수 윤조에센스" 검색 → 네이버·쿠팡·올리브영 가격 동시 확인</p>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-icon">📥</div>
+            <div>
+              <p class="text-sm font-semibold navy mb-1">Excel 다운로드</p>
+              <p class="text-xs text-gray-500 leading-relaxed">현재 채널별 성과 데이터를 <code class="bg-gray-100 px-1 rounded text-xs">.xlsx</code> 파일로 즉시 다운로드할 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 브랜드별 -->
+        <div class="subtab-block">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="sub-chip">브랜드별</span>
+            <p class="text-sm font-semibold navy">아모레 브랜드 심층 분석</p>
+          </div>
+          <div class="feature-row" style="padding-top:0">
+            <div class="feature-icon">🌸</div>
+            <div>
+              <p class="text-sm font-semibold navy mb-1">브랜드별 성과 테이블</p>
+              <p class="text-xs text-gray-500 leading-relaxed">설화수·라네즈·이니스프리 등 16개 브랜드의 전 채널 합산 성과를 한 테이블에서 비교합니다. 상품 수·리뷰 점유율·총 리뷰·평균 판매가·채널 분포를 확인할 수 있습니다.</p>
+            </div>
+          </div>
+          <div class="feature-row">
+            <div class="feature-icon">📦</div>
+            <div>
+              <p class="text-sm font-semibold navy mb-1">브랜드 드릴다운 <span class="feature-tag">핵심 기능</span></p>
+              <p class="text-xs text-gray-500 leading-relaxed">브랜드 행의 <strong>→ 상세 보기</strong>를 클릭하면 3개 탭으로 구성된 드릴다운 화면으로 진입합니다.</p>
+              <p class="text-xs text-gray-400 mt-2 leading-relaxed">· <strong>상품 현황</strong> — 상품 × 채널 매트릭스. 채널별 판매가·리뷰 수 확인, 최저가 셀 강조 표시. 상품명·카테고리·채널 필터 지원</p>
+              <p class="text-xs text-gray-400 mt-1 leading-relaxed">· <strong>채널 성과</strong> — 취급 채널 수·총 리뷰·최저가 채널 KPI, 채널별 리뷰 점유율·평균 가격·취급 상품 수 비교</p>
+              <p class="text-xs text-gray-400 mt-1 leading-relaxed">· <strong>시장 위치</strong> — 카테고리 내 리뷰 점유율, 가격 vs 리뷰 볼륨 포지셔닝맵, 가격대 분포</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 카테고리별 -->
+        <div class="subtab-block" style="margin-bottom:0">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="sub-chip">카테고리별</span>
+            <p class="text-sm font-semibold navy">카테고리 내 경쟁 구도 비교</p>
+          </div>
+          <div class="feature-row" style="padding-top:0">
+            <div class="feature-icon">🗂️</div>
+            <div>
+              <p class="text-sm font-semibold navy mb-1">카테고리별 브랜드 경쟁</p>
+              <p class="text-xs text-gray-500 leading-relaxed">스킨케어·메이크업·헤어케어 등 8개 카테고리를 선택하면, 해당 카테고리에서 아모레와 경쟁사 브랜드의 리뷰 점유율을 함께 비교할 수 있습니다. 아모레 브랜드는 파란 행으로 구분됩니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 경쟁사 -->
+    <div class="page-card">
+      <div class="page-card-header" style="background:#F7F3EE">
+        <span class="section-num">3</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="tab-chip">경쟁사</span>
+            <p class="text-base font-bold navy">경쟁 브랜드 모니터링</p>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">채널을 선택하면 해당 채널 기준으로 점유율이 실시간 재계산됩니다</p>
+        </div>
+      </div>
+      <div class="page-card-body">
+        <p class="text-sm text-gray-600 leading-relaxed mb-6">
+          닥터자르트·아누아·코스알엑스 등 주요 경쟁 브랜드와 아모레 브랜드의 시장 점유율을 한 화면에서 비교합니다. 아모레 브랜드는 파란 행으로 표시되어 자사 포지션을 쉽게 파악할 수 있습니다.
+        </p>
+        <div class="feature-row">
+          <div class="feature-icon">⚠️</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">요약 지표 3개</p>
+            <p class="text-xs text-gray-500 leading-relaxed">주시 필요 경쟁 브랜드 수 · 아모레 합산 점유율 · 점유율이 하락 중인 경쟁사 수를 상단에 요약합니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">📡</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">채널별 점유율 동적 필터 <span class="feature-tag">핵심 기능</span></p>
+            <p class="text-xs text-gray-500 leading-relaxed">상단 드롭다운에서 채널을 선택하면 해당 채널 기준의 리뷰 점유율로 즉시 재계산됩니다.</p>
+            <p class="text-xs text-gray-400 mt-1">예) 올리브영 선택 시 → 올리브영 내 브랜드별 점유율 비교</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🔎</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">브랜드 검색</p>
+            <p class="text-xs text-gray-500 leading-relaxed">브랜드명을 입력하면 해당 브랜드 행만 필터링됩니다. 특정 경쟁사를 빠르게 찾을 때 활용합니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🏷️</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">주요 동향 배지 <span class="feature-tag">자동 계산</span></p>
+            <p class="text-xs text-gray-500 leading-relaxed">취급 상품 수·리뷰 수·점유율 데이터를 기반으로 매일 자동 계산됩니다. <span style="background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:4px;font-size:11px">주시</span> <span style="background:#dcfce7;color:#16a34a;padding:1px 6px;border-radius:4px;font-size:11px">기회</span> <span style="background:#f3f4f6;color:#6b7280;padding:1px 6px;border-radius:4px;font-size:11px">정보</span> 3단계로 구분하며, 감지 가능한 신호만 표시합니다.</p>
+            <p class="text-xs text-gray-400 mt-2 leading-relaxed">감지 항목: 채널 신규 입점 · 입점 확대 · 리뷰 급증(≥25%) · 점유율 급등/상승 · 점유율 하락세 · 채널 비중 높음</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">📥</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">Excel 다운로드</p>
+            <p class="text-xs text-gray-500 leading-relaxed">현재 경쟁사 현황 데이터를 <code class="bg-gray-100 px-1 rounded text-xs">.xlsx</code> 파일로 즉시 다운로드할 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 트렌딩 -->
+    <div class="page-card">
+      <div class="page-card-header" style="background:#F7F3EE">
+        <span class="section-num">4</span>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="tab-chip">트렌딩</span>
+            <p class="text-base font-bold navy">급상승 상품 모니터링</p>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">리뷰 급증 또는 찜 급증 기준으로 전환할 수 있습니다</p>
+        </div>
+      </div>
+      <div class="page-card-body">
+        <p class="text-sm text-gray-600 leading-relaxed mb-6">
+          최근 7일 기준으로 리뷰 또는 찜이 급격히 늘어난 상품을 모아 보여주는 화면입니다. 시장에서 갑자기 주목받는 상품을 빠르게 발견하는 데 활용합니다.
+        </p>
+        <div class="feature-row">
+          <div class="feature-icon">🧪</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">이번 주 주목 성분 <span class="feature-tag">신규</span></p>
+            <p class="text-xs text-gray-500 leading-relaxed">리뷰 급증 상품들에서 공통으로 나타나는 성분을 추출해 리뷰 증가율 순으로 표시합니다. 경쟁사 상품을 포함한 전 채널 기준이며, 아모레 상품 포함 여부도 함께 표시됩니다.</p>
+            <p class="text-xs text-gray-400 mt-1">예) 글루타치온 관련 상품 리뷰 +41.7% → 시장에서 해당 성분에 대한 소비자 반응이 급증 중</p>
+            <p class="text-xs text-gray-400 mt-1">※ 성분 분석 제공 카테고리: 스킨케어 · 바디케어 · 선케어 · 헤어케어 · 맨즈케어 (메이크업·향수·네일 제외)</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">💬</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">리뷰 급증 / 찜 급증 전환</p>
+            <p class="text-xs text-gray-500 leading-relaxed">리뷰가 갑자기 늘어난 상품(구매 반응 급상승)과 찜이 급증한 상품(잠재 수요 급상승)을 버튼으로 전환하며 확인합니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🛒</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">채널 선택</p>
+            <p class="text-xs text-gray-500 leading-relaxed">보고 싶은 채널을 선택하면 해당 채널 기준의 트렌딩 데이터를 확인할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🌸</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">아모레만 보기 토글</p>
+            <p class="text-xs text-gray-500 leading-relaxed">전체 화장품 트렌딩 상품 중 아모레 브랜드 상품만 필터링해서 볼 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 공통 기능 -->
+    <div class="flex items-center gap-3 mb-6">
+      <div style="height:2px; flex:1; background:#E8C4CE;"></div>
+      <p class="text-xs font-bold tracking-widest text-gray-400 uppercase">공통 기능</p>
+      <div style="height:2px; flex:1; background:#E8C4CE;"></div>
+    </div>
+
+    <div class="page-card">
+      <div class="page-card-body">
+        <div class="feature-row">
+          <div class="feature-icon">🪟</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">상품 상세 팝업</p>
+            <p class="text-xs text-gray-500 leading-relaxed">상품 이름을 클릭하면 팝업이 열립니다. 최근 1·2·3개월 또는 전체 기간의 <strong>가격 추이 차트</strong>와 <strong>리뷰 추이 차트</strong>를 확인하고, 날짜별 정가·할인가·리뷰·찜 이력을 테이블로 볼 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">📥</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">Excel 다운로드</p>
+            <p class="text-xs text-gray-500 leading-relaxed">채널별 성과·경쟁사 화면에서 현재 보고 있는 데이터를 Excel 파일로 다운로드할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🔐</div>
+          <div>
+            <p class="text-sm font-semibold navy mb-1">접속</p>
+            <p class="text-xs text-gray-500 leading-relaxed">서비스에 접속하면 로그인 없이 바로 대시보드 화면으로 진입합니다. 헤더 우측 로그아웃 버튼을 누르면 로그인 화면으로 이동합니다.</p>
+            <p class="text-xs text-gray-400 mt-1">프로토타입 접속 계정: ID <code class="bg-gray-100 px-1 rounded">amore</code> / PW <code class="bg-gray-100 px-1 rounded">amore2026!</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-gray-300 pb-8">AMOREPACIFIC Commerce Insight · ver.2 · 2026 · Internal Use Only</p>
+  </div>
+
+</body>
+</html>
