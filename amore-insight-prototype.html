@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>AMOREPACIFIC Commerce Insight</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css');
+    body { font-family: Pretendard, -apple-system, sans-serif; }
+    .navy { color: #1A2B4A; }
+    .rose { color: #C8748A; }
+    .bg-navy { background-color: #1A2B4A; }
+    .bg-rose { background-color: #C8748A; }
+    .bg-cream { background-color: #F7F3EE; }
+    .border-navy { border-color: #1A2B4A; }
+    .border-rose { border-color: #C8748A; }
+    .ap-badge { background:#1A2B4A; color:#C8748A; padding:1px 6px; border-radius:3px; font-size:9px; margin-left:4px; }
+    .ap-row { background:#EEF3FF; }
+    .tab-active { color:#C8748A; font-weight:700; border-bottom:2px solid #C8748A; }
+    .channel-pill-active { background:#1A2B4A; color:#fff; }
+    .channel-pill { background:#fff; color:#555; border:1px solid #ddd; }
+    .clickable { cursor:pointer; transition:all 0.15s; }
+    .clickable:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-thumb { background:#C8748A; border-radius:3px; }
+    [x-cloak] { display:none !important; }
+    .subtab-active { background:#1A2B4A; color:#fff; }
+    .subtab { background:#fff; color:#8899AA; }
+    .toggle-on { background:#1A2B4A; }
+    .toggle-off { background:#ddd; }
+  </style>
+</head>
+<body class="min-h-screen" x-data="amoreApp()" x-cloak>
+
+  <!-- ===== LOGIN ===== -->
+  <div x-show="page==='login'" class="min-h-screen bg-navy flex items-center justify-center">
+    <div class="bg-white p-10 rounded-2xl shadow-2xl w-96 text-center">
+      <h1 class="text-2xl font-bold tracking-widest navy mb-1">AMOREPACIFIC</h1>
+      <p class="text-xs mb-8 tracking-widest" style="color:#C8748A">COMMERCE INSIGHT</p>
+      <div class="space-y-4">
+        <input x-model="loginId" type="text" placeholder="Username"
+          class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-sm"
+          style="focus:ring-color:#1A2B4A" @keyup.enter="doLogin()">
+        <input x-model="loginPw" type="password" placeholder="Password"
+          class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 text-sm"
+          @keyup.enter="doLogin()">
+        <p x-show="loginError" class="text-red-500 text-xs">아이디 또는 비밀번호를 확인해주세요</p>
+        <button @click="doLogin()" class="w-full py-3 rounded-lg text-white font-semibold text-sm transition"
+          style="background:#1A2B4A" onmouseover="this.style.background='#C8748A'" onmouseout="this.style.background='#1A2B4A'">
+          Sign In
+        </button>
+      </div>
+      <p class="text-xs text-gray-300 mt-6">ID: amore &nbsp;|&nbsp; PW: amore2026!</p>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP ===== -->
+  <div x-show="page==='app'" class="min-h-screen bg-cream">
+
+    <!-- Header -->
+    <header class="bg-navy text-white shadow-lg sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="cursor-pointer" @click="tab='overview'">
+          <h1 class="text-base font-bold tracking-widest">AMOREPACIFIC</h1>
+          <p class="text-xs tracking-widest" style="color:#C8748A">COMMERCE INSIGHT</p>
+        </div>
+        <nav class="flex gap-8 text-sm">
+          <button @click="tab='overview'" :class="tab==='overview'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">Overview</button>
+          <button @click="tab='merged-a'; mergedATab='channel'; mergedABrandView='brand'" :class="tab==='merged-a'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">성과 분석</button>
+          <button @click="tab='compete'" :class="tab==='compete'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">경쟁사</button>
+          <button @click="tab='trending'" :class="tab==='trending'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">트렌딩</button>
+        </nav>
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-gray-500">📅 2026-04-01 기준</span>
+          <button @click="page='login'" class="text-xs text-gray-500 hover:text-white">로그아웃</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+
+      <!-- ===== OVERVIEW ===== -->
+      <div x-show="tab==='overview'">
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-xl p-5 shadow-sm" style="border-left:4px solid #1A2B4A">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">화장품 전체 상품</p>
+            <p class="text-3xl font-black navy mt-2">1.2만</p>
+            <p class="text-xs text-gray-300 mt-1">7개 채널 합산</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #C8748A" @click="tab='merged-a'; mergedATab='brand'; mergedABrandView='brand'">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">아모레 상품</p>
+            <p class="text-3xl font-black mt-2" style="color:#C8748A">3,241</p>
+            <p class="text-xs mt-1" style="color:#C8748A">16개 브랜드 전 채널 → 성과 분석</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #8899AA" @click="tab='merged-a'; mergedATab='channel'; mergedABrandView='brand'">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">총 리뷰 수</p>
+            <p class="text-3xl font-black navy mt-2">847만</p>
+            <p class="text-xs mt-1 text-gray-400">화장품 카테고리 전체 → 성과 분석</p>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #1A2B4A" @click="tab='merged-a'; mergedATab='channel'; mergedABrandView='brand'">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">아모레 채널 점유율</p>
+            <p class="text-3xl font-black navy mt-2">26.8%</p>
+            <p class="text-xs mt-1" style="color:#4CAF82">↑ 1.4%p 전월 대비 → 성과 분석</p>
+          </div>
+        </div>
+
+        <!-- 2x2 Grid -->
+        <div class="grid grid-cols-2 gap-5">
+          <!-- 채널별 상품 분포 -->
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold navy text-sm">📊 채널별 상품 분포</h3>
+              <button @click="tab='merged-a'; mergedATab='channel'; mergedABrandView='brand'" class="text-xs rose hover:underline">채널별 →</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">아모레 상품 기준</p>
+            <template x-for="ch in channelDist" :key="ch.name">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs w-14 text-gray-600" x-text="ch.name"></span>
+                <div class="flex-1 bg-gray-100 rounded h-2.5">
+                  <div class="h-2.5 rounded" style="background:#1A2B4A" :style="{width: ch.pct+'%'}"></div>
+                </div>
+                <span class="text-xs text-gray-500 w-10 text-right" x-text="ch.count.toLocaleString()"></span>
+              </div>
+            </template>
+          </div>
+
+          <!-- 아모레 브랜드 현황 -->
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold navy text-sm">🌸 아모레 브랜드 현황</h3>
+              <button @click="tab='merged-a'; mergedATab='brand'; mergedABrandView='brand'" class="text-xs rose hover:underline">브랜드별 →</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">전 채널 상품수 기준</p>
+            <template x-for="(br, i) in brandOverview.slice(0,6)" :key="br.name">
+              <div class="flex items-center gap-2 mb-1.5 px-2 py-1 rounded" :class="i<3?'bg-purple-50':''">
+                <span class="text-xs font-semibold navy w-16" x-text="br.name"></span>
+                <div class="flex-1 bg-gray-100 rounded h-2">
+                  <div class="h-2 rounded bg-navy" :style="{width: br.pct+'%'}"></div>
+                </div>
+                <span class="text-xs text-gray-400 w-8 text-right" x-text="br.count"></span>
+              </div>
+            </template>
+            <button @click="tab='merged-a'; mergedATab='brand'; mergedABrandView='brand'" class="text-xs rose mt-2">+ 10개 브랜드 더보기</button>
+          </div>
+
+          <!-- 리뷰 급증 TOP5 -->
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold navy text-sm">🔥 리뷰 급증 TOP 5</h3>
+              <button @click="tab='trending'" class="text-xs rose hover:underline">트렌딩 →</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">최근 7일 · 전 채널 합산 기준</p>
+            <template x-for="(t, i) in trendingTop" :key="t.name">
+              <div class="flex items-center gap-2 py-2 border-b last:border-0 clickable rounded px-1" @click="openModal(t)">
+                <span class="text-sm font-black w-4" :class="i<3?'rose':'navy'" x-text="i+1"></span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold navy truncate" x-text="t.name"></p>
+                  <p class="text-xs text-gray-400" x-text="t.cat+' · '+t.brand"></p>
+                </div>
+                <span class="text-xs font-bold text-red-500" x-text="'+'+t.delta.toLocaleString()"></span>
+              </div>
+            </template>
+          </div>
+
+          <!-- 경쟁사 주요 동향 -->
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold navy text-sm">⚠️ 경쟁사 주요 동향</h3>
+              <button @click="tab='compete'" class="text-xs rose hover:underline">경쟁사 →</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-3">전 채널 합산 · 주시 필요 브랜드</p>
+            <template x-for="br in competeTableComputed.filter(b=>!b.isAP && b.alertType==='warn').slice(0,4)" :key="br.name">
+              <div class="flex items-center gap-2 py-2 border-b last:border-0">
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-semibold navy truncate" x-text="br.name"></p>
+                  <p class="text-xs text-gray-400 truncate" x-text="br.alert"></p>
+                </div>
+                <span class="text-xs font-bold whitespace-nowrap" style="color:#E53E3E" x-text="br.chgShare"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 경쟁사 ===== -->
+      <div x-show="tab==='compete'">
+        <!-- 헤더: 채널 필터 -->
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex gap-3 items-center">
+            <select x-model="brandChannel" class="text-xs border rounded-lg px-3 py-2 text-gray-600">
+              <option value="all">전체 채널</option>
+              <option value="naver">네이버</option>
+              <option value="coupang">쿠팡</option>
+              <option value="oliveyoung">올리브영</option>
+              <option value="gmarket">지마켓</option>
+              <option value="street">11번가</option>
+              <option value="kakao">카카오</option>
+              <option value="auction">옥션</option>
+            </select>
+            <span class="text-xs text-gray-400">기준 채널 선택 시 리뷰 점유율 동적 재계산</span>
+          </div>
+          <button @click="downloadCompeteExcel()" class="text-xs px-4 py-2 rounded-lg rose font-semibold" style="background:#1A2B4A">📥 Excel 다운로드</button>
+        </div>
+
+        <!-- 요약 KPI -->
+        <div class="grid grid-cols-3 gap-4 mb-5">
+          <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #E53E3E">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">주시 필요 브랜드</p>
+            <p class="text-2xl font-black mt-1" style="color:#E53E3E"
+              x-text="competeTableComputed.filter(c=>!c.isAP&&c.alertType==='warn').length+'개'"></p>
+            <p class="text-xs text-gray-400 mt-1">전월 대비 상승 중</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #1A2B4A">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">AP 합산 점유율</p>
+            <p class="text-2xl font-black navy mt-1"
+              x-text="competeTableComputed.filter(c=>c.isAP).reduce((s,c)=>s+parseFloat(c.computedShare),0).toFixed(1)+'%'"></p>
+            <p class="text-xs text-gray-400 mt-1"
+              x-text="(brandChannel==='all'?'전 채널':channels.find(c=>c.key===brandChannel)?.name||'') + ' 기준'"></p>
+          </div>
+          <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #48BB78">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">점유율 하락 경쟁사</p>
+            <p class="text-2xl font-black mt-1" style="color:#48BB78"
+              x-text="competeTableComputed.filter(c=>!c.isAP&&c.chgShare.startsWith('-')).length+'개'"></p>
+            <p class="text-xs text-gray-400 mt-1">기회 포착 가능</p>
+          </div>
+        </div>
+
+        <!-- 경쟁사 테이블 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between p-4 border-b">
+            <div class="flex items-center gap-3 flex-1">
+              <h3 class="font-bold navy text-sm whitespace-nowrap">경쟁 브랜드 현황 ·
+                <span x-text="brandChannel==='all'?'전 채널 합산':(channels.find(c=>c.key===brandChannel)?.name||'')+ ' 기준'"></span>
+              </h3>
+              <div class="flex items-center gap-2 flex-1 max-w-xs">
+                <input x-model="competeQuery" placeholder="브랜드명 검색..." class="flex-1 px-3 py-1.5 border rounded-lg text-xs focus:outline-none focus:ring-1" style="focus:ring-color:#C8748A">
+                <button x-show="competeQuery" @click="competeQuery=''" class="text-gray-300 hover:text-gray-500 text-xs">✕</button>
+              </div>
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full ml-3" style="background:#EEF3FF; color:#1A2B4A">AP 브랜드 포함</span>
+          </div>
+          <table class="w-full text-xs">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="py-2.5 px-3 text-left navy font-semibold">#</th>
+                <th class="py-2.5 px-3 text-left navy font-semibold">브랜드</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 점유율</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">점유율 전월 대비</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">총 리뷰</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 증감</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">상품 수</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">평균 판매가</th>
+                <th class="py-2.5 px-3 text-left navy font-semibold">주요 동향</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr x-show="competeTableFiltered.length === 0">
+                <td colspan="9" class="py-10 text-center text-gray-400 text-xs">
+                  <p class="font-semibold mb-1" x-text="'&quot;' + competeQuery + '&quot;' + ' 브랜드를 찾을 수 없어요'"></p>
+                  <p>현재 모니터링 중인 브랜드 목록에 없습니다</p>
+                </td>
+              </tr>
+              <template x-for="(br, i) in competeTableFiltered" :key="br.name">
+                <tr class="border-t transition" :class="br.isAP ? 'ap-row hover:bg-blue-100' : 'hover:bg-gray-50'">
+                  <td class="py-2.5 px-3 font-bold" :class="br.isAP?'navy':'text-gray-500'" x-text="i+1"></td>
+                  <td class="py-2.5 px-3 font-semibold" :class="br.isAP?'navy':'text-gray-700'">
+                    <span x-text="br.name"></span>
+                    <span x-show="br.isAP" class="ap-badge">AP</span>
+                  </td>
+                  <td class="py-2.5 px-3 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      <div class="w-16 bg-gray-100 rounded h-1.5">
+                        <div class="h-1.5 rounded" :style="{width: br.computedShare+'%', background: br.isAP?'#1A2B4A':'#C8748A'}"></div>
+                      </div>
+                      <span :class="br.isAP?'font-bold navy':'text-gray-600'" x-text="br.computedShare+'%'"></span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-3 text-right font-semibold"
+                    :class="br.chgShare.startsWith('+') ? 'text-red-500' : br.chgShare.startsWith('-') ? 'text-blue-500' : 'text-gray-400'"
+                    x-text="br.chgShare"></td>
+                  <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-600'" x-text="(br.computedReviews/10000).toFixed(1)+'만'"></td>
+                  <td class="py-2.5 px-3 text-right font-semibold"
+                    :class="br.chgReviews.startsWith('+') ? 'text-red-500' : 'text-blue-500'"
+                    x-text="br.chgReviews"></td>
+                  <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-600'" x-text="br.products.toLocaleString()"></td>
+                  <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-600'" x-text="br.avgPrice.toLocaleString()+'원'"></td>
+                  <td class="py-2.5 px-3">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                      :class="{
+                        'bg-red-50 text-red-600':   br.alertType==='warn',
+                        'bg-green-50 text-green-600': br.alertType==='good',
+                        'bg-gray-50 text-gray-500':   br.alertType==='info'
+                      }"
+                      x-text="br.alert"></span>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== 트렌딩 ===== -->
+      <div x-show="tab==='trending'">
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-5">
+          <div class="flex gap-4 items-end flex-wrap">
+            <div>
+              <p class="text-xs text-gray-400 mb-1 uppercase">채널</p>
+              <select x-model="trendChannel" class="text-xs border rounded-lg px-3 py-2 text-gray-600">
+                <option value="all">전체 채널</option>
+                <option value="naver">네이버</option>
+                <option value="coupang">쿠팡</option>
+                <option value="oliveyoung">올리브영</option>
+                <option value="gmarket">지마켓</option>
+                <option value="street">11번가</option>
+                <option value="kakao">카카오</option>
+                <option value="auction">옥션</option>
+              </select>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 mb-1 uppercase">지표</p>
+              <div class="flex border rounded-lg overflow-hidden text-xs">
+                <button @click="trendMetric='review'" :class="trendMetric==='review'?'subtab-active':'subtab'" class="px-4 py-2 border-r transition">리뷰 급증</button>
+                <button @click="trendMetric='zzim'" :class="trendMetric==='zzim'?'subtab-active':'subtab'" class="px-4 py-2 transition">찜 급증</button>
+              </div>
+            </div>
+            <div class="flex-1 min-w-40">
+              <p class="text-xs text-gray-400 mb-1 uppercase">카테고리</p>
+              <select x-model="trendCat" class="text-xs border rounded-lg px-3 py-2 text-gray-600 w-full">
+                <option value="">전체 화장품</option>
+                <option value="스킨케어">스킨케어</option>
+                <option value="메이크업">메이크업</option>
+                <option value="헤어케어">헤어케어</option>
+                <option value="바디케어">바디케어</option>
+                <option value="선케어">선케어</option>
+                <option value="향수">향수</option>
+                <option value="네일">네일</option>
+                <option value="맨즈케어">맨즈케어</option>
+              </select>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 mb-1 uppercase">아모레만 보기</p>
+              <div class="flex items-center gap-2">
+                <div @click="apOnly=!apOnly" class="w-10 h-5 rounded-full cursor-pointer transition relative" :class="apOnly?'toggle-on':'toggle-off'">
+                  <div class="w-4 h-4 bg-white rounded-full absolute top-0.5 transition-all" :class="apOnly?'right-0.5':'left-0.5'"></div>
+                </div>
+                <span class="text-xs font-semibold" :class="apOnly?'navy':'text-gray-400'" x-text="apOnly?'ON':'OFF'"></span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-3">📅 2026-03-25 → 2026-04-01 기간 대비 증가량</p>
+        </div>
+
+        <!-- 이번 주 주목 성분 -->
+        <div class="mb-5" x-show="['','스킨케어','바디케어','선케어','헤어케어','맨즈케어'].includes(trendCat)">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold navy">이번 주 주목 성분</h3>
+            <span class="text-xs text-gray-400">
+              리뷰 급증 상품 기준 · 경쟁사 포함 전 채널
+              <span x-show="trendCat===''"> · 스킨케어·바디케어 외 카테고리 제외</span>
+            </span>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <template x-for="(ing, i) in ingredientData" :key="ing.name">
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-top: 3px solid #1A2B4A">
+                <div class="flex items-start justify-between mb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-black" style="color:#C8748A" x-text="i+1"></span>
+                    <span class="text-sm font-bold navy" x-text="ing.name"></span>
+                  </div>
+                  <span class="text-xs font-bold px-2 py-0.5 rounded-full"
+                    :class="ing.pct>=30?'bg-red-100 text-red-600':ing.pct>=15?'bg-orange-50 text-orange-500':'bg-yellow-50 text-yellow-600'"
+                    x-text="'+'+ing.pct+'%'"></span>
+                </div>
+                <p class="text-xs text-gray-400 mb-2">
+                  관련 상품 <span class="font-semibold text-gray-600" x-text="ing.products+'개'"></span> ·
+                  브랜드 <span class="font-semibold text-gray-600" x-text="ing.brands+'개'"></span>
+                </p>
+                <div class="text-xs text-gray-500 truncate" x-text="'↑ '+ing.topProduct"></div>
+                <div class="flex items-center gap-1 mt-1.5">
+                  <span x-show="ing.hasAP" class="ap-badge" style="font-size:10px">AP 포함</span>
+                  <span class="text-xs text-gray-300" x-text="ing.cat"></span>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- 성분 분석 미제공 안내 -->
+        <div class="mb-5 bg-white rounded-xl p-5 shadow-sm text-center"
+          x-show="!['','스킨케어','바디케어','선케어','헤어케어','맨즈케어'].includes(trendCat)">
+          <p class="text-sm text-gray-400">선택한 카테고리는 성분 분석을 제공하지 않습니다.</p>
+          <p class="text-xs text-gray-300 mt-1">성분 분석 제공 카테고리: 스킨케어 · 바디케어 · 선케어 · 헤어케어 · 맨즈케어</p>
+        </div>
+
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold navy" x-text="trendMetric==='zzim'?'이번 주 찜 급증 상품':'이번 주 리뷰 급증 상품'"></h3>
+          <span class="text-xs text-gray-400">최근 7일 · 전 채널 합산 기준</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <table class="w-full text-xs">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="py-2.5 px-3 text-left navy font-semibold">#</th>
+                <th class="py-2.5 px-3 text-left navy font-semibold">상품</th>
+                <th class="py-2.5 px-3 text-left navy font-semibold">카테고리</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold" x-text="trendMetric==='zzim'?'현재 찜':'현재 리뷰'"></th>
+                <th class="py-2.5 px-3 text-right navy font-semibold" x-text="trendMetric==='zzim'?'이전 찜':'이전 리뷰'"></th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">증가량</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">증가율</th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">판매가</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="(t,i) in filteredTrending" :key="t.name">
+                <tr class="border-t transition clickable" :class="t.isAP?'ap-row hover:bg-blue-100':'hover:bg-gray-50'" @click="openModal(t)">
+                  <td class="py-2.5 px-3 font-black" :class="t.isAP?'rose':'navy'" x-text="i+1"></td>
+                  <td class="py-2.5 px-3">
+                    <p class="font-semibold truncate max-w-48" :class="t.isAP?'navy':'text-gray-700'" x-text="t.name"></p>
+                    <p class="text-gray-400 mt-0.5">
+                      <span x-text="t.brand"></span>
+                      <span x-show="t.isAP" class="ap-badge">AP</span>
+                    </p>
+                  </td>
+                  <td class="py-2.5 px-3 text-gray-500" x-text="t.cat"></td>
+                  <td class="py-2.5 px-3 text-right" :class="t.isAP?'font-semibold navy':'text-gray-600'" x-text="(t.current).toLocaleString()"></td>
+                  <td class="py-2.5 px-3 text-right text-gray-400" x-text="(t.prev).toLocaleString()"></td>
+                  <td class="py-2.5 px-3 text-right font-bold text-red-500" x-text="'+'+t.delta.toLocaleString()"></td>
+                  <td class="py-2.5 px-3 text-right">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-bold"
+                      :class="t.pct>4?'bg-red-100 text-red-600':'bg-orange-50 text-orange-500'"
+                      x-text="'+'+t.pct+'%'"></span>
+                  </td>
+                  <td class="py-2.5 px-3 text-right" :class="t.isAP?'font-semibold navy':'text-gray-600'" x-text="t.price.toLocaleString()+'원'"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <div class="p-4 text-center">
+            <button @click="showToast('더 많은 트렌딩 상품을 불러옵니다...')" class="px-6 py-2 text-xs rounded-lg font-semibold" style="border:1px solid #C8748A; color:#C8748A;">더 보기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 성과 분석 (채널별·브랜드별·카테고리별 동등 3탭) ===== -->
+      <div x-show="tab==='merged-a'">
+
+        <!-- 서브탭 바 -->
+        <div class="flex gap-1 mb-6 bg-white rounded-xl shadow-sm p-1">
+          <button @click="mergedATab='channel'; mergedABrandView='brand'"
+            class="flex-1 py-2 text-xs font-semibold rounded-lg transition"
+            :style="mergedATab==='channel' ? 'background:#1A2B4A;color:#fff' : 'color:#6b7280'">채널별</button>
+          <button @click="mergedATab='brand'; mergedABrandView='brand'"
+            class="flex-1 py-2 text-xs font-semibold rounded-lg transition"
+            :style="mergedATab==='brand' ? 'background:#1A2B4A;color:#fff' : 'color:#6b7280'">브랜드별</button>
+          <button @click="mergedATab='category'; mergedABrandView='brand'"
+            class="flex-1 py-2 text-xs font-semibold rounded-lg transition"
+            :style="mergedATab==='category' ? 'background:#1A2B4A;color:#fff' : 'color:#6b7280'">카테고리별</button>
+        </div>
+
+        <!-- ── A안 채널별 ── -->
+        <div x-show="mergedATab==='channel' && mergedABrandView !== 'drilldown'">
+          <!-- 채널 pills -->
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex gap-2 flex-wrap">
+              <template x-for="ch in channels" :key="ch.key">
+                <button @click="channelTab=ch.key; channelSubTab='ranking'"
+                  class="px-4 py-2 rounded-full text-xs transition font-medium"
+                  :class="channelTab===ch.key?'channel-pill-active':'channel-pill'"
+                  x-text="ch.name"></button>
+              </template>
+            </div>
+            <button @click="downloadChannelExcel()" class="text-xs px-4 py-2 rounded-lg text-rose font-semibold" style="background:#1A2B4A">📥 Excel 다운로드</button>
+          </div>
+
+          <!-- 전체 채널 비교 테이블 -->
+          <div x-show="channelTab==='all'">
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="font-bold navy text-sm">채널별 아모레퍼시픽 성과 비교</h3>
+                <select class="text-xs border rounded-lg px-3 py-1.5 text-gray-600">
+                  <option>전체 카테고리</option><option>스킨케어</option><option>메이크업</option>
+                </select>
+              </div>
+              <table class="w-full text-xs">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="py-3 px-4 text-left navy font-semibold">채널</th>
+                    <th class="py-3 px-4 text-right navy font-semibold">아모레 상품수</th>
+                    <th class="py-3 px-4 text-right navy font-semibold">리뷰 점유율</th>
+                    <th class="py-3 px-4 text-right navy font-semibold">총 리뷰</th>
+                    <th class="py-3 px-4 text-right navy font-semibold">평균 판매가</th>
+                    <th class="py-3 px-4 text-right navy font-semibold">평균 할인율</th>
+                    <th class="py-3 px-4"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="ch in channelAll" :key="ch.name">
+                    <tr class="border-t hover:bg-gray-50 transition">
+                      <td class="py-3 px-4 font-semibold navy" x-text="ch.name"></td>
+                      <td class="py-3 px-4 text-right" x-text="ch.products.toLocaleString()"></td>
+                      <td class="py-3 px-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                          <div class="w-16 bg-gray-100 rounded h-1.5">
+                            <div class="h-1.5 rounded" :style="{width:ch.shareW+'%', background: ch.isTop ? '#1A2B4A' : '#C8748A'}"></div>
+                          </div>
+                          <span class="font-bold" :class="ch.isTop?'navy':'rose'" x-text="ch.share+'%'"></span>
+                        </div>
+                      </td>
+                      <td class="py-3 px-4 text-right text-gray-600" x-text="ch.reviews"></td>
+                      <td class="py-3 px-4 text-right text-gray-600" x-text="ch.avgPrice.toLocaleString()+'원'"></td>
+                      <td class="py-3 px-4 text-right text-gray-600" x-text="ch.discount+'%'"></td>
+                      <td class="py-3 px-4 text-right">
+                        <button @click="channelTab=ch.key; channelSubTab='ranking'" class="text-xs rose hover:underline">상세 →</button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <!-- 인사이트 -->
+            <div class="grid grid-cols-2 gap-4 mt-4">
+              <div class="rounded-xl p-4" style="background:#EEF3FF; border-left:3px solid #1A2B4A">
+                <p class="text-xs font-bold navy mb-1">💡 리뷰 점유율 1위 채널</p>
+                <p class="text-base font-black navy">네이버 <span class="text-sm font-normal">24.3%</span></p>
+                <p class="text-xs text-gray-400 mt-1">채널 탭 클릭 → 브랜드별 상세 확인</p>
+              </div>
+              <div class="rounded-xl p-4" style="background:#FDF0F3; border-left:3px solid #C8748A">
+                <p class="text-xs font-bold rose mb-1">💡 할인율 가장 높은 채널</p>
+                <p class="text-base font-black rose">옥션 <span class="text-sm font-normal">24.6%</span></p>
+                <p class="text-xs text-gray-400 mt-1">가격 전략 점검 필요</p>
+              </div>
+            </div>
+            <!-- 크로스채널 비교 -->
+            <div class="bg-white rounded-xl shadow-sm p-5 mt-4">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold navy">↔️ 크로스채널 비교</h3>
+                <span class="text-xs text-gray-400">상품명으로 검색하면 채널별 가격을 한눈에 비교합니다</span>
+              </div>
+              <div class="flex gap-2 mb-4">
+                <input x-model="crossQuery" placeholder="상품명 검색 (예: 설화수 윤조에센스)" class="flex-1 px-4 py-2 border rounded-lg text-xs focus:outline-none" @keyup.enter="searchCross()">
+                <button @click="searchCross()" class="px-5 py-2 text-white text-xs rounded-lg font-semibold" style="background:#1A2B4A">비교</button>
+              </div>
+              <template x-for="ch in crossResults" :key="ch.channel">
+                <div class="mb-3 bg-gray-50 rounded-xl p-4">
+                  <h4 class="font-bold rose text-xs mb-2" x-text="ch.channel"></h4>
+                  <template x-for="p in ch.products" :key="p.name">
+                    <div class="flex justify-between py-1.5 border-b last:border-0 text-xs clickable rounded px-1" @click="openModal(p)">
+                      <div class="min-w-0 flex-1">
+                        <p class="truncate text-gray-700" x-text="p.name"></p>
+                        <p class="text-gray-400" x-text="p.brand"></p>
+                      </div>
+                      <div class="text-right ml-4">
+                        <p class="font-semibold navy" x-text="p.price.toLocaleString()+'원'"></p>
+                        <p class="text-gray-400" x-text="(p.reviews/10000).toFixed(1)+'만 리뷰'"></p>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <p x-show="crossResults.length===0" class="text-xs text-gray-400 text-center py-6">상품명을 검색하면 채널별 가격을 비교해드려요</p>
+            </div>
+          </div>
+
+          <!-- 개별 채널 -->
+          <div x-show="channelTab!=='all'">
+            <div class="grid grid-cols-4 gap-4 mb-5">
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #1A2B4A">
+                <p class="text-xs text-gray-400 uppercase">아모레 상품수</p>
+                <p class="text-2xl font-black navy mt-1" x-text="currentChannel.products?.toLocaleString()"></p>
+                <p class="text-xs mt-1" style="color:#4CAF82" x-text="currentChannel.chgProducts+' 전월 대비'"></p>
+              </div>
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #C8748A">
+                <p class="text-xs text-gray-400 uppercase">리뷰 점유율</p>
+                <p class="text-2xl font-black mt-1" style="color:#C8748A" x-text="currentChannel.share+'%'"></p>
+                <p class="text-xs mt-1" style="color:#4CAF82" x-text="currentChannel.chgShare"></p>
+              </div>
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #8899AA">
+                <p class="text-xs text-gray-400 uppercase">평균 판매가</p>
+                <p class="text-2xl font-black navy mt-1" x-text="currentChannel.avgPrice?.toLocaleString()+'원'"></p>
+                <p class="text-xs mt-1 text-gray-400" x-text="currentChannel.chgAvgPrice"></p>
+              </div>
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #8899AA">
+                <p class="text-xs text-gray-400 uppercase">평균 할인율</p>
+                <p class="text-2xl font-black navy mt-1" x-text="currentChannel.discount+'%'"></p>
+                <p class="text-xs mt-1 text-gray-400" x-text="currentChannel.chgDiscount"></p>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold navy">아모레 브랜드 순위</h3>
+                <div class="flex gap-2">
+                  <select class="text-xs border rounded-lg px-3 py-1.5 text-gray-600"><option>전체 카테고리</option><option>스킨케어</option><option>메이크업</option></select>
+                  <select class="text-xs border rounded-lg px-3 py-1.5 text-gray-600"><option>리뷰 점유율순</option><option>상품수순</option><option>평균가 높은순</option></select>
+                </div>
+              </div>
+              <table class="w-full text-xs">
+                <thead><tr class="bg-gray-50">
+                  <th class="py-2.5 px-3 text-left navy font-semibold">#</th>
+                  <th class="py-2.5 px-3 text-left navy font-semibold">브랜드</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">상품수</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">총 리뷰</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 점유율</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">평균 판매가</th>
+                </tr></thead>
+                <tbody>
+                  <template x-for="(br,i) in amoreBrandsTable" :key="br.name">
+                    <tr class="border-t hover:bg-blue-50 ap-row transition">
+                      <td class="py-2.5 px-3 font-bold navy" x-text="i+1"></td>
+                      <td class="py-2.5 px-3 font-bold navy"><span x-text="br.name"></span><span class="ap-badge">AP</span></td>
+                      <td class="py-2.5 px-3 text-right" x-text="br.products.toLocaleString()"></td>
+                      <td class="py-2.5 px-3 text-right" x-text="(br.reviews/10000).toFixed(1)+'만'"></td>
+                      <td class="py-2.5 px-3 text-right">
+                        <span class="px-2 py-0.5 rounded-full text-white text-xs" :style="{background: i<3?'#1A2B4A':'#8899AA'}" x-text="br.share+'%'"></span>
+                      </td>
+                      <td class="py-2.5 px-3 text-right" x-text="br.avgPrice.toLocaleString()+'원'"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── A안 브랜드별 ── -->
+        <div x-show="mergedATab==='brand' && mergedABrandView !== 'drilldown'">
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-5">
+            <div class="p-4 border-b">
+              <h3 class="font-bold navy text-sm">아모레퍼시픽 <span x-text="amoreBrandsFull.length"></span>개 브랜드 · 전 채널 합산</h3>
+            </div>
+            <table class="w-full text-xs">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="py-2.5 px-3 text-left navy font-semibold">#</th>
+                  <th class="py-2.5 px-3 text-left navy font-semibold">브랜드</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">상품수</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 점유율</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">총 리뷰</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">평균 판매가</th>
+                  <th class="py-2.5 px-3 text-left navy font-semibold">채널 분포</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(br,i) in amoreBrandsFull" :key="br.name">
+                  <tr class="border-t hover:bg-blue-50 clickable transition" @click="openBrandDrilldown(br)">
+                    <td class="py-2.5 px-3 font-bold navy" x-text="i+1"></td>
+                    <td class="py-2.5 px-3 font-semibold navy">
+                      <span x-text="br.name"></span>
+                      <span class="text-xs rose ml-1">→ 상세 보기</span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right" x-text="br.products.toLocaleString()"></td>
+                    <td class="py-2.5 px-3 text-right">
+                      <span class="px-2 py-0.5 rounded-full text-white text-xs" :style="{background: i<3?'#1A2B4A':'#8899AA'}" x-text="br.share+'%'"></span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right text-gray-600" x-text="(br.reviews/10000).toFixed(1)+'만'"></td>
+                    <td class="py-2.5 px-3 text-right text-gray-600" x-text="br.avgPrice.toLocaleString()+'원'"></td>
+                    <td class="py-2.5 px-3">
+                      <div class="flex gap-0.5 items-center">
+                        <div class="h-2 rounded-sm" style="background:#1A2B4A" :style="{width: br.chDist[0]+'px'}"></div>
+                        <div class="h-2 rounded-sm" style="background:#3A4B6A" :style="{width: br.chDist[1]+'px'}"></div>
+                        <div class="h-2 rounded-sm" style="background:#C8748A" :style="{width: br.chDist[2]+'px'}"></div>
+                        <div class="h-2 rounded-sm" style="background:#E8C4CE" :style="{width: br.chDist[3]+'px'}"></div>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── A안 카테고리별 ── -->
+        <div x-show="mergedATab==='category' && mergedABrandView !== 'drilldown'">
+          <div class="flex gap-2 mb-4 flex-wrap">
+            <template x-for="cat in categories" :key="cat">
+              <button @click="selectedCat=cat" class="px-4 py-2 rounded-full text-xs transition font-medium"
+                :class="selectedCat===cat?'channel-pill-active':'channel-pill'" x-text="cat"></button>
+            </template>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b">
+              <h3 class="font-bold navy text-sm">
+                <span x-text="selectedCat"></span> 카테고리 · 브랜드별 리뷰 점유율
+              </h3>
+            </div>
+            <table class="w-full text-xs">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="py-2.5 px-3 text-left navy font-semibold">#</th>
+                  <th class="py-2.5 px-3 text-left navy font-semibold">브랜드</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">상품수</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 점유율</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">총 리뷰</th>
+                  <th class="py-2.5 px-3 text-right navy font-semibold">평균 판매가</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(br,i) in catBrands" :key="br.name">
+                  <tr class="border-t transition" :class="br.isAP?'ap-row hover:bg-blue-100':'hover:bg-gray-50'">
+                    <td class="py-2.5 px-3" :class="br.isAP?'font-bold navy':'text-gray-500'" x-text="i+1"></td>
+                    <td class="py-2.5 px-3" :class="br.isAP?'font-bold navy':'text-gray-600'">
+                      <span x-text="br.name"></span>
+                      <span x-show="br.isAP" class="ap-badge">AP</span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-500'" x-text="br.products.toLocaleString()"></td>
+                    <td class="py-2.5 px-3 text-right">
+                      <span class="px-2 py-0.5 rounded-full text-xs" :class="br.isAP?'text-white':'text-gray-600 bg-gray-100'" :style="br.isAP?{background:'#1A2B4A'}:{}" x-text="br.share+'%'"></span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-500'" x-text="(br.reviews/10000).toFixed(1)+'만'"></td>
+                    <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-500'" x-text="br.avgPrice.toLocaleString()+'원'"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── A안 드릴다운 뷰 (브랜드별 서브탭에서 진입) ── -->
+        <div x-show="mergedABrandView === 'drilldown'" x-cloak>
+          <div class="flex items-center gap-3 mb-4">
+            <button @click="closeDrilldown()" class="text-xs px-3 py-1.5 border rounded-lg text-gray-500 hover:bg-gray-100 transition">← 브랜드 분석</button>
+            <span class="text-base font-bold navy" x-text="selectedBrand?.name"></span>
+            <span class="ap-badge text-xs">AP</span>
+          </div>
+          <div class="flex gap-1 mb-5 bg-white rounded-xl shadow-sm p-1">
+            <button @click="drilldownTab='products'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition" :style="drilldownTab==='products' ? 'background:#1A2B4A;color:#fff' : 'color:#6b7280'">상품 현황</button>
+            <button @click="drilldownTab='channel'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition" :style="drilldownTab==='channel' ? 'background:#1A2B4A;color:#fff' : 'color:#6b7280'">채널 성과</button>
+            <button @click="drilldownTab='market'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition" :style="drilldownTab==='market' ? 'background:#1A2B4A;color:#fff' : 'color:#6b7280'">시장 위치</button>
+          </div>
+          <!-- 상품 현황 -->
+          <div x-show="drilldownTab==='products'" x-cloak>
+            <div class="grid grid-cols-3 gap-4 mb-5">
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #1A2B4A">
+                <p class="text-xs text-gray-400 uppercase">전 채널 상품 수</p>
+                <p class="text-2xl font-black navy mt-1" x-text="(selectedBrand?.products||0).toLocaleString()+'개'"></p>
+              </div>
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #C8748A">
+                <p class="text-xs text-gray-400 uppercase">평균 리뷰 수</p>
+                <p class="text-2xl font-black mt-1" style="color:#C8748A" x-text="drilldownProductsAll.length ? Math.round(drilldownProductsAll.reduce((s,p)=>s+p.reviews,0)/drilldownProductsAll.length).toLocaleString() : '-'"></p>
+              </div>
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #8899AA">
+                <p class="text-xs text-gray-400 uppercase">평균 할인가</p>
+                <p class="text-2xl font-black navy mt-1" x-text="drilldownProductsAll.length ? Math.round(drilldownProductsAll.reduce((s,p)=>s+p.price,0)/drilldownProductsAll.length).toLocaleString()+'원' : '-'"></p>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+              <div class="flex gap-3 items-center flex-wrap">
+                <input x-model="drilldownQuery" placeholder="상품명 검색..." class="flex-1 min-w-36 px-3 py-2 border rounded-lg text-xs focus:outline-none" @input="drilldownPage=1">
+                <select x-model="drilldownCat" class="text-xs border rounded-lg px-3 py-2 text-gray-600" @change="drilldownPage=1">
+                  <option value="">전체 카테고리</option>
+                  <template x-for="cat in categories" :key="cat"><option :value="cat" x-text="cat"></option></template>
+                </select>
+                <select x-model="drilldownChannel" class="text-xs border rounded-lg px-3 py-2 text-gray-600" @change="drilldownPage=1">
+                  <option value="">전체 채널</option>
+                  <template x-for="ch in channels.filter(c=>c.key!=='all')" :key="ch.key"><option :value="ch.key" x-text="ch.name"></option></template>
+                </select>
+                <button @click="drilldownQuery=''; drilldownCat=''; drilldownChannel=''; drilldownPage=1" class="text-xs text-gray-400 hover:text-gray-600">초기화</button>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div class="p-4 border-b flex items-center gap-2">
+                <span class="font-bold navy text-sm" x-text="selectedBrand?.name"></span>
+                <span class="text-sm text-gray-400">상품 목록 · 채널별 성과</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                  <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th class="py-3 px-4 text-left navy font-semibold min-w-40">상품명</th>
+                      <template x-for="ch in channelCols" :key="ch.key">
+                        <th class="py-3 px-4 text-center font-semibold min-w-28" :class="drilldownChannel===ch.key ? 'rose' : 'navy'" x-text="ch.name"></th>
+                      </template>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="p in drilldownProductsPaged" :key="p.name">
+                      <tr class="border-t hover:bg-gray-50 transition">
+                        <td class="py-3 px-4">
+                          <p class="font-semibold navy truncate max-w-40" x-text="p.name.replace(p.brand+' ','')"></p>
+                          <p class="text-gray-400 mt-0.5" x-text="p.cat"></p>
+                        </td>
+                        <template x-for="ch in channelCols" :key="ch.key">
+                          <td class="py-3 px-4 text-center">
+                            <template x-if="p.channels[ch.key]">
+                              <div class="rounded-lg px-2 py-1.5 cursor-pointer transition hover:opacity-80" :class="isLowestPrice(p, ch.key) ? 'border-2 border-rose bg-red-50' : 'border border-gray-100'" @click="openModal({name:p.name, brand:p.brand, cat:p.cat, price:p.channels[ch.key].price, reviews:p.channels[ch.key].reviews, delta:0})">
+                                <p class="font-bold" :class="isLowestPrice(p, ch.key) ? 'rose' : 'navy'" x-text="p.channels[ch.key].price.toLocaleString()+'원'"></p>
+                                <p class="text-gray-400 mt-0.5" x-text="(p.channels[ch.key].reviews/10000).toFixed(1)+'만 리뷰'"></p>
+                              </div>
+                            </template>
+                            <template x-if="!p.channels[ch.key]"><span class="text-gray-300">–</span></template>
+                          </td>
+                        </template>
+                      </tr>
+                    </template>
+                    <tr x-show="drilldownProductsFiltered.length===0">
+                      <td :colspan="channelCols.length+1" class="py-8 text-center text-gray-400">검색 결과가 없어요</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="p-4 text-center" x-show="drilldownProductsFiltered.length > drilldownPage * 20">
+                <button @click="drilldownPage++" class="px-6 py-2 text-xs rounded-lg font-semibold" style="border:1px solid #C8748A; color:#C8748A;">더 보기</button>
+              </div>
+            </div>
+          </div>
+          <!-- 채널 성과 -->
+          <div x-show="drilldownTab==='channel'" x-cloak>
+            <div class="grid grid-cols-3 gap-4 mb-5">
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #1A2B4A">
+                <p class="text-xs text-gray-400 uppercase">취급 채널 수</p>
+                <p class="text-2xl font-black navy mt-1" x-text="drilldownChannelStats.length+'개'"></p>
+              </div>
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #C8748A">
+                <p class="text-xs text-gray-400 uppercase">채널 총 리뷰</p>
+                <p class="text-2xl font-black mt-1" style="color:#C8748A" x-text="drilldownChannelStats.reduce((s,c)=>s+c.reviews,0).toLocaleString()"></p>
+              </div>
+              <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #8899AA">
+                <p class="text-xs text-gray-400 uppercase">최저가 채널</p>
+                <p class="text-xl font-black navy mt-1" x-text="drilldownChannelStats.slice().sort((a,b)=>a.avgPrice-b.avgPrice)[0]?.name||'-'"></p>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+              <p class="text-xs font-bold navy mb-3">채널별 리뷰 점유율</p>
+              <div class="flex rounded-lg overflow-hidden mb-3" style="height:28px">
+                <template x-for="c in drilldownChannelStats" :key="c.key">
+                  <div class="flex items-center justify-center text-white text-xs font-bold overflow-hidden transition-all" :style="'flex:'+c.reviews+';background:'+c.color" x-text="parseFloat(c.sharePct)>=10 ? c.name+' '+c.sharePct+'%' : ''"></div>
+                </template>
+              </div>
+              <div class="flex flex-wrap gap-x-4 gap-y-1">
+                <template x-for="c in drilldownChannelStats" :key="c.key">
+                  <span class="flex items-center gap-1 text-xs text-gray-600">
+                    <span class="inline-block w-2 h-2 rounded-full shrink-0" :style="'background:'+c.color"></span>
+                    <span x-text="c.name+' '+c.sharePct+'%'"></span>
+                  </span>
+                </template>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-white rounded-xl shadow-sm p-4">
+                <p class="text-xs font-bold navy mb-3">채널별 평균 가격</p>
+                <template x-for="c in drilldownChannelStats.slice().sort((a,b)=>b.avgPrice-a.avgPrice)" :key="c.key">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xs text-gray-500 shrink-0" style="width:52px" x-text="c.name"></span>
+                    <div class="flex-1 bg-gray-100 rounded-full overflow-hidden" style="height:7px">
+                      <div class="h-full rounded-full" :style="'width:'+Math.round(c.avgPrice/drilldownChannelStats.reduce((m,x)=>Math.max(m,x.avgPrice),1)*100)+'%;background:'+c.color"></div>
+                    </div>
+                    <span class="text-xs text-gray-500 text-right shrink-0" style="width:72px" x-text="c.avgPrice.toLocaleString()+'원'"></span>
+                  </div>
+                </template>
+              </div>
+              <div class="bg-white rounded-xl shadow-sm p-4">
+                <p class="text-xs font-bold navy mb-3">채널별 리뷰 수</p>
+                <template x-for="c in drilldownChannelStats.slice().sort((a,b)=>b.reviews-a.reviews)" :key="c.key">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xs text-gray-500 shrink-0" style="width:52px" x-text="c.name"></span>
+                    <div class="flex-1 bg-gray-100 rounded-full overflow-hidden" style="height:7px">
+                      <div class="h-full rounded-full" :style="'width:'+Math.round(c.reviews/drilldownChannelStats.reduce((m,x)=>Math.max(m,x.reviews),1)*100)+'%;background:'+c.color"></div>
+                    </div>
+                    <span class="text-xs text-gray-500 text-right shrink-0" style="width:48px" x-text="(c.reviews/10000).toFixed(1)+'만'"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+          <!-- 시장 위치 -->
+          <div x-show="drilldownTab==='market'" x-cloak>
+            <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+              <div class="flex items-center gap-2 mb-3">
+                <p class="text-xs font-bold navy"><span x-text="drilldownMarketData.mainCat"></span> 카테고리 내 리뷰 점유율</p>
+              </div>
+              <div class="flex rounded-lg overflow-hidden mb-3" style="height:28px">
+                <template x-for="(br,i) in drilldownMarketData.brands.slice(0,5)" :key="br.name">
+                  <div class="flex items-center justify-center text-white text-xs font-bold overflow-hidden" :style="'flex:'+br.share+';background:'+(br.isAP?'#1A2B4A':['#5c6bc0','#43a047','#ff6f00','#8e24aa','#00897b'][i])" x-text="br.share>=8?br.name+' '+br.share+'%':''"></div>
+                </template>
+                <div class="flex items-center justify-center text-xs font-bold text-gray-400 overflow-hidden" style="flex:20;background:#e5e7eb">기타</div>
+              </div>
+              <div class="flex flex-wrap gap-x-4 gap-y-1">
+                <template x-for="(br,i) in drilldownMarketData.brands.slice(0,5)" :key="br.name">
+                  <span class="flex items-center gap-1 text-xs" :class="br.name===selectedBrand?.name?'font-bold navy':'text-gray-600'">
+                    <span class="inline-block w-2 h-2 rounded-full shrink-0" :style="'background:'+(br.isAP?'#1A2B4A':['#5c6bc0','#43a047','#ff6f00','#8e24aa','#00897b'][i])"></span>
+                    <span x-text="br.name+' '+br.share+'%'+(br.name===selectedBrand?.name?' ★':'')"></span>
+                  </span>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- 상품 상세 모달 -->
+    <div x-show="modal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="modal=null; destroyCharts()">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-screen overflow-y-auto p-8 relative">
+        <button @click="modal=null; destroyCharts()" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl">&times;</button>
+        <template x-if="modal">
+          <div>
+            <p class="text-xs text-gray-400 mb-1" x-text="modal.cat"></p>
+            <h2 class="text-lg font-bold navy mb-2" x-text="modal.name"></h2>
+            <div class="flex gap-4 items-center mb-4">
+              <span class="ap-badge text-sm" x-text="modal.brand"></span>
+              <span class="text-xl font-black rose" x-text="modal.price?.toLocaleString()+'원'"></span>
+              <span class="text-sm text-gray-500" x-text="(modal.reviews/10000).toFixed(1)+'만 리뷰'"></span>
+            </div>
+            <!-- 기간 선택 -->
+            <div class="flex gap-2 items-center mb-5 bg-gray-50 rounded-xl p-3">
+              <span class="text-xs text-gray-500">기간:</span>
+              <button @click="selectPeriod('1m')" :class="modalPeriod==='1m'?'bg-navy text-white':'hover:bg-gray-200'" class="px-3 py-1 text-xs rounded-full border transition">1개월</button>
+              <button @click="selectPeriod('2m')" :class="modalPeriod==='2m'?'bg-navy text-white':'hover:bg-gray-200'" class="px-3 py-1 text-xs rounded-full border transition">2개월</button>
+              <button @click="selectPeriod('3m')" :class="modalPeriod==='3m'?'bg-navy text-white':'hover:bg-gray-200'" class="px-3 py-1 text-xs rounded-full border transition">3개월</button>
+              <button @click="selectPeriod('all')" :class="modalPeriod==='all'?'bg-navy text-white':'hover:bg-gray-200'" class="px-3 py-1 text-xs rounded-full border transition">전체</button>
+            </div>
+            <!-- 차트 -->
+            <h3 class="font-semibold navy mb-2 text-sm">📈 가격 추이</h3>
+            <div class="h-48 mb-5"><canvas id="priceChart"></canvas></div>
+            <h3 class="font-semibold navy mb-2 text-sm">💬 리뷰 추이</h3>
+            <div class="h-48 mb-5"><canvas id="reviewChart"></canvas></div>
+            <!-- 히스토리 테이블 -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead><tr class="border-b text-gray-500">
+                  <th class="py-2 text-left">날짜</th>
+                  <th class="py-2 text-right">가격</th>
+                  <th class="py-2 text-right">할인가</th>
+                  <th class="py-2 text-right">리뷰</th>
+                  <th class="py-2 text-right">찜</th>
+                </tr></thead>
+                <tbody>
+                  <template x-for="h in modalHistory" :key="h.date">
+                    <tr class="border-b border-gray-50">
+                      <td class="py-1.5" x-text="h.date"></td>
+                      <td class="py-1.5 text-right text-gray-500" x-text="h.price.toLocaleString()"></td>
+                      <td class="py-1.5 text-right font-medium navy" x-text="h.discount.toLocaleString()"></td>
+                      <td class="py-1.5 text-right" x-text="h.reviews.toLocaleString()"></td>
+                      <td class="py-1.5 text-right" x-text="h.zzim.toLocaleString()"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- 토스트 -->
+    <div x-show="toast" x-cloak class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-navy text-white px-6 py-3 rounded-full text-sm shadow-lg z-50" x-text="toast"></div>
+  </div>
+
+  <script>
+    let priceChartInst = null, reviewChartInst = null;
+
+    function amoreApp() {
+      return {
+        page: 'app',
+        loginId: '', loginPw: '', loginError: false,
+        tab: 'overview',
+        channelTab: 'all', channelSubTab: 'ranking',
+        brandView: 'brand', selectedCat: '스킨케어', brandChannel: 'all',
+        mergedATab: 'channel', mergedABrandView: 'brand',
+        selectedBrand: null,
+        drilldownQuery: '', drilldownCat: '', drilldownChannel: '', drilldownPage: 1, drilldownTab: 'products',
+        trendChannel: 'all', trendMetric: 'review', apOnly: false, trendCat: '',
+        modal: null, modalPeriod: 'all',
+        toast: null,
+        crossQuery: '', crossResults: [],
+        competeQuery: '',
+        productQuery: '', productBrand: '', productChannel: '', productResults: [],
+
+        channels: [
+          {key:'all',name:'전체'},
+          {key:'naver',name:'네이버'},{key:'coupang',name:'쿠팡'},
+          {key:'oliveyoung',name:'올리브영'},{key:'gmarket',name:'지마켓'},
+          {key:'street',name:'11번가'},{key:'kakao',name:'카카오'},{key:'auction',name:'옥션'}
+        ],
+
+        channelDist: [
+          {name:'네이버',pct:85,count:1240},{name:'쿠팡',pct:72,count:980},
+          {name:'올리브영',pct:58,count:512},{name:'지마켓',pct:38,count:324},
+          {name:'11번가',pct:28,count:241},{name:'카카오',pct:18,count:122},{name:'옥션',pct:12,count:98}
+        ],
+
+
+        brandOverview: [
+          {name:'설화수',pct:90,count:'587개'},{name:'라네즈',pct:74,count:'412개'},
+          {name:'이니스프리',pct:60,count:'341개'},{name:'헤라',pct:46,count:'287개'},
+          {name:'에뛰드',pct:38,count:'214개'},{name:'마몽드',pct:30,count:'168개'}
+        ],
+
+        channelAll: [
+          {key:'naver',name:'네이버',products:1240,share:24.3,shareW:85,reviews:'142만',avgPrice:54200,discount:12.4,isTop:true,chgProducts:'+43',chgShare:'+1.2%p',chgAvgPrice:'-1,800원',chgDiscount:'전월 동일'},
+          {key:'coupang',name:'쿠팡',products:980,share:20.8,shareW:72,reviews:'98만',avgPrice:51800,discount:8.2,isTop:true,chgProducts:'+28',chgShare:'+0.8%p',chgAvgPrice:'+2,100원',chgDiscount:'-0.4%p'},
+          {key:'oliveyoung',name:'올리브영',products:512,share:18.1,shareW:63,reviews:'67만',avgPrice:48500,discount:15.3,isTop:false,chgProducts:'+12',chgShare:'+2.1%p',chgAvgPrice:'-500원',chgDiscount:'+1.2%p'},
+          {key:'gmarket',name:'지마켓',products:324,share:11.2,shareW:39,reviews:'41만',avgPrice:46200,discount:18.7,isTop:false,chgProducts:'-5',chgShare:'-0.3%p',chgAvgPrice:'-1,200원',chgDiscount:'+0.6%p'},
+          {key:'street',name:'11번가',products:241,share:8.4,shareW:29,reviews:'29만',avgPrice:43100,discount:21.2,isTop:false,chgProducts:'+7',chgShare:'+0.2%p',chgAvgPrice:'-800원',chgDiscount:'+1.8%p'},
+          {key:'kakao',name:'카카오',products:122,share:4.7,shareW:16,reviews:'12만',avgPrice:52400,discount:9.1,isTop:false,chgProducts:'+3',chgShare:'전월 동일',chgAvgPrice:'+3,200원',chgDiscount:'-0.5%p'},
+          {key:'auction',name:'옥션',products:98,share:3.2,shareW:11,reviews:'8만',avgPrice:41800,discount:24.6,isTop:false,chgProducts:'-2',chgShare:'-0.1%p',chgAvgPrice:'-2,400원',chgDiscount:'+2.1%p'},
+        ],
+
+        amoreBrandsTable: [
+          {name:'설화수',products:587,reviews:421000,share:14.2,avgPrice:92000,topProduct:'자음생 에센스 160ml'},
+          {name:'라네즈',products:412,reviews:384000,share:12.9,avgPrice:54000,topProduct:'네오쿠션 N21'},
+          {name:'이니스프리',products:341,reviews:297000,share:10.0,avgPrice:38000,topProduct:'블랙티 유스 앰플'},
+          {name:'헤라',products:287,reviews:212000,share:7.1,avgPrice:68000,topProduct:'블랙 쿠션 SPF34'},
+          {name:'에뛰드',products:214,reviews:173000,share:5.8,avgPrice:22000,topProduct:'더블 래스팅 파운데이션'},
+        ],
+
+        competeTable: [
+          {name:'닥터자르트',products:412,reviews:548000,avgPrice:48000,isAP:false,chgShare:'+1.8%p',chgReviews:'+12.3%',
+            ch:{naver:180000,coupang:148000,oliveyoung:118000,gmarket:52000,street:32000,kakao:11000,auction:7000},
+            chProducts:{naver:98,coupang:72,oliveyoung:108,gmarket:48,street:38,kakao:28,auction:22},
+            prevChProducts:{naver:82,coupang:64,oliveyoung:102,gmarket:48,street:38,kakao:28,auction:22}},
+          {name:'아누아',    products:187,reviews:451000,avgPrice:32000,isAP:false,chgShare:'+2.4%p',chgReviews:'+19.1%',
+            ch:{naver:98000,coupang:82000,oliveyoung:198000,gmarket:38000,street:22000,kakao:8000,auction:5000},
+            chProducts:{naver:58,coupang:42,oliveyoung:38,gmarket:28,street:18,kakao:8,auction:5},
+            prevChProducts:{naver:52,coupang:38,oliveyoung:12,gmarket:28,street:18,kakao:8,auction:5}},
+          {name:'설화수',    products:587,reviews:421000,avgPrice:92000,isAP:true, chgShare:'-0.6%p',chgReviews:'+3.2%',
+            ch:{naver:182000,coupang:98000,oliveyoung:72000,gmarket:38000,street:18000,kakao:8000,auction:5000},
+            chProducts:{naver:152,coupang:88,oliveyoung:72,gmarket:42,street:22,kakao:12,auction:8},
+            prevChProducts:{naver:148,coupang:82,oliveyoung:68,gmarket:42,street:22,kakao:12,auction:8}},
+          {name:'코스알엑스',products:234,reviews:406000,avgPrice:28000,isAP:false,chgShare:'+0.9%p',chgReviews:'+7.8%',
+            ch:{naver:122000,coupang:168000,oliveyoung:68000,gmarket:28000,street:12000,kakao:5000,auction:3000},
+            chProducts:{naver:52,coupang:72,oliveyoung:44,gmarket:18,street:12,kakao:6,auction:4},
+            prevChProducts:{naver:48,coupang:68,oliveyoung:42,gmarket:18,street:12,kakao:6,auction:4}},
+          {name:'라네즈',    products:412,reviews:385000,avgPrice:54000,isAP:true, chgShare:'+0.4%p',chgReviews:'+5.1%',
+            ch:{naver:128000,coupang:102000,oliveyoung:88000,gmarket:38000,street:18000,kakao:7000,auction:4000},
+            chProducts:{naver:128,coupang:88,oliveyoung:92,gmarket:42,street:28,kakao:18,auction:12},
+            prevChProducts:{naver:122,coupang:84,oliveyoung:88,gmarket:42,street:28,kakao:18,auction:12}},
+          {name:'토리든',    products:98, reviews:311000,avgPrice:24000,isAP:false,chgShare:'+1.2%p',chgReviews:'+28.4%',
+            ch:{naver:88000,coupang:62000,oliveyoung:128000,gmarket:18000,street:8000,kakao:4000,auction:3000},
+            chProducts:{naver:28,coupang:18,oliveyoung:32,gmarket:8,street:4,kakao:2,auction:1},
+            prevChProducts:{naver:24,coupang:16,oliveyoung:28,gmarket:8,street:4,kakao:2,auction:1}},
+          {name:'이니스프리',products:341,reviews:298000,avgPrice:38000,isAP:true, chgShare:'-0.3%p',chgReviews:'+1.8%',
+            ch:{naver:82000,coupang:68000,oliveyoung:108000,gmarket:22000,street:10000,kakao:5000,auction:3000},
+            chProducts:{naver:108,coupang:72,oliveyoung:88,gmarket:32,street:22,kakao:12,auction:8},
+            prevChProducts:{naver:108,coupang:72,oliveyoung:88,gmarket:32,street:22,kakao:12,auction:8}},
+          {name:'미즌',      products:76, reviews:233000,avgPrice:18000,isAP:false,chgShare:'-0.5%p',chgReviews:'-3.2%',
+            ch:{naver:48000,coupang:62000,oliveyoung:52000,gmarket:18000,street:22000,kakao:12000,auction:9000},
+            chProducts:{naver:18,coupang:22,oliveyoung:18,gmarket:0,street:6,kakao:2,auction:2},
+            prevChProducts:{naver:18,coupang:22,oliveyoung:18,gmarket:8,street:6,kakao:2,auction:2}},
+          {name:'헤라',      products:287,reviews:212000,avgPrice:68000,isAP:true, chgShare:'+0.2%p',chgReviews:'+4.4%',
+            ch:{naver:88000,coupang:42000,oliveyoung:52000,gmarket:15000,street:8000,kakao:4000,auction:3000},
+            chProducts:{naver:88,coupang:52,oliveyoung:72,gmarket:28,street:18,kakao:12,auction:8},
+            prevChProducts:{naver:84,coupang:48,oliveyoung:68,gmarket:28,street:18,kakao:12,auction:8}},
+          {name:'조선미녀',  products:154,reviews:198000,avgPrice:26000,isAP:false,chgShare:'+3.1%p',chgReviews:'+34.2%',
+            ch:{naver:62000,coupang:52000,oliveyoung:42000,gmarket:18000,street:12000,kakao:8000,auction:4000},
+            chProducts:{naver:42,coupang:38,oliveyoung:28,gmarket:8,street:6,kakao:4,auction:3},
+            prevChProducts:{naver:28,coupang:22,oliveyoung:0,gmarket:0,street:0,kakao:0,auction:0}},
+        ],
+
+        amoreBrandsFull: [
+          {name:'설화수',products:587,reviews:421000,share:14.2,avgPrice:92000,topProduct:'자음생 에센스',chDist:[32,26,16,14]},
+          {name:'라네즈',products:412,reviews:384000,share:12.9,avgPrice:54000,topProduct:'네오쿠션 N21',chDist:[28,30,20,10]},
+          {name:'이니스프리',products:341,reviews:297000,share:10.0,avgPrice:38000,topProduct:'블랙티 앰플',chDist:[24,18,28,18]},
+          {name:'헤라',products:287,reviews:212000,share:7.1,avgPrice:68000,topProduct:'블랙 쿠션',chDist:[34,24,14,16]},
+          {name:'에뛰드',products:214,reviews:173000,share:5.8,avgPrice:22000,topProduct:'더블 래스팅',chDist:[28,28,22,10]},
+          {name:'마몽드',products:168,reviews:124000,share:4.2,avgPrice:28000,topProduct:'로즈 워터 토너',chDist:[30,22,20,16]},
+          {name:'아이오페',products:142,reviews:98000,share:3.3,avgPrice:45000,topProduct:'레티놀 엑스퍼트',chDist:[36,24,16,12]},
+          {name:'한율',products:118,reviews:82000,share:2.7,avgPrice:35000,topProduct:'쌀 발효 앰플',chDist:[32,20,26,10]},
+          {name:'프리메라',products:96,reviews:64000,share:2.1,avgPrice:42000,topProduct:'알파인 베리 워터리 크림',chDist:[28,18,30,12]},
+          {name:'려',products:88,reviews:57000,share:1.9,avgPrice:18000,topProduct:'자양윤모 두피케어샴푸',chDist:[22,32,16,18]},
+          {name:'미쟝센',products:74,reviews:49000,share:1.6,avgPrice:12000,topProduct:'퍼펙트 세럼 오리지널',chDist:[20,34,14,20]},
+          {name:'일리윤',products:62,reviews:41000,share:1.4,avgPrice:16000,topProduct:'세라마이드 아토 로션',chDist:[26,28,18,16]},
+          {name:'바이탈뷰티',products:48,reviews:33000,share:1.1,avgPrice:35000,topProduct:'메타그린 슬림',chDist:[24,22,26,16]},
+          {name:'오딜리',products:38,reviews:26000,share:0.9,avgPrice:28000,topProduct:'카밍 세럼',chDist:[30,24,20,14]},
+          {name:'에스쁘아',products:32,reviews:21000,share:0.7,avgPrice:32000,topProduct:'프로 태일러 파운데이션',chDist:[32,18,22,16]},
+          {name:'웨이크메이크',products:28,reviews:17000,share:0.6,avgPrice:19000,topProduct:'컬러 파레트',chDist:[28,26,20,14]},
+        ],
+
+        categories: ['스킨케어','메이크업','헤어케어','바디케어','선케어','향수','네일','맨즈케어'],
+
+        get catBrands() {
+          const maps = {
+            '스킨케어': [
+              {name:'닥터자르트',products:312,reviews:412000,share:18.4,avgPrice:48000,topProduct:'시카페어 크림',isAP:false},
+              {name:'설화수',products:287,reviews:321000,share:14.2,avgPrice:92000,topProduct:'자음생 에센스',isAP:true},
+              {name:'아누아',products:187,reviews:298000,share:13.2,avgPrice:32000,topProduct:'어성초 토너패드',isAP:false},
+              {name:'라네즈',products:198,reviews:241000,share:10.7,avgPrice:54000,topProduct:'워터뱅크 크림',isAP:true},
+              {name:'이니스프리',products:167,reviews:198000,share:8.8,avgPrice:38000,topProduct:'블랙티 앰플',isAP:true},
+              {name:'코스알엑스',products:198,reviews:187000,share:8.3,avgPrice:28000,topProduct:'달팽이 크림',isAP:false},
+            ],
+            '메이크업': [
+              {name:'헤라',products:198,reviews:187000,share:16.8,avgPrice:68000,topProduct:'블랙 쿠션',isAP:true},
+              {name:'클리오',products:287,reviews:163000,share:14.7,avgPrice:32000,topProduct:'킬커버 파운웨어',isAP:false},
+              {name:'에뛰드',products:167,reviews:141000,share:12.7,avgPrice:22000,topProduct:'더블 래스팅',isAP:true},
+              {name:'맥',products:142,reviews:132000,share:11.9,avgPrice:45000,topProduct:'루비우 립스틱',isAP:false},
+              {name:'라네즈',products:98,reviews:98000,share:8.8,avgPrice:42000,topProduct:'네오쿠션',isAP:true},
+              {name:'웨이크메이크',products:72,reviews:62000,share:5.6,avgPrice:19000,topProduct:'컬러 파레트',isAP:true},
+            ],
+            '헤어케어': [
+              {name:'려',products:214,reviews:341000,share:22.3,avgPrice:18000,topProduct:'자양윤모 샴푸',isAP:true},
+              {name:'미쟝센',products:187,reviews:298000,share:19.5,avgPrice:12000,topProduct:'퍼펙트 세럼',isAP:true},
+              {name:'TS샴푸',products:98,reviews:241000,share:15.7,avgPrice:24000,topProduct:'TS 두피케어 샴푸',isAP:false},
+              {name:'닥터방기원',products:76,reviews:187000,share:12.2,avgPrice:32000,topProduct:'두피에센스',isAP:false},
+              {name:'케라시스',products:124,reviews:163000,share:10.6,avgPrice:14000,topProduct:'데미지클리닉',isAP:false},
+            ],
+            '바디케어': [
+              {name:'일리윤',products:142,reviews:198000,share:21.4,avgPrice:16000,topProduct:'세라마이드 아토 로션',isAP:true},
+              {name:'세타필',products:98,reviews:176000,share:19.0,avgPrice:22000,topProduct:'모이스처라이징 크림',isAP:false},
+              {name:'바이오더마',products:76,reviews:143000,share:15.4,avgPrice:28000,topProduct:'아토덤 크림',isAP:false},
+              {name:'마몽드',products:87,reviews:112000,share:12.1,avgPrice:18000,topProduct:'로즈 워터 바디로션',isAP:true},
+              {name:'이니스프리',products:64,reviews:89000,share:9.6,avgPrice:22000,topProduct:'그린티 바디워시',isAP:true},
+            ],
+            '선케어': [
+              {name:'아누아',products:87,reviews:312000,share:24.8,avgPrice:19800,topProduct:'어성초 선크림',isAP:false},
+              {name:'이니스프리',products:98,reviews:241000,share:19.2,avgPrice:24000,topProduct:'톤업 선크림',isAP:true},
+              {name:'라네즈',products:64,reviews:187000,share:14.9,avgPrice:32000,topProduct:'선 밀크 EX',isAP:true},
+              {name:'바이오더마',products:54,reviews:143000,share:11.4,avgPrice:28000,topProduct:'포토덤 UV',isAP:false},
+              {name:'아이오페',products:48,reviews:98000,share:7.8,avgPrice:38000,topProduct:'UV쉴드 퍼펙션',isAP:true},
+            ],
+            '향수': [
+              {name:'조말론',products:124,reviews:87000,share:18.2,avgPrice:185000,topProduct:'우드 세이지 앤 시 솔트',isAP:false},
+              {name:'헤라',products:76,reviews:62000,share:12.9,avgPrice:98000,topProduct:'블랙 퍼퓸',isAP:true},
+              {name:'딥티크',products:98,reviews:54000,share:11.3,avgPrice:172000,topProduct:'오 로즈',isAP:false},
+              {name:'설화수',products:42,reviews:41000,share:8.6,avgPrice:142000,topProduct:'자음 오 드 퍼퓸',isAP:true},
+              {name:'라네즈',products:38,reviews:33000,share:6.9,avgPrice:72000,topProduct:'투데이 미 퍼퓸',isAP:true},
+            ],
+            '네일': [
+              {name:'오호라',products:187,reviews:421000,share:31.2,avgPrice:14000,topProduct:'젤 네일 스티커',isAP:false},
+              {name:'에뛰드',products:142,reviews:198000,share:14.7,avgPrice:9000,topProduct:'컬러 젤 네일',isAP:true},
+              {name:'네일팩토리',products:98,reviews:143000,share:10.6,avgPrice:8000,topProduct:'글리터 네일',isAP:false},
+              {name:'쏘내추럴',products:76,reviews:112000,share:8.3,avgPrice:11000,topProduct:'세미 퍼머넌트 젤',isAP:false},
+              {name:'웨이크메이크',products:54,reviews:78000,share:5.8,avgPrice:12000,topProduct:'워터 네일 글루',isAP:true},
+            ],
+            '맨즈케어': [
+              {name:'라운드랩',products:98,reviews:187000,share:19.8,avgPrice:22000,topProduct:'1025 독도 토너',isAP:false},
+              {name:'에스쁘아',products:64,reviews:141000,share:14.9,avgPrice:32000,topProduct:'프로 태일러',isAP:true},
+              {name:'니베아맨',products:124,reviews:132000,share:14.0,avgPrice:14000,topProduct:'비즈니스 크림',isAP:false},
+              {name:'아이오페',products:54,reviews:98000,share:10.4,avgPrice:42000,topProduct:'맨 레티놀 임팩트',isAP:true},
+              {name:'헤라',products:42,reviews:74000,share:7.8,avgPrice:55000,topProduct:'맨 블랙 쿠션',isAP:true},
+            ],
+          };
+          return maps[this.selectedCat] || maps['스킨케어'];
+        },
+
+        trendingData: [
+          {name:'설화수 윤조에센스 6세대',brand:'설화수',cat:'스킨케어',current:52341,prev:50000,delta:2341,pct:4.7,price:148000,reviews:52341,isAP:true},
+          {name:'라네즈 워터뱅크 블루 히알루로닉 크림',brand:'라네즈',cat:'스킨케어',current:38921,prev:37029,delta:1892,pct:5.1,price:38000,reviews:38921,isAP:true},
+          {name:'닥터자르트 시카페어 크림',brand:'닥터자르트',cat:'스킨케어',current:81204,prev:79802,delta:1402,pct:1.8,price:15000,reviews:81204,isAP:false},
+          {name:'이니스프리 블랙티 유스 앰플 세럼',brand:'이니스프리',cat:'스킨케어',current:29812,prev:28608,delta:1204,pct:4.2,price:45000,reviews:29812,isAP:true},
+          {name:'아누아 어성초 77 토너패드',brand:'아누아',cat:'스킨케어',current:67891,prev:66918,delta:973,pct:1.5,price:19800,reviews:67891,isAP:false},
+          {name:'헤라 블랙 쿠션 SPF34',brand:'헤라',cat:'메이크업',current:21874,prev:20887,delta:987,pct:4.7,price:55000,reviews:21874,isAP:true},
+          {name:'코스알엑스 달팽이 크림',brand:'코스알엑스',cat:'스킨케어',current:54321,prev:53621,delta:700,pct:1.3,price:22000,reviews:54321,isAP:false},
+          {name:'에뛰드 픽싱 틴트',brand:'에뛰드',cat:'메이크업',current:17432,prev:16689,delta:743,pct:4.5,price:12000,reviews:17432,isAP:true},
+        ],
+
+        zzimData: [
+          {name:'라네즈 네오쿠션 N21',brand:'라네즈',cat:'메이크업',current:184200,prev:178400,delta:5800,pct:3.3,price:42000,reviews:38921,isAP:true},
+          {name:'이니스프리 블랙티 유스 앰플',brand:'이니스프리',cat:'스킨케어',current:97300,prev:93100,delta:4200,pct:4.5,price:45000,reviews:29812,isAP:true},
+          {name:'아누아 어성초 선크림',brand:'아누아',cat:'선케어',current:142800,prev:139100,delta:3700,pct:2.7,price:19800,reviews:67891,isAP:false},
+          {name:'설화수 자음생 크림 EX',brand:'설화수',cat:'스킨케어',current:54100,prev:51200,delta:2900,pct:5.7,price:198000,reviews:28742,isAP:true},
+          {name:'헤라 블랙 쿠션',brand:'헤라',cat:'메이크업',current:87600,prev:85100,delta:2500,pct:2.9,price:55000,reviews:21874,isAP:true},
+          {name:'닥터자르트 시카페어 크림',brand:'닥터자르트',cat:'스킨케어',current:212400,prev:210200,delta:2200,pct:1.0,price:15000,reviews:81204,isAP:false},
+          {name:'오호라 젤 네일 스티커',brand:'오호라',cat:'네일',current:318700,prev:316900,delta:1800,pct:0.6,price:14000,reviews:42100,isAP:false},
+          {name:'에뛰드 더블 래스팅',brand:'에뛰드',cat:'메이크업',current:63200,prev:61700,delta:1500,pct:2.4,price:12000,reviews:17432,isAP:true},
+        ],
+
+        ingredientData: [
+          {name:'글루타치온', products:8, brands:4, pct:41.7, topProduct:'코스알엑스 어드밴시드 스네일 무신', topBrand:'코스알엑스', hasAP:false, cat:'스킨케어'},
+          {name:'레티놀', products:15, brands:6, pct:31.2, topProduct:'닥터자르트 시카페어 크림', topBrand:'닥터자르트', hasAP:false, cat:'스킨케어'},
+          {name:'트라넥삼산', products:11, brands:5, pct:22.8, topProduct:'설화수 윤조에센스 6세대', topBrand:'설화수', hasAP:true, cat:'스킨케어'},
+          {name:'나이아신아마이드', products:23, brands:8, pct:18.4, topProduct:'이니스프리 블랙티 유스 앰플 세럼', topBrand:'이니스프리', hasAP:true, cat:'스킨케어'},
+          {name:'판테놀', products:18, brands:7, pct:12.5, topProduct:'아누아 어성초 77 토너패드', topBrand:'아누아', hasAP:false, cat:'스킨케어'},
+          {name:'세라마이드', products:14, brands:6, pct:9.3, topProduct:'일리윤 세라마이드 크림', topBrand:'일리윤', hasAP:true, cat:'바디케어'},
+        ],
+
+        get filteredTrending() {
+          const data = this.trendMetric === 'zzim' ? this.zzimData : this.trendingData;
+          return this.apOnly ? data.filter(t => t.isAP) : data;
+        },
+
+        trendingTop: [
+          {name:'설화수 윤조에센스 6세대',brand:'설화수',cat:'스킨케어',delta:8420,price:148000,reviews:189200},
+          {name:'라네즈 워터뱅크 크림',brand:'라네즈',cat:'스킨케어',delta:6810,price:38000,reviews:142800},
+          {name:'이니스프리 블랙티 세럼',brand:'이니스프리',cat:'스킨케어',delta:4330,price:45000,reviews:108400},
+          {name:'헤라 블랙 쿠션',brand:'헤라',cat:'메이크업',delta:3560,price:55000,reviews:79600},
+          {name:'에뛰드 픽싱 틴트',brand:'에뛰드',cat:'메이크업',delta:2680,price:12000,reviews:63200},
+        ],
+
+        topProducts: [
+          {name:'설화수 자음생 에센스',brand:'설화수',cat:'스킨케어',price:128000,reviews:1240000},
+          {name:'라네즈 네오쿠션',brand:'라네즈',cat:'메이크업',price:42000,reviews:1120000},
+          {name:'이니스프리 블랙티 앰플',brand:'이니스프리',cat:'스킨케어',price:45000,reviews:890000},
+          {name:'헤라 센슈얼 파우더 매트',brand:'헤라',cat:'메이크업',price:52000,reviews:640000},
+          {name:'에뛰드 더블 래스팅',brand:'에뛰드',cat:'메이크업',price:22000,reviews:520000},
+        ],
+
+        get currentChannel() {
+          return this.channelAll.find(c => c.key === this.channelTab) || {};
+        },
+
+        modalHistory: [],
+
+        doLogin() {
+          if (this.loginId === 'amore' && this.loginPw === 'amore2026!') {
+            this.loginError = false;
+            this.page = 'app';
+          } else {
+            this.loginError = true;
+          }
+        },
+
+        openModal(item) {
+          this.modal = item;
+          this.modalPeriod = 'all';
+          this.modalHistory = this.generateHistory(item.price || 50000);
+          this.$nextTick(() => { this.renderCharts(); });
+        },
+
+        generateHistory(basePrice, period='all') {
+          const allDates = [
+            '2025-10-05','2025-10-19','2025-11-02','2025-11-16','2025-11-30',
+            '2025-12-14','2025-12-28',
+            '2026-01-05','2026-01-12','2026-01-19','2026-01-26',
+            '2026-02-02','2026-02-09','2026-02-16','2026-02-23',
+            '2026-03-02','2026-03-09','2026-03-16','2026-03-23','2026-03-30',
+            '2026-04-01'
+          ];
+          const sliceMap = { '1m': -5, '2m': -10, '3m': -15, 'all': 0 };
+          const dates = sliceMap[period] < 0 ? allDates.slice(sliceMap[period]) : allDates;
+          let reviews = 45000;
+          return dates.map((d) => {
+            reviews += Math.floor(Math.random() * 1200 + 200);
+            const discount = Math.floor(basePrice * (0.85 + Math.random() * 0.1));
+            return { date: d, price: basePrice, discount, reviews, zzim: Math.floor(reviews * 0.3) };
+          });
+        },
+
+        selectPeriod(p) {
+          this.modalPeriod = p;
+          this.modalHistory = this.generateHistory(this.modal?.price || 50000, p);
+          this.$nextTick(() => { this.renderCharts(); });
+        },
+
+        renderCharts() {
+          this.destroyCharts();
+          const h = this.modalHistory;
+          const labels = h.map(r => r.date.substring(5));
+          const ctx1 = document.getElementById('priceChart');
+          const ctx2 = document.getElementById('reviewChart');
+          if (!ctx1 || !ctx2) return;
+          priceChartInst = new Chart(ctx1, {
+            type: 'line',
+            data: { labels, datasets: [
+              { label: '정가', data: h.map(r=>r.price), borderColor:'#8899AA', borderDash:[4,4], pointRadius:0, tension:0.3 },
+              { label: '할인가', data: h.map(r=>r.discount), borderColor:'#1A2B4A', backgroundColor:'rgba(26,43,74,0.05)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:'#1A2B4A' },
+            ]},
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{font:{size:10}}}}, scales:{y:{ticks:{font:{size:9},callback:v=>v.toLocaleString()+'원'},grid:{color:'#f0f0f0'}},x:{ticks:{font:{size:9}}}}}
+          });
+          reviewChartInst = new Chart(ctx2, {
+            type: 'line',
+            data: { labels, datasets: [
+              { label: '리뷰 수', data: h.map(r=>r.reviews), borderColor:'#C8748A', backgroundColor:'rgba(200,116,138,0.05)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:'#C8748A' },
+            ]},
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{font:{size:10}}}}, scales:{y:{ticks:{font:{size:9},callback:v=>v.toLocaleString()},grid:{color:'#f0f0f0'}},x:{ticks:{font:{size:9}}}}}
+          });
+        },
+
+        destroyCharts() {
+          if (priceChartInst) { priceChartInst.destroy(); priceChartInst = null; }
+          if (reviewChartInst) { reviewChartInst.destroy(); reviewChartInst = null; }
+        },
+
+        searchCross() {
+          if (!this.crossQuery.trim()) return;
+          const q = this.crossQuery.trim();
+          // 검색어에서 브랜드 추출 (없으면 '아모레퍼시픽')
+          const knownBrands = ['설화수','라네즈','이니스프리','헤라','에뛰드','마몽드','아이오페','한율','프리메라','려','미쟝센','일리윤'];
+          const matched = knownBrands.find(b => q.includes(b)) || '아모레퍼시픽';
+          const basePrice = Math.floor(Math.random() * 80000 + 20000);
+          this.crossResults = [
+            { channel: '네이버', products: [
+              {name:q+' (네이버 공식몰)', brand:matched, cat:'스킨케어', price:basePrice, reviews:Math.floor(Math.random()*50000+5000)},
+              {name:q+' 기획세트', brand:matched, cat:'스킨케어', price:Math.floor(basePrice*1.3), reviews:Math.floor(Math.random()*10000+1000)},
+            ]},
+            { channel: '쿠팡', products: [
+              {name:q, brand:matched, cat:'스킨케어', price:Math.floor(basePrice*0.95), reviews:Math.floor(Math.random()*40000+3000)},
+            ]},
+            { channel: '올리브영', products: [
+              {name:q+' 올영 단독', brand:matched, cat:'스킨케어', price:Math.floor(basePrice*1.05), reviews:Math.floor(Math.random()*20000+2000)},
+            ]},
+            { channel: '지마켓', products: [
+              {name:q, brand:matched, cat:'스킨케어', price:Math.floor(basePrice*0.88), reviews:Math.floor(Math.random()*15000+1000)},
+            ]},
+          ];
+        },
+
+        allProducts: [
+          {name:'설화수 윤조에센스 6세대 160ml', brand:'설화수', cat:'스킨케어', price:148000, reviews:52341,
+            channels:{naver:{price:148000,reviews:42100},coupang:{price:141000,reviews:31200},oliveyoung:{price:152000,reviews:15400},gmarket:{price:145000,reviews:8100},street:{price:146000,reviews:5400},kakao:null,auction:{price:139000,reviews:3200}}},
+          {name:'설화수 자음생 에센스 30ml', brand:'설화수', cat:'스킨케어', price:128000, reviews:41200,
+            channels:{naver:{price:128000,reviews:28700},coupang:{price:122000,reviews:19400},oliveyoung:{price:135000,reviews:9200},gmarket:{price:125000,reviews:4800},street:null,kakao:{price:132000,reviews:2100},auction:{price:120000,reviews:1800}}},
+          {name:'설화수 자음생 크림 EX 60ml', brand:'설화수', cat:'스킨케어', price:198000, reviews:28742,
+            channels:{naver:{price:198000,reviews:18400},coupang:{price:188000,reviews:12100},oliveyoung:{price:198000,reviews:7800},gmarket:null,street:{price:192000,reviews:2400},kakao:null,auction:{price:185000,reviews:1400}}},
+          {name:'설화수 퍼펙팅 쿠션 15g', brand:'설화수', cat:'메이크업', price:92000, reviews:18400,
+            channels:{naver:{price:92000,reviews:11200},coupang:{price:87000,reviews:7800},oliveyoung:{price:92000,reviews:4200},gmarket:{price:89000,reviews:1800},street:null,kakao:null,auction:{price:85000,reviews:900}}},
+          {name:'라네즈 워터뱅크 블루 히알루로닉 크림', brand:'라네즈', cat:'스킨케어', price:38000, reviews:38921,
+            channels:{naver:{price:38000,reviews:24100},coupang:{price:35000,reviews:18400},oliveyoung:{price:38000,reviews:12800},gmarket:{price:36000,reviews:5200},street:{price:37000,reviews:3400},kakao:null,auction:{price:34000,reviews:2100}}},
+          {name:'라네즈 네오쿠션 N21 Ivory 15g', brand:'라네즈', cat:'메이크업', price:42000, reviews:31200,
+            channels:{naver:{price:42000,reviews:18700},coupang:{price:39000,reviews:14200},oliveyoung:{price:42000,reviews:9800},gmarket:{price:40000,reviews:3400},street:{price:41000,reviews:2100},kakao:null,auction:null}},
+          {name:'라네즈 워터 슬리핑 마스크 70ml', brand:'라네즈', cat:'스킨케어', price:26000, reviews:24800,
+            channels:{naver:{price:26000,reviews:14800},coupang:{price:24000,reviews:11200},oliveyoung:{price:26000,reviews:8400},gmarket:{price:25000,reviews:2800},street:null,kakao:{price:26000,reviews:1200},auction:{price:23000,reviews:900}}},
+          {name:'라네즈 투데이 미 퍼퓸 100ml', brand:'라네즈', cat:'향수', price:72000, reviews:8400,
+            channels:{naver:{price:72000,reviews:5200},coupang:null,oliveyoung:{price:72000,reviews:3800},gmarket:null,street:null,kakao:{price:75000,reviews:1400},auction:null}},
+          {name:'이니스프리 블랙티 유스 앰플 세럼 50ml', brand:'이니스프리', cat:'스킨케어', price:45000, reviews:29812,
+            channels:{naver:{price:45000,reviews:18400},coupang:{price:42000,reviews:12100},oliveyoung:{price:45000,reviews:9800},gmarket:{price:43000,reviews:3200},street:{price:44000,reviews:2100},kakao:null,auction:{price:41000,reviews:1400}}},
+          {name:'이니스프리 그린티 씨드 세럼 80ml', brand:'이니스프리', cat:'스킨케어', price:35000, reviews:22400,
+            channels:{naver:{price:35000,reviews:13400},coupang:{price:32000,reviews:9800},oliveyoung:{price:35000,reviews:7800},gmarket:{price:33000,reviews:2400},street:null,kakao:null,auction:{price:31000,reviews:1200}}},
+          {name:'이니스프리 노세범 선케어 쿠션', brand:'이니스프리', cat:'선케어', price:26000, reviews:18700,
+            channels:{naver:{price:26000,reviews:11200},coupang:{price:24000,reviews:8400},oliveyoung:{price:26000,reviews:6800},gmarket:{price:25000,reviews:1800},street:{price:25500,reviews:1200},kakao:null,auction:{price:23500,reviews:800}}},
+          {name:'헤라 블랙 쿠션 SPF34 15g', brand:'헤라', cat:'메이크업', price:55000, reviews:21874,
+            channels:{naver:{price:55000,reviews:13400},coupang:{price:52000,reviews:9800},oliveyoung:{price:55000,reviews:7200},gmarket:{price:53000,reviews:2400},street:null,kakao:{price:57000,reviews:1800},auction:{price:51000,reviews:900}}},
+          {name:'헤라 센슈얼 스파이시 누드 립스틱', brand:'헤라', cat:'메이크업', price:38000, reviews:14200,
+            channels:{naver:{price:38000,reviews:8400},coupang:{price:36000,reviews:6200},oliveyoung:{price:38000,reviews:4800},gmarket:{price:37000,reviews:1400},street:null,kakao:null,auction:{price:35000,reviews:700}}},
+          {name:'에뛰드 더블 래스팅 파운데이션 30ml', brand:'에뛰드', cat:'메이크업', price:22000, reviews:17432,
+            channels:{naver:{price:22000,reviews:10400},coupang:{price:20000,reviews:7800},oliveyoung:{price:22000,reviews:5800},gmarket:{price:21000,reviews:2400},street:{price:21500,reviews:1400},kakao:null,auction:{price:19500,reviews:800}}},
+          {name:'에뛰드 픽싱 틴트 5g', brand:'에뛰드', cat:'메이크업', price:12000, reviews:14800,
+            channels:{naver:{price:12000,reviews:8800},coupang:{price:11000,reviews:6200},oliveyoung:{price:12000,reviews:4800},gmarket:{price:11500,reviews:2100},street:null,kakao:null,auction:{price:10500,reviews:900}}},
+          {name:'마몽드 로즈 워터 토너 150ml', brand:'마몽드', cat:'스킨케어', price:18000, reviews:19200,
+            channels:{naver:{price:18000,reviews:11400},coupang:{price:16500,reviews:8400},oliveyoung:{price:18000,reviews:6200},gmarket:{price:17000,reviews:2400},street:{price:17500,reviews:1400},kakao:null,auction:{price:16000,reviews:800}}},
+          {name:'아이오페 레티놀 엑스퍼트 0.1 30ml', brand:'아이오페', cat:'스킨케어', price:68000, reviews:12400,
+            channels:{naver:{price:68000,reviews:7800},coupang:{price:64000,reviews:5400},oliveyoung:{price:68000,reviews:4200},gmarket:null,street:{price:66000,reviews:1200},kakao:null,auction:{price:63000,reviews:700}}},
+          {name:'한율 쌀 발효 앰플 30ml', brand:'한율', cat:'스킨케어', price:32000, reviews:9800,
+            channels:{naver:{price:32000,reviews:5800},coupang:{price:30000,reviews:4200},oliveyoung:{price:32000,reviews:3200},gmarket:{price:31000,reviews:1200},street:null,kakao:null,auction:{price:29000,reviews:600}}},
+          {name:'려 자양윤모 두피케어 샴푸 400ml', brand:'려', cat:'헤어케어', price:18000, reviews:24100,
+            channels:{naver:{price:18000,reviews:14800},coupang:{price:16500,reviews:10400},oliveyoung:{price:18000,reviews:7200},gmarket:{price:17000,reviews:3400},street:{price:17500,reviews:2100},kakao:null,auction:{price:16000,reviews:1200}}},
+          {name:'미쟝센 퍼펙트 세럼 오리지널 80ml', brand:'미쟝센', cat:'헤어케어', price:11000, reviews:18700,
+            channels:{naver:{price:11000,reviews:11200},coupang:{price:9800,reviews:8400},oliveyoung:{price:11000,reviews:5800},gmarket:{price:10500,reviews:2400},street:{price:10800,reviews:1400},kakao:null,auction:{price:9500,reviews:900}}},
+          {name:'일리윤 세라마이드 아토 로션 200ml', brand:'일리윤', cat:'바디케어', price:15000, reviews:16400,
+            channels:{naver:{price:15000,reviews:9800},coupang:{price:13500,reviews:7200},oliveyoung:{price:15000,reviews:5400},gmarket:{price:14000,reviews:2100},street:{price:14500,reviews:1400},kakao:null,auction:{price:13000,reviews:800}}},
+        ],
+
+        searchProducts() {
+          const q = this.productQuery.toLowerCase().trim();
+          const b = this.productBrand;
+          const ch = this.productChannel;
+          if (!q && !b) { this.productResults = []; return; }
+          this.productResults = this.allProducts.filter(p => {
+            return (!q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.cat.includes(q))
+              && (!b || p.brand === b);
+          }).slice(0, 8);
+        },
+
+        // 브랜드 드릴다운
+        channelCols: [
+          {key:'naver',name:'네이버'},{key:'coupang',name:'쿠팡'},
+          {key:'oliveyoung',name:'올리브영'},{key:'gmarket',name:'지마켓'},
+          {key:'street',name:'11번가'},{key:'kakao',name:'카카오'},{key:'auction',name:'옥션'}
+        ],
+
+        openBrandDrilldown(br) {
+          this.selectedBrand = br;
+          this.drilldownQuery = '';
+          this.drilldownCat = '';
+          this.drilldownChannel = '';
+          this.drilldownPage = 1;
+          this.drilldownTab = 'products';
+          if (this.tab === 'merged-a') {
+            this.mergedABrandView = 'drilldown';
+          } else {
+            this.brandView = 'drilldown';
+          }
+        },
+
+        closeDrilldown() {
+          if (this.tab === 'merged-a') {
+            this.mergedABrandView = 'brand';
+          } else {
+            this.brandView = 'brand';
+          }
+          this.selectedBrand = null;
+        },
+
+        downloadChannelExcel() {
+          const date = '20260401';
+          const rows = this.channelAll.map(ch => ({
+            '채널': ch.name,
+            '전체 상품수': ch.products,
+            'AP 점유율 (%)': ch.share,
+            '리뷰 수': ch.reviews,
+            '평균 판매가 (원)': ch.avgPrice,
+            '평균 할인율 (%)': ch.discount,
+            '상품수 변동': ch.chgProducts,
+            '점유율 변동': ch.chgShare,
+            '평균가 변동': ch.chgAvgPrice,
+            '할인율 변동': ch.chgDiscount,
+          }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          ws['!cols'] = [10,12,14,10,16,14,12,12,14,12].map(w => ({ wch: w }));
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, '채널별 성과');
+          XLSX.writeFile(wb, `채널별성과_${date}.xlsx`);
+        },
+
+        downloadCompeteExcel() {
+          const date = '20260401';
+          const rows = this.competeTableComputed.map(br => ({
+            '브랜드': br.name,
+            'AP 브랜드': br.isAP ? 'Y' : 'N',
+            '상품수': br.products,
+            '총 리뷰': br.computedReviews,
+            '리뷰 증감': br.chgReviews,
+            '점유율 (%)': br.computedShare,
+            '점유율 변동': br.chgShare,
+            '평균 판매가 (원)': br.avgPrice,
+            '주요 동향': br.alert,
+          }));
+          const ws = XLSX.utils.json_to_sheet(rows);
+          ws['!cols'] = [14,10,8,10,10,10,10,16,28].map(w => ({ wch: w }));
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, '경쟁사 현황');
+          XLSX.writeFile(wb, `경쟁사현황_${date}.xlsx`);
+        },
+
+        get competeTableComputed() {
+          const key = this.brandChannel;
+          const getReviews = br => key === 'all' ? br.reviews : (br.ch?.[key] || 0);
+          const total = this.competeTable.reduce((s, br) => s + getReviews(br), 0);
+          const chKeys = ['naver','coupang','oliveyoung','gmarket','street','kakao','auction'];
+          const chNames = {naver:'네이버',coupang:'쿠팡',oliveyoung:'올리브영',gmarket:'지마켓',street:'11번가',kakao:'카카오',auction:'옥션'};
+
+          return this.competeTable.map(br => {
+            const computedReviews = getReviews(br);
+            const computedShare = total > 0 ? (computedReviews / total * 100).toFixed(1) : '0.0';
+
+            let alert = '동향 이상 없음';
+            let alertType = 'info';
+
+            const cp = br.chProducts || {};
+            const pp = br.prevChProducts || {};
+            const chgShareVal = parseFloat(br.chgShare);
+            const chgReviewsVal = parseFloat(br.chgReviews);
+
+            // Rule 1: 채널 신규 입점 (prev===0, curr>0)
+            const newChs = chKeys.filter(c => (pp[c] || 0) === 0 && (cp[c] || 0) > 0);
+            if (newChs.length >= 3) {
+              alert = '다중 채널 신규 입점 · 급성장';
+              alertType = 'warn';
+            } else if (newChs.length >= 1) {
+              alert = newChs.map(c => chNames[c]).join('·') + ' 신규 입점';
+              alertType = 'warn';
+            } else {
+              // Rule 2: 채널 입점 확대 (취급 상품 2배+)
+              const expandedCh = chKeys.find(c => (pp[c] || 0) > 0 && (cp[c] || 0) >= (pp[c] || 0) * 2);
+              if (expandedCh) {
+                alert = chNames[expandedCh] + ' 입점 확대';
+                alertType = 'warn';
+              } else if (chgReviewsVal >= 25) {
+                // Rule 3: 리뷰 급증 >=25%
+                const topCh = chKeys.reduce((a, b) => (br.ch?.[a] || 0) >= (br.ch?.[b] || 0) ? a : b);
+                alert = chNames[topCh] + ' 중심 리뷰 급증';
+                alertType = 'warn';
+              } else if (!br.isAP && chgShareVal >= 2.0) {
+                // Rule 4: 점유율 급등 >=2%p
+                alert = '점유율 급등 · 주시 필요';
+                alertType = 'warn';
+              } else if (!br.isAP && chgShareVal >= 1.0) {
+                // Rule 4: 점유율 상승 >=1%p
+                alert = '점유율 상승 · 주시';
+                alertType = 'warn';
+              } else if (!br.isAP && chgShareVal < -0.3) {
+                // Rule 5: 점유율 하락세
+                alert = '점유율 하락세';
+                alertType = 'good';
+              } else if (!br.isAP) {
+                // Rule 6: 단일 채널 의존도
+                const totalBrRevs = chKeys.reduce((s, c) => s + (br.ch?.[c] || 0), 0);
+                const dominantCh = totalBrRevs > 0 ? chKeys.find(c => (br.ch?.[c] || 0) / totalBrRevs > 0.4) : null;
+                if (dominantCh && chgReviewsVal > 5) {
+                  alert = chNames[dominantCh] + ' 비중 높음';
+                  alertType = 'info';
+                }
+              }
+            }
+
+            return { ...br, computedReviews, computedShare, alert, alertType };
+          });
+        },
+
+        get competeTableFiltered() {
+          const q = this.competeQuery.trim().toLowerCase();
+          if (!q) return this.competeTableComputed;
+          return this.competeTableComputed.filter(br => br.name.toLowerCase().includes(q));
+        },
+
+        get drilldownChannelStats() {
+          const chCfg = [
+            {key:'naver',name:'네이버',color:'#1976d2'},
+            {key:'coupang',name:'쿠팡',color:'#ff6f00'},
+            {key:'oliveyoung',name:'올리브영',color:'#C8748A'},
+            {key:'gmarket',name:'지마켓',color:'#43a047'},
+            {key:'street',name:'11번가',color:'#8e24aa'},
+            {key:'kakao',name:'카카오',color:'#00897b'},
+            {key:'auction',name:'옥션',color:'#f4511e'},
+          ];
+          const products = this.drilldownProductsAll;
+          const totalReviews = chCfg.reduce((s, c) =>
+            s + products.filter(p => p.channels[c.key]).reduce((rs, p) => rs + p.channels[c.key].reviews, 0), 0);
+          return chCfg.map(c => {
+            const prods = products.filter(p => p.channels[c.key]);
+            const reviews = prods.reduce((s, p) => s + p.channels[c.key].reviews, 0);
+            const avgPrice = prods.length ? Math.round(prods.reduce((s, p) => s + p.channels[c.key].price, 0) / prods.length) : 0;
+            return { ...c, count: prods.length, reviews, avgPrice, sharePct: totalReviews > 0 ? (reviews / totalReviews * 100).toFixed(1) : '0.0' };
+          }).filter(c => c.count > 0);
+        },
+
+        get drilldownMarketData() {
+          if (!this.selectedBrand) return { mainCat: '', brands: [], priceDist: [] };
+          const products = this.drilldownProductsAll;
+          if (!products.length) return { mainCat: '', brands: [], priceDist: [] };
+          const catCounts = {};
+          products.forEach(p => { catCounts[p.cat] = (catCounts[p.cat] || 0) + 1; });
+          const mainCat = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0][0];
+          const maps = {
+            '스킨케어': [{name:'닥터자르트',reviews:412000,share:18.4,avgPrice:48000,isAP:false},{name:'설화수',reviews:321000,share:14.2,avgPrice:92000,isAP:true},{name:'아누아',reviews:298000,share:13.2,avgPrice:32000,isAP:false},{name:'라네즈',reviews:241000,share:10.7,avgPrice:54000,isAP:true},{name:'이니스프리',reviews:198000,share:8.8,avgPrice:38000,isAP:true},{name:'코스알엑스',reviews:187000,share:8.3,avgPrice:28000,isAP:false}],
+            '메이크업': [{name:'헤라',reviews:187000,share:16.8,avgPrice:68000,isAP:true},{name:'클리오',reviews:163000,share:14.7,avgPrice:32000,isAP:false},{name:'에뛰드',reviews:141000,share:12.7,avgPrice:22000,isAP:true},{name:'맥',reviews:132000,share:11.9,avgPrice:45000,isAP:false},{name:'라네즈',reviews:98000,share:8.8,avgPrice:42000,isAP:true},{name:'웨이크메이크',reviews:62000,share:5.6,avgPrice:19000,isAP:true}],
+            '헤어케어': [{name:'려',reviews:341000,share:22.3,avgPrice:18000,isAP:true},{name:'미쟝센',reviews:298000,share:19.5,avgPrice:12000,isAP:true},{name:'TS샴푸',reviews:241000,share:15.7,avgPrice:24000,isAP:false},{name:'닥터방기원',reviews:187000,share:12.2,avgPrice:32000,isAP:false},{name:'케라시스',reviews:163000,share:10.6,avgPrice:14000,isAP:false}],
+            '바디케어': [{name:'일리윤',reviews:198000,share:21.4,avgPrice:16000,isAP:true},{name:'세타필',reviews:176000,share:19.0,avgPrice:22000,isAP:false},{name:'바이오더마',reviews:143000,share:15.4,avgPrice:28000,isAP:false},{name:'마몽드',reviews:112000,share:12.1,avgPrice:18000,isAP:true},{name:'이니스프리',reviews:89000,share:9.6,avgPrice:22000,isAP:true}],
+            '선케어': [{name:'아누아',reviews:312000,share:24.8,avgPrice:19800,isAP:false},{name:'이니스프리',reviews:241000,share:19.2,avgPrice:24000,isAP:true},{name:'라네즈',reviews:187000,share:14.9,avgPrice:32000,isAP:true},{name:'바이오더마',reviews:143000,share:11.4,avgPrice:28000,isAP:false},{name:'아이오페',reviews:98000,share:7.8,avgPrice:38000,isAP:true}],
+            '향수': [{name:'조말론',reviews:87000,share:18.2,avgPrice:185000,isAP:false},{name:'헤라',reviews:62000,share:12.9,avgPrice:98000,isAP:true},{name:'딥티크',reviews:54000,share:11.3,avgPrice:172000,isAP:false},{name:'설화수',reviews:41000,share:8.6,avgPrice:142000,isAP:true},{name:'라네즈',reviews:33000,share:6.9,avgPrice:72000,isAP:true}],
+            '네일': [{name:'오호라',reviews:421000,share:31.2,avgPrice:14000,isAP:false},{name:'에뛰드',reviews:198000,share:14.7,avgPrice:9000,isAP:true},{name:'네일팩토리',reviews:143000,share:10.6,avgPrice:8000,isAP:false},{name:'쏘내추럴',reviews:112000,share:8.3,avgPrice:11000,isAP:false},{name:'웨이크메이크',reviews:78000,share:5.8,avgPrice:12000,isAP:true}],
+            '맨즈케어': [{name:'라운드랩',reviews:187000,share:19.8,avgPrice:22000,isAP:false},{name:'에스쁘아',reviews:141000,share:14.9,avgPrice:32000,isAP:true},{name:'니베아맨',reviews:132000,share:14.0,avgPrice:14000,isAP:false},{name:'아이오페',reviews:98000,share:10.4,avgPrice:42000,isAP:true},{name:'헤라',reviews:74000,share:7.8,avgPrice:55000,isAP:true}],
+          };
+          const rawBrands = maps[mainCat] || [];
+          const prices = rawBrands.map(b => b.avgPrice);
+          const revs = rawBrands.map(b => b.reviews);
+          const minP = Math.min(...prices), maxP = Math.max(...prices);
+          const minR = Math.min(...revs), maxR = Math.max(...revs);
+          const brands = rawBrands.map(b => ({
+            ...b,
+            px: maxP === minP ? 50 : Math.round((b.avgPrice - minP) / (maxP - minP) * 76 + 10),
+            py: maxR === minR ? 50 : Math.round((1 - (b.reviews - minR) / (maxR - minR)) * 68 + 12),
+          }));
+          const ranges = [
+            {label:'3만원↓',min:0,max:30000},
+            {label:'3~10만원',min:30000,max:100000},
+            {label:'10~20만원',min:100000,max:200000},
+            {label:'20만원↑',min:200000,max:Infinity},
+          ];
+          const priceDist = ranges.map(r => {
+            const cnt = products.filter(p => p.price >= r.min && p.price < r.max).length;
+            return { label: r.label, pct: products.length ? Math.round(cnt / products.length * 100) : 0 };
+          });
+          return { mainCat, brands, priceDist };
+        },
+
+        get drilldownProductsAll() {
+          if (!this.selectedBrand) return [];
+          return this.allProducts.filter(p => p.brand === this.selectedBrand.name);
+        },
+
+        get drilldownProductsFiltered() {
+          return this.drilldownProductsAll.filter(p => {
+            const q = this.drilldownQuery.toLowerCase();
+            const matchQ = !q || p.name.toLowerCase().includes(q);
+            const matchCat = !this.drilldownCat || p.cat === this.drilldownCat;
+            const matchCh = !this.drilldownChannel || (p.channels && p.channels[this.drilldownChannel]);
+            return matchQ && matchCat && matchCh;
+          });
+        },
+
+        get drilldownProductsPaged() {
+          return this.drilldownProductsFiltered.slice(0, this.drilldownPage * 20);
+        },
+
+        isLowestPrice(p, chKey) {
+          if (!p.channels || !p.channels[chKey]) return false;
+          const prices = Object.values(p.channels).filter(v => v).map(v => v.price);
+          return p.channels[chKey].price === Math.min(...prices);
+        },
+
+        showToast(msg) {
+          this.toast = msg;
+          setTimeout(() => this.toast = null, 2500);
+        },
+      }
+    }
+  </script>
+</body>
+</html>
