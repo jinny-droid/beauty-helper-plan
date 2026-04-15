@@ -325,12 +325,11 @@ reviewAlert = changeRate >= 20 ? 'rise' : ...</div>
       <div class="section-body">
         <div class="sub-section"><span class="calc-badge">계산값</span> alertType 판별 로직 (독립 조건 전체 수집 → 우선순위 순 정렬 → 첫 번째를 메인 배지로 표시. 복수 해당 시 +N 표기 + hover 툴팁으로 나머지 노출)</div>
         <table>
-          <thead><tr><th style="width:5%">#</th><th style="width:28%">표시 텍스트</th><th style="width:8%">배지</th><th style="width:40%">감지 조건</th><th>비고</th></tr></thead>
+          <thead><tr><th style="width:5%">#</th><th style="width:30%">배지</th><th style="width:45%">감지 조건</th><th>비고</th></tr></thead>
           <tbody>
             <tr>
               <td class="text-gray-400 font-bold text-xs">1</td>
-              <td><span class="metric-name">다중 채널 신규 입점 · 급성장</span></td>
-              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">다중 채널 신규 입점 · 급성장</span></td>
               <td>
                 <div class="formula">newChs = chKeys.filter(c =>
   prevChProducts[c] === 0 && chProducts[c] > 0
@@ -341,8 +340,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">2</td>
-              <td><span class="metric-name">[채널명] 신규 입점</span></td>
-              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">[채널명] 신규 입점</span></td>
               <td>
                 <div class="formula">newChs.length >= 1 && newChs.length < 3
 // [채널명] = newChs[0].name (동적 치환)</div>
@@ -351,8 +349,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">3</td>
-              <td><span class="metric-name">[채널명] 입점 확대</span></td>
-              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">[채널명] 입점 확대</span></td>
               <td>
                 <div class="formula">chKeys.some(c =>
   chProducts[c] >= prevChProducts[c] * 2
@@ -363,8 +360,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">4</td>
-              <td><span class="metric-name">[채널명] 중심 리뷰 급증</span></td>
-              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">[채널명] 중심 리뷰 급증</span></td>
               <td>
                 <div class="formula">parseFloat(chgReviews) >= 25
 // [채널명] = 리뷰 수 최다 채널명 (ch 객체 max값 기준)</div>
@@ -374,8 +370,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">5</td>
-              <td><span class="metric-name">점유율 급등 · 주시 필요</span></td>
-              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">점유율 급등 · 주시 필요</span></td>
               <td>
                 <div class="formula">!isAP && parseFloat(chgShare) >= 2.0</div>
                 <p class="threshold">⚠️ 임계값 +2.0%p는 초기 설정값.</p>
@@ -384,8 +379,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">6</td>
-              <td><span class="metric-name">점유율 상승 · 주시</span></td>
-              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">점유율 상승 · 주시</span></td>
               <td>
                 <div class="formula">!isAP && parseFloat(chgShare) >= 1.0</div>
                 <p class="threshold">⚠️ 임계값 +1.0%p는 초기 설정값.</p>
@@ -394,8 +388,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">7</td>
-              <td><span class="metric-name">리뷰 급감 · 약세</span></td>
-              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">기회</span></td>
+              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">리뷰 급감 · 약세</span></td>
               <td>
                 <div class="formula">!isAP && parseFloat(chgReviews) <= -25</div>
                 <p class="threshold">⚠️ 임계값 -25%는 초기 설정값.</p>
@@ -404,8 +397,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">8</td>
-              <td><span class="metric-name">점유율 하락세</span></td>
-              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">기회</span></td>
+              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">점유율 하락세</span></td>
               <td>
                 <div class="formula">!isAP && parseFloat(chgShare) <= -0.3</div>
                 <p class="threshold">⚠️ 임계값 -0.3%p는 초기 설정값.</p>
@@ -414,8 +406,7 @@ newChs.length >= 3</div>
             </tr>
             <tr>
               <td class="text-gray-400 font-bold text-xs">9</td>
-              <td><span class="metric-name">[채널명] 비중 높음</span></td>
-              <td><span style="background:#f3f4f6;color:#6b7280;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">정보</span></td>
+              <td><span style="background:#f3f4f6;color:#6b7280;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">[채널명] 비중 높음</span></td>
               <td>
                 <div class="formula">singleChRatio = max(ch[c]) / Σ(ch) > 0.4
 && parseFloat(chgReviews) > 5</div>
@@ -425,7 +416,6 @@ newChs.length >= 3</div>
             <tr>
               <td class="text-gray-400 font-bold text-xs" style="color:#cbd5e1">—</td>
               <td><span class="text-gray-400 text-sm">배지 미표시</span></td>
-              <td>—</td>
               <td>
                 <div class="formula">// 위 1~9 조건 모두 미해당
 alert = ''  // 빈 값 반환, 배지 미렌더링</div>
