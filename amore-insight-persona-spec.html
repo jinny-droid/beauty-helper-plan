@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아모레퍼시픽 Commerce Insight — 서비스 기획서 (직군별 뷰)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1A2B4A;
+    --navy-light: #2d4270;
+    --rose: #C8748A;
+    --rose-light: #f3e0e5;
+    --cream: #F7F3EE;
+    --blue-bg: #EEF3FF;
+    --border: #e2e8f0;
+    --text: #2d3748;
+    --text-muted: #718096;
+    --warn: #FEB2B2;
+    --warn-text: #C53030;
+    --good: #C6F6D5;
+    --good-text: #276749;
+    --info-bg: #F7FAFC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f9fc;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ─── 레이아웃 ─── */
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--navy);
+    color: #c9d4e8;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 28px 0 40px;
+    flex-shrink: 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+  .sidebar-logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 16px;
+  }
+  .sidebar-logo .brand { font-size: 11px; font-weight: 600; color: var(--rose); letter-spacing: 0.05em; text-transform: uppercase; }
+  .sidebar-logo .title { font-size: 15px; font-weight: 700; color: #fff; margin-top: 4px; line-height: 1.4; }
+  .sidebar-logo .version { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 6px; }
+  .nav-group { margin-bottom: 6px; }
+  .nav-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 10px 20px 4px;
+  }
+  .nav-item {
+    display: block;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+  }
+  .nav-item:hover { color: #fff; background: rgba(255,255,255,0.06); }
+  .nav-item.active { color: #fff; border-left-color: var(--rose); background: rgba(200,116,138,0.12); }
+  .nav-sub {
+    padding: 5px 20px 5px 32px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    display: block;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .nav-sub:hover { color: rgba(255,255,255,0.75); }
+  .nav-sub.active { color: var(--rose); border-left-color: var(--rose); }
+
+  .content { flex: 1; min-width: 0; }
+
+  /* ─── 헤더 ─── */
+  .doc-header {
+    background: var(--navy);
+    padding: 48px 56px;
+    color: #fff;
+  }
+  .doc-header .badge {
+    display: inline-block;
+    background: var(--rose);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .doc-header h1 { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
+  .doc-header p { font-size: 14px; color: rgba(255,255,255,0.55); }
+  .doc-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    flex-wrap: wrap;
+  }
+  .doc-meta-item { font-size: 12px; color: rgba(255,255,255,0.45); }
+  .doc-meta-item strong { color: rgba(255,255,255,0.8); margin-right: 6px; }
+
+  /* ─── 섹션 ─── */
+  .section {
+    padding: 48px 56px;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+    scroll-margin-top: 20px;
+  }
+  .section-number {
+    display: inline-block;
+    width: 26px; height: 26px;
+    background: var(--rose);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 26px;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--navy);
+  }
+  .section-title { font-size: 20px; font-weight: 800; color: var(--navy); }
+  .section-subtitle { font-size: 13px; color: var(--text-muted); margin-left: auto; }
+
+  /* ─── 콘텐츠 블록 ─── */
+  h2 { font-size: 17px; font-weight: 700; color: var(--navy); margin: 32px 0 12px; }
+  h2:first-child { margin-top: 0; }
+  h3 { font-size: 14px; font-weight: 700; color: var(--text); margin: 24px 0 10px; }
+  h4 { font-size: 13px; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+  p { margin-bottom: 10px; color: var(--text); }
+
+  /* ─── 목적 박스 ─── */
+  .purpose-box {
+    background: var(--blue-bg);
+    border-left: 4px solid var(--navy);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: var(--navy);
+    line-height: 1.8;
+  }
+
+  /* ─── 와이어프레임 ─── */
+  .wireframe {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #4a5568;
+    line-height: 1.6;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* ─── 테이블 ─── */
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  .spec-table th {
+    background: var(--navy);
+    color: #fff;
+    padding: 9px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  .spec-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+  }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table tr:hover td { background: #f7f9ff; }
+  .spec-table.compact td, .spec-table.compact th { padding: 7px 12px; }
+
+  /* ─── 배지 ─── */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-warn { background: #FFF0F0; color: var(--warn-text); }
+  .badge-good { background: #F0FFF4; color: var(--good-text); }
+  .badge-info { background: #F7FAFC; color: #4a5568; border: 1px solid #e2e8f0; }
+  .badge-navy { background: var(--navy); color: #fff; }
+  .badge-rose { background: var(--rose); color: #fff; }
+  .badge-todo { background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; }
+
+  /* ─── 시나리오 박스 ─── */
+  .scenario-box {
+    background: #fffdf8;
+    border: 1px solid #e8e0d0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 12px 0 20px;
+    font-size: 13px;
+    color: #5a4a3a;
+    line-height: 1.9;
+  }
+  .scenario-box::before {
+    content: '💡 사용자 시나리오';
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #a07850;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  /* ─── 규칙 박스 ─── */
+  .rule-box {
+    background: #f0f7ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  .rule-box-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #1e40af;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .rule-box ul { padding-left: 16px; }
+  .rule-box li { margin-bottom: 4px; color: #1e3a5f; }
+
+  /* ─── 흐름도 ─── */
+  .flow-box {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0 20px;
+    font-size: 12.5px;
+    line-height: 1.8;
+    white-space: pre;
+    font-family: 'Courier New', monospace;
+    color: var(--navy);
+    overflow-x: auto;
+  }
+
+  /* ─── 미결 사항 ─── */
+  .todo-box {
+    background: #FFFBEB;
+    border: 1px solid #FCD34D;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 24px 0 0;
+  }
+  .todo-box-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #92400E;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .todo-box ul { padding-left: 16px; }
+  .todo-box li { font-size: 13px; color: #78350F; margin-bottom: 4px; }
+
+  /* ─── 직군 카드 그리드 ─── */
+  .persona-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 12px 0 20px;
+  }
+  .persona-card {
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 13px;
+  }
+  .persona-card .p-title { font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .persona-card .p-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .persona-card.selected { border-color: var(--navy); background: #f0f4f9; }
+
+  /* ─── KPI 그리드 ─── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 12px 0 20px; }
+  .kpi-card {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 14px 16px;
+    border-top: 3px solid var(--navy);
+  }
+  .kpi-card.rose { border-top-color: var(--rose); }
+  .kpi-card .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-card .kpi-value { font-size: 22px; font-weight: 900; color: var(--navy); margin: 4px 0; }
+  .kpi-card .kpi-sub { font-size: 12px; color: var(--text-muted); }
+
+  /* ─── 구분선 ─── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* ─── 인라인 강조 ─── */
+  strong { font-weight: 700; color: var(--navy); }
+  code {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--rose);
+  }
+  blockquote {
+    border-left: 3px solid var(--rose);
+    padding: 8px 16px;
+    margin: 12px 0;
+    color: #5a4a3a;
+    background: #fffdf8;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  ul.spec-list { padding-left: 18px; margin-bottom: 16px; }
+  ul.spec-list li { margin-bottom: 5px; }
+
+  /* ─── 직군 뷰 테이블 ─── */
+  .persona-view-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  .persona-view-table th {
+    background: #f1f5f9;
+    color: var(--navy);
+    padding: 8px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .persona-view-table th.p-head {
+    background: var(--navy);
+    color: #fff;
+  }
+  .persona-view-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-size: 12px;
+  }
+  .persona-view-table tr:last-child td { border-bottom: none; }
+
+  /* ─── 반응형 ─── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .section { padding: 32px 24px; }
+    .doc-header { padding: 32px 24px; }
+    .persona-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media print {
+    .sidebar { display: none; }
+    .section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ─── 사이드바 ─── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">Beauty Dome</div>
+    <div class="title">Commerce Insight<br>서비스 기획서</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">for Amorepacific</div>
+    <div class="version">직군별 뷰 · 2026-04-14</div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">공통</div>
+    <a class="nav-item" href="#sec-global">서비스 개요 &amp; 공통</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">진입 흐름</div>
+    <a class="nav-item" href="#sec-login">로그인 &amp; 직군 선택</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">화면별 기획</div>
+    <a class="nav-item" href="#sec-overview">Overview</a>
+    <a class="nav-sub" href="#sec-overview-executive">↳ 전사 보기</a>
+    <a class="nav-sub" href="#sec-overview-strategy">↳ 전략기획</a>
+    <a class="nav-sub" href="#sec-overview-md">↳ 채널 MD</a>
+    <a class="nav-sub" href="#sec-overview-brand">↳ 브랜드 매니저</a>
+    <a class="nav-item" href="#sec-channel">성과 분석 &gt; 채널별</a>
+    <a class="nav-item" href="#sec-brand">성과 분석 &gt; 브랜드별</a>
+    <a class="nav-item" href="#sec-category">성과 분석 &gt; 카테고리별</a>
+    <a class="nav-item" href="#sec-competitor">경쟁사</a>
+    <a class="nav-item" href="#sec-trending">트렌딩</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">부록</div>
+    <a class="nav-item" href="#sec-thresholds">수치 기준 협의 항목</a>
+
+  </div>
+</nav>
+
+<!-- ─── 본문 ─── -->
+<main class="content">
+
+  <!-- 문서 헤더 -->
+  <div class="doc-header">
+    <div class="badge">Beauty Dome · SERVICE PLAN</div>
+    <h1>아모레퍼시픽 Commerce Insight</h1>
+    <p>Beauty Dome 이커머스 인텔리전스 — 아모레퍼시픽 맞춤 기획서</p>
+    <div class="doc-meta">
+      <div class="doc-meta-item"><strong>작성일</strong>2026-04-14</div>
+      <div class="doc-meta-item"><strong>기준 파일</strong>amore-insight-persona-prototype.html</div>
+      <div class="doc-meta-item"><strong>대상 채널</strong>네이버 · 쿠팡 · 올리브영 · 지마켓 · 11번가 · 카카오 · 옥션</div>
+      <div class="doc-meta-item"><strong>대상 브랜드</strong>아모레퍼시픽 16개 브랜드 + 경쟁사</div>
+      <div class="doc-meta-item"><strong>비교 기준</strong>전주 대비 (주 1회 수집)</div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════
+       0. 서비스 개요 & 공통
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-global">
+    <div class="section-header">
+      <span class="section-number">0</span>
+      <span class="section-title">서비스 개요 &amp; 공통 기획</span>
+    </div>
+
+    <h2>서비스 개요</h2>
+    <div class="purpose-box">
+      아모레퍼시픽 내부 직원이 <strong>7개 이커머스 채널</strong>(네이버·쿠팡·올리브영·지마켓·11번가·카카오·옥션)의 화장품 데이터를 모니터링하는 인텔리전스 대시보드.<br>
+      사용자의 <strong>직군(전사·전략기획·채널MD·브랜드매니저)</strong>에 따라 Overview 화면이 맞춤 구성된다.<br>
+      수집 주기: 일 1회 (전일 기준) · 비교 기준: 전주 대비 · 대상 브랜드: 아모레퍼시픽 16개 브랜드 + 주요 경쟁사
+    </div>
+
+    <h2>전체 화면 구조</h2>
+    <div class="wireframe">로그인
+  └── 직군 선택 팝업
+        └── 메인 대시보드
+              ├── Overview        직군별 맞춤 현황 요약
+              ├── 성과 분석       채널별 · 브랜드별 · 카테고리별
+              ├── 경쟁사          경쟁 브랜드 모니터링
+              └── 트렌딩          급상승 상품 모니터링</div>
+
+    <h2>헤더 (전 화면 공통)</h2>
+    <p>화면 상단에 항상 고정 노출.</p>
+    <table class="spec-table">
+      <thead><tr><th>요소</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>로고</td><td>클릭 시 Overview로 이동</td></tr>
+        <tr><td>탭 네비게이션</td><td>Overview / 성과 분석 / 경쟁사 / 트렌딩</td></tr>
+        <tr><td>데이터 기준일</td><td>현재 데이터 수집 기준일 표시</td></tr>
+        <tr><td>뷰 전환 버튼</td><td>현재 직군명 표시. 클릭 시 직군 선택 팝업 재진입 → 직군 변경 가능</td></tr>
+        <tr><td>로그아웃</td><td>클릭 시 로그인 화면으로 이동</td></tr>
+      </tbody>
+    </table>
+
+    <h2>로그인</h2>
+    <ul class="spec-list">
+      <li>사내 계정 ID/PW 입력 후 접속</li>
+      <li>잘못된 계정 입력 시 에러 문구 안내</li>
+      <li>현재 프로토타입 계정: ID <code>amore</code> / PW <code>amore2026!</code></li>
+      <li>직군이 고정(pin)된 경우 로그인 성공 즉시 대시보드로 직행 (직군 선택 팝업 스킵)</li>
+    </ul>
+
+    <h2>Info 버튼 (공통 UX)</h2>
+    <p>각 지표·컬럼명 옆에 작은 원형 <code>i</code> 버튼이 표시된다. 호버 시 해당 지표의 정의를 툴팁으로 보여준다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>속성</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>노출 위치</td><td>KPI 카드 지표명 옆, 테이블 컬럼 헤더 옆</td></tr>
+        <tr><td>노출 조건</td><td>PC 전용 (모바일 미제공)</td></tr>
+        <tr><td>트리거</td><td>마우스 호버</td></tr>
+        <tr><td>툴팁 내용</td><td>지표 정의 1~2줄 간결한 설명</td></tr>
+      </tbody>
+    </table>
+
+    <h2>전주 대비 기준 안내</h2>
+    <p>변동값(증감·등락)이 노출되는 모든 화면에서 <strong>"수치 하단 변동값은 전주 대비 기준입니다"</strong> 문구를 표 상단에 안내한다. 데이터 수집이 일 1회이므로 전주 동일 시점 대비 비교가 기준이 된다.</p>
+
+    <h2>Excel 다운로드 (공통)</h2>
+    <p>데이터 활용이 필요한 5개 화면에서 Excel 다운로드를 제공한다. 모든 파일 첫 행에 <strong>데이터 기준일(전일 기준)</strong>이 자동 삽입된다.</p>
+    <table class="spec-table">
+      <thead><tr><th>화면</th><th>버튼 위치</th><th>활용 가치</th><th>파일명</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>성과 분석 &gt; 채널별</td>
+          <td>채널별 성과 비교 테이블 헤더 우측</td>
+          <td>채널 담당자·MD가 채널별 성과를 주간 보고 자료로 가공할 때 사용. 변동값이 별도 컬럼으로 분리되어 피벗·가공에 용이</td>
+          <td><code>채널별성과_YYYYMMDD_HH-MM-SS.xlsx</code></td>
+        </tr>
+        <tr>
+          <td>성과 분석 &gt; 브랜드별</td>
+          <td>전 브랜드 성과 목록 헤더 우측</td>
+          <td>브랜드 매니저·전략기획이 자사 전 브랜드 성과를 한 시트에서 비교하거나 경영진 보고 자료 작성 시 활용. 직군별 활성도 점수도 함께 제공</td>
+          <td><code>브랜드별성과_YYYYMMDD_HH-MM-SS.xlsx</code></td>
+        </tr>
+        <tr>
+          <td>성과 분석 &gt; 카테고리별</td>
+          <td>카테고리 내 경쟁 브랜드 순위표 헤더 우측</td>
+          <td>선택한 카테고리·채널 조합의 경쟁 구도를 스냅샷으로 보관. 월간 포지셔닝 변화 추적 시 날짜별 파일을 누적해 비교 가능</td>
+          <td><code>카테고리별성과_YYYYMMDD_HH-MM-SS.xlsx</code></td>
+        </tr>
+        <tr>
+          <td>경쟁사</td>
+          <td>경쟁 브랜드 현황 테이블 헤더 우측</td>
+          <td>경쟁 브랜드 전체 현황을 담당자별로 공유하거나 이슈 대응 근거 자료로 활용. 주시 동향 컬럼 포함으로 현황 파악이 빠름</td>
+          <td><code>경쟁사현황_YYYYMMDD_HH-MM-SS.xlsx</code></td>
+        </tr>
+        <tr>
+          <td>트렌딩</td>
+          <td>급성장 상품 순위 테이블 헤더 우측</td>
+          <td>이번 주 급상승 상품 목록을 마케팅·기획팀에 공유하거나 신상품·리뉴얼 기획 인풋으로 활용. 현재 선택된 필터(카테고리·자사만 보기) 기준으로 다운로드됨</td>
+          <td><code>트렌딩리뷰급증_YYYYMMDD_HH-MM-SS.xlsx</code><br><code>트렌딩찜급증_YYYYMMDD_HH-MM-SS.xlsx</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--text-muted);">※ 파일명에 날짜(YYYYMMDD) + 시각(HH-MM-SS)이 자동 포함된다. 화면에는 변동값이 숫자 하단 인라인으로 표시되나, Excel에는 별도 컬럼으로 분리해 제공한다. 트렌딩 파일명은 현재 선택 지표(리뷰/찜)에 따라 자동 전환된다.</p>
+
+    <h2>공통 UI 규칙</h2>
+    <table class="spec-table">
+      <thead><tr><th>규칙</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>자사 브랜드 강조</td><td>경쟁사 테이블에서 자사 행은 배경색으로 구분. 자사 배지 함께 표시</td></tr>
+        <tr><td>클릭 가능 카드</td><td>인터랙션 가능 여부 시각 안내</td></tr>
+        <tr><td>채널 이상 감지</td><td>전주 대비 리뷰 수 ±20% 이상 변동 채널에 ▲/▼ 배지 자동 표시. 기획전·이벤트 정보는 수집 불가로 미제공</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       1. 로그인 & 직군 선택
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-login">
+    <div class="section-header">
+      <span class="section-number">1</span>
+      <span class="section-title">로그인 &amp; 직군 선택</span>
+      <span class="section-subtitle">서비스 진입 흐름</span>
+    </div>
+
+    <div class="purpose-box">
+      사용자가 자신의 직군을 선택하면 Overview 화면이 그 직군에 맞게 구성된다. 매번 선택하는 번거로움을 줄이기 위해 <strong>직군 고정(pin)</strong> 기능을 제공한다.
+    </div>
+
+    <h2>화면 흐름</h2>
+    <div class="flow-box">로그인 화면 → 로그인 성공
+  ├── [직군 미고정] 직군 선택 팝업 표시
+  │     ├── 직군 카드 선택 → 카드 하이라이트
+  │     ├── (선택) "이 직군 설정 고정하기" 체크
+  │     └── "시작하기" 버튼 → 대시보드 진입
+  └── [직군 고정된 경우] 직군 선택 팝업 스킵 → 대시보드 직행</div>
+
+    <h2>직군 선택 팝업</h2>
+    <p>로그인 성공 후 대시보드 위에 오버레이로 표시된다.</p>
+
+    <h3>직군 카드 4종</h3>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="p-title">전사 보기</div>
+        <div class="p-desc">경영진·본부장급. 시장 점유율·경쟁사 현황 중심 요약</div>
+      </div>
+      <div class="persona-card">
+        <div class="p-title">전략기획</div>
+        <div class="p-desc">중장기 전략 담당. 카테고리 기회·시장 성장률 중심</div>
+      </div>
+      <div class="persona-card">
+        <div class="p-title">채널 MD</div>
+        <div class="p-desc">채널 운영 담당. 채널별 상세 지표·이상 감지 중심</div>
+      </div>
+      <div class="persona-card">
+        <div class="p-title">브랜드 매니저</div>
+        <div class="p-desc">브랜드 담당 PM. 자사 브랜드 활성도·경쟁 포지션 중심</div>
+      </div>
+    </div>
+    <h3>직군 고정 기능</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>요소</th><th>동작</th></tr></thead>
+      <tbody>
+        <tr><td>"이 직군 설정 고정하기" 체크박스</td><td>체크 후 시작하기 클릭 시 선택한 직군을 localStorage에 저장</td></tr>
+        <tr><td>시작하기 버튼</td><td>직군 선택 상태에서만 활성화. 클릭 시 대시보드 진입</td></tr>
+        <tr><td>고정 해제</td><td>헤더 "뷰 전환" 버튼 → 직군 선택 팝업 재진입 → 체크 해제 후 시작하기</td></tr>
+        <tr><td>체크 없이 시작</td><td>해당 세션에서만 직군 적용. 다음 로그인 시 다시 선택 팝업 표시</td></tr>
+      </tbody>
+    </table>
+
+    <h3>직군 변경 (뷰 전환)</h3>
+    <p>대시보드 헤더에 <strong>"뷰 전환"</strong> 버튼이 항상 노출된다. 클릭 시 현재 직군을 미리 선택된 상태로 직군 선택 팝업이 다시 열린다. 다른 직군을 선택하고 시작하기를 누르면 즉시 해당 뷰로 전환된다.</p>
+
+    <div class="todo-box">
+      <div class="todo-box-title">미결 / 추후 개선</div>
+      <ul>
+        <li>직군 고정 저장소: 현재 localStorage → 실서비스에서 사용자 계정 서버에 저장 예정</li>
+        <li>추후 권한 기반 접근 제어 검토 (특정 직군 탭 노출 제한 가능성)</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       2. Overview
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-overview">
+    <div class="section-header">
+      <span class="section-number">2</span>
+      <span class="section-title">Overview 탭</span>
+      <span class="section-subtitle">직군별 맞춤 현황 요약</span>
+    </div>
+
+    <div class="purpose-box">
+      대시보드 메인 화면. 선택한 직군에 따라 KPI 카드 구성과 하단 섹션이 달라진다. "지금 내 관점에서 시장이 어떻게 돌아가는가"를 빠르게 파악하는 것이 목표.
+    </div>
+
+    <h2>직군별 KPI 카드 비교 (상단 4개)</h2>
+    <p>모든 직군에서 KPI 카드 4개가 노출된다. 직군마다 다른 지표를 보여주며, 카드는 클릭 시 연관된 상세 탭으로 이동한다.</p>
+
+    <table class="persona-view-table">
+      <thead>
+        <tr>
+          <th style="width:20%">직군</th>
+          <th class="p-head">카드 1</th>
+          <th class="p-head">카드 2</th>
+          <th class="p-head">카드 3</th>
+          <th class="p-head">카드 4</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>전사 보기</strong></td>
+          <td>자사 합산 점유율<br><span style="color:#888">↑ 1.2%p 전주 대비</span></td>
+          <td>전주 대비 성장률</td>
+          <td>성장 중인 채널<br><span style="color:#888">올리브영·쿠팡 외 2개</span></td>
+          <td>주시 경쟁사<br><span style="color:#888">아누아·닥터지 외 3개</span></td>
+        </tr>
+        <tr>
+          <td><strong>전략기획</strong></td>
+          <td>자사 합산 점유율<br><span style="color:#888">↑ 1.2%p 최근 3개월</span></td>
+          <td>전주 대비 성장률</td>
+          <td>성장 중인 채널<br><span style="color:#888">올리브영·쿠팡 외 2개</span></td>
+          <td>주시 경쟁사<br><span style="color:#888">아누아·닥터지 외 3개</span></td>
+        </tr>
+        <tr>
+          <td><strong>채널 MD</strong></td>
+          <td>성장 채널<br><span style="color:#888">올리브영·쿠팡 외 2개</span></td>
+          <td>점유율 하락 채널<br><span style="color:#888">지마켓·옥션</span></td>
+          <td>리뷰 급증 채널<br><span style="color:#888">+2.1%p — 쿠팡도 상승 중</span></td>
+          <td>경쟁사 신규 동향<br><span style="color:#888">건수 표시</span></td>
+        </tr>
+        <tr>
+          <td><strong>브랜드 매니저</strong></td>
+          <td>평균 브랜드 활성도<br><span style="color:#888">16개 브랜드 평균</span></td>
+          <td>상위 브랜드<br><span style="color:#888">활성도 83점 ▲2점</span></td>
+          <td>성장 브랜드 수<br><span style="color:#888">설화수·라네즈 외 5개</span></td>
+          <td>하락 브랜드 수<br><span style="color:#888">이니스프리·마몽드 등</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <blockquote>KPI 카드 하단 보조 텍스트는 핵심 데이터 또는 대표 항목명만 표시. 지표 정의는 info 버튼 툴팁으로 제공하므로 카드 본문에서 중복 노출하지 않는다.</blockquote>
+
+    <h3>보조 텍스트 노출 기준</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>기준</th><th>규칙</th></tr></thead>
+      <tbody>
+        <tr><td>데이터 없음</td><td>보조 텍스트 영역을 표시하지 않음 (빈 줄 남기지 않음). 단, 집계 자체가 0건인 경우는 "해당 없음" 표시</td></tr>
+        <tr><td>복수 항목</td><td>대표 항목 최대 2개를 "·" 로 연결해 표시 후 나머지는 "외 N개"로 요약. 예: 올리브영·쿠팡 외 2개</td></tr>
+      </tbody>
+    </table>
+
+    <h3>직군별 KPI 카드 보조 텍스트 내용</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>직군</th><th>카드</th><th>보조 텍스트 내용</th></tr></thead>
+      <tbody>
+        <tr>
+          <td rowspan="4"><strong>전사 보기</strong></td>
+          <td>자사 합산 점유율</td><td>전주 대비 증감 수치. 예: ↑ 1.2%p 전주 대비</td>
+        </tr>
+        <tr><td>전주 대비 성장률</td><td>없음 (수치 자체가 메인 정보)</td></tr>
+        <tr><td>성장 중인 채널</td><td>성장률 상위 채널명 최대 2개 + 외 N개</td></tr>
+        <tr><td>주시 경쟁사</td><td>주시 등급 경쟁사명 최대 2개 + 외 N개</td></tr>
+        <tr>
+          <td rowspan="4"><strong>전략기획</strong></td>
+          <td>자사 합산 점유율</td><td>최근 3개월 대비 증감 수치. 예: ↑ 1.2%p 최근 3개월</td>
+        </tr>
+        <tr><td>전주 대비 성장률</td><td>없음 (수치 자체가 메인 정보)</td></tr>
+        <tr><td>성장 중인 채널</td><td>성장률 상위 채널명 최대 2개 + 외 N개</td></tr>
+        <tr><td>주시 경쟁사</td><td>주시 등급 경쟁사명 최대 2개 + 외 N개</td></tr>
+        <tr>
+          <td rowspan="4"><strong>채널 MD</strong></td>
+          <td>성장 채널</td><td>성장률 상위 채널명 최대 2개 + 외 N개</td>
+        </tr>
+        <tr><td>점유율 하락 채널</td><td>하락 채널명 전체 나열 (통상 2개 이하 예상)</td></tr>
+        <tr><td>리뷰 급증 채널</td><td>전주 대비 증감률 수치 + 대표 채널명 1개. 예: +2.1%p — 쿠팡도 상승 중</td></tr>
+        <tr><td>경쟁사 신규 동향</td><td>신규 감지된 동향 건수. 예: 3건</td></tr>
+        <tr>
+          <td rowspan="4"><strong>브랜드 매니저</strong></td>
+          <td>평균 브랜드 활성도</td><td>"16개 브랜드 평균" 고정 문구</td>
+        </tr>
+        <tr><td>상위 브랜드</td><td>활성도 1위 브랜드명 + 점수 + 전주 대비 등락. 예: 활성도 83점 ▲2점</td></tr>
+        <tr><td>성장 브랜드 수</td><td>성장 브랜드명 최대 2개 + 외 N개</td></tr>
+        <tr><td>하락 브랜드 수</td><td>하락 브랜드명 최대 2개 + 외 N개</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 전사 뷰 -->
+    <h2 id="sec-overview-executive">전사 보기 뷰</h2>
+    <div class="purpose-box" style="border-left-color:var(--navy)">
+      경영진이 시장 전체 점유율 흐름과 경쟁사 움직임을 빠르게 파악한다.
+    </div>
+
+    <h3>화면 구성</h3>
+    <div class="wireframe">전사 현황 요약 (KPI 카드 × 4)
+인사이트 배너 (주요 시사점 텍스트)
+자사 점유율 추이 차트 (최근 6개월 · 주요 경쟁사 비교)
+─────────────────────────────────────
+채널 신호 (좌) │ 브랜드 신호 (중) │ 시장 신호 (우)</div>
+
+    <h3>KPI 카드 4개</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>카드</th><th>지표 정의</th><th>더보기 이동</th></tr></thead>
+      <tbody>
+        <tr><td>자사 합산 점유율</td><td>전 채널 자사 리뷰 점유율 가중 평균</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>전주 대비 성장률</td><td>전주 동기 대비 자사 전체 리뷰 수 증감률</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>성장 중인 채널</td><td>전주 대비 점유율이 상승한 채널 수 (전체 7개 채널 기준)</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>주시 경쟁사</td><td>점유율 급등·신규 입점 등 이상 신호가 감지된 경쟁 브랜드 수</td><td>경쟁사 탭</td></tr>
+      </tbody>
+    </table>
+
+    <h3>인사이트 배너</h3>
+    <p>KPI 영역 바로 아래에 위치. 자동 생성된 주요 시사점을 한 줄 텍스트로 표시한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>노출 내용</td><td>① 자사 합산 점유율 증감 요약 → ② 주요 경쟁사 동향 → ③ 진입 기회 카테고리 감지 여부 순으로 연결</td></tr>
+        <tr><td>위치</td><td>전사 보기: KPI 카드 아래 · 차트 위. 전략기획: 차트 하단</td></tr>
+        <tr><td>비고</td><td>현재 더미 텍스트 고정 → 실서비스에서 데이터 기반 자동 생성으로 전환 예정</td></tr>
+      </tbody>
+    </table>
+
+    <h3>자사 시장 점유율 추이 · 주요 경쟁사 비교 차트</h3>
+    <p>자사 합산 점유율과 상위 2개 경쟁사 점유율을 최근 6개월 라인 차트로 비교해 트렌드를 한눈에 확인한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>정의</th></tr></thead>
+      <tbody>
+        <tr><td>X축</td><td>최근 6개월 월별 단위. 표기 형식: YYYY.MM (예: 2025.11 ~ 2026.04)</td></tr>
+        <tr><td>Y축</td><td>리뷰 점유율 (%). 최솟값 5% 고정. 단위: %p</td></tr>
+        <tr><td>자사 라인</td><td>전 채널 합산 리뷰 점유율</td></tr>
+        <tr><td>경쟁사 라인</td><td>리뷰 점유율 상위 2개 경쟁사. 자사와 시각적으로 구분</td></tr>
+        <tr><td>경쟁사 선정 기준</td><td>해당 기간 전 채널 리뷰 점유율 기준 상위 2개 브랜드 (자사 제외). 실서비스에서는 동적 선정</td></tr>
+        <tr><td>집계 기준</td><td>전 채널 리뷰 수 기준 월별 집계. 헤더 우측에 "최근 6개월 월별 · 전 채널 리뷰 기준" 부연 표시</td></tr>
+        <tr><td>노출 대상</td><td>전사 보기 · 전략기획 뷰 공통 노출. 동일한 데이터를 사용하며 차트 인스턴스만 별도 생성</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3열 요약 섹션</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>패널</th><th>내용</th><th>더보기 이동</th></tr></thead>
+      <tbody>
+        <tr><td>채널 신호</td><td>채널별 전주 대비 성장률 바 차트 (상위 5개) + 리뷰 이상 감지 배지</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>브랜드 신호</td><td>활성도 상위 브랜드 4개 (브랜드명 + 점수 + 등락) + 전체 브랜드 성장/하락/보합 수 요약</td><td>성과 분석 &gt; 브랜드별</td></tr>
+        <tr>
+          <td>시장 신호</td>
+          <td>
+            <strong>주시 경쟁사</strong> — "주시" 등급 경쟁사 최대 3개 (브랜드명 + 동향 + 점유율 변화)<br>
+            <strong>카테고리 기회</strong> — 진입 기회 카테고리 최대 2개 (카테고리명 + 시장 성장률 + 진입 기회 배지)<br>
+            <span style="color:#888;font-size:0.9em">※ 카테고리 기회: 시장 성장률이 높고 자사 점유율이 낮은 카테고리</span>
+          </td>
+          <td>경쟁사 탭</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 전략기획 뷰 -->
+    <h2 id="sec-overview-strategy">전략기획 뷰</h2>
+    <div class="purpose-box" style="border-left-color:#4CAF82">
+      시장 성장 기회와 경쟁 구도 변화를 전략 수립 관점에서 확인한다.
+    </div>
+
+    <h3>화면 구성</h3>
+    <div class="wireframe">시장 현황 요약 (KPI 카드 × 4)
+자사 점유율 추이 차트
+인사이트 배너 (차트 하단)
+─────────────────────────────────────
+채널별 성장률 현황 (좌) │ 카테고리별 기회 지수 (우)</div>
+
+    <h3>KPI 카드 4개</h3>
+    <p>전사 보기 뷰와 동일한 4개 지표를 사용하나, 자사 합산 점유율의 보조 텍스트 기준이 다르다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>카드</th><th>지표 정의</th><th>보조 텍스트 차이</th><th>더보기 이동</th></tr></thead>
+      <tbody>
+        <tr><td>자사 합산 점유율</td><td>전 채널 자사 리뷰 점유율 가중 평균</td><td>최근 3개월 대비 증감 (전사 보기는 전주 대비)</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>전주 대비 성장률</td><td>전주 동기 대비 자사 전체 리뷰 수 증감률</td><td>없음</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>성장 중인 채널</td><td>전주 대비 점유율이 상승한 채널 수</td><td>전사 보기와 동일</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>주시 경쟁사</td><td>점유율 급등·신규 입점 등 이상 신호가 감지된 경쟁 브랜드 수</td><td>전사 보기와 동일</td><td>경쟁사 탭</td></tr>
+      </tbody>
+    </table>
+
+    <h3>자사 시장 점유율 추이 · 주요 경쟁사 비교 차트</h3>
+    <p>차트 스펙(X축·Y축·라인 구성·집계 기준·경쟁사 선정 기준)은 전사 보기 뷰와 동일하다. → <a href="#sec-overview-executive">전사 보기 뷰 차트 정의 참조</a></p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>전략기획 뷰 차이점</th></tr></thead>
+      <tbody>
+        <tr><td>인사이트 배너 위치</td><td>전사 보기는 KPI 아래·차트 위에 배너가 노출되지만, 전략기획은 차트 하단에 배너가 위치한다</td></tr>
+        <tr><td>차트 인스턴스</td><td>동일 데이터를 사용하나 전사 보기와 별도 인스턴스로 생성 (id: strategyShareChart)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>채널별 성장률 현황</h3>
+    <p>7개 채널의 전주 대비 성장률을 가로 바 차트로 나열한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>표시 항목</td><td>채널명 · 가로 바 차트 · 증감률 수치 · 성장/하락/보합 배지</td></tr>
+        <tr><td>배지 기준</td><td>성장 (증감률 &gt; 0) / 하락 (증감률 &lt; 0) / 보합 (증감률 = 0)</td></tr>
+        <tr><td>더보기 이동</td><td>성과 분석 &gt; 채널별</td></tr>
+      </tbody>
+    </table>
+
+    <h3>카테고리별 기회 지수</h3>
+    <p>8개 카테고리별 시장 성장률 · 자사 점유율 · 진입 기회 신호를 표로 제공한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>카테고리</td><td>8개 카테고리명</td></tr>
+        <tr><td>시장 성장률</td><td>전주 대비 해당 카테고리 전체 리뷰 증감률</td></tr>
+        <tr><td>자사 점유율</td><td>해당 카테고리 내 자사 리뷰 점유율 (%)</td></tr>
+        <tr><td>신호</td><td>진입 기회 (시장 성장률 높고 자사 점유율 낮음) · 강세 유지 (성장률 높고 자사 점유율 높음) · — (그 외)</td></tr>
+        <tr><td>더보기 이동</td><td>성과 분석 &gt; 카테고리별</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 채널 MD 뷰 -->
+    <h2 id="sec-overview-md">채널 MD 뷰</h2>
+    <div class="purpose-box" style="border-left-color:#4169E1">
+      담당 채널의 성과 현황과 이상 징후를 빠르게 파악한다.
+    </div>
+
+    <h3>화면 구성</h3>
+    <div class="wireframe">채널 성과 현황 요약 (KPI 카드 × 4)
+──────────────────────────────────────────────
+채널별 상품 분포 (좌상) │ 채널 이상 감지 현황 (우상)
+리뷰 급증 TOP 5 (좌하) │ 경쟁사 채널별 동향 (우하)</div>
+
+    <h3>KPI 카드 4개</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>카드</th><th>지표 정의</th><th>더보기 이동</th></tr></thead>
+      <tbody>
+        <tr><td>성장 채널</td><td>전주 대비 점유율이 상승한 채널 수</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>점유율 하락 채널</td><td>전주 대비 점유율이 하락한 채널 수</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>리뷰 급증 채널</td><td>전주 대비 리뷰 수 20% 이상 증가한 채널. 메인 수치는 대표 채널명 1개로 표시</td><td>성과 분석 &gt; 채널별</td></tr>
+        <tr><td>경쟁사 신규 동향</td><td>신규 입점·점유율 급등 등 주의 신호가 감지된 경쟁사 동향 건수</td><td>경쟁사 탭</td></tr>
+      </tbody>
+    </table>
+
+    <h3>채널별 상품 분포</h3>
+    <p>7개 채널별 자사 상품 수 비율을 가로 바 차트로 비교한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>집계 기준</td><td>자사 전체 상품 수 기준. 채널 중복 제거 없이 각 채널 등록 상품 수 집계</td></tr>
+        <tr><td>표시 항목</td><td>채널명 · 가로 바 차트 · 상품 수</td></tr>
+        <tr><td>더보기 이동</td><td>성과 분석 &gt; 채널별</td></tr>
+      </tbody>
+    </table>
+
+    <h3>채널 이상 감지 현황</h3>
+    <p>전주 대비 리뷰 수 ±20% 이상 변동된 채널을 자동으로 감지해 나열한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>▲ 리뷰 급증</td><td>초록 배지. 해당 채널 리뷰가 전주 대비 +20% 이상 증가</td></tr>
+        <tr><td>▼ 리뷰 급감</td><td>빨강 배지. 해당 채널 리뷰가 전주 대비 -20% 이상 감소</td></tr>
+        <tr><td>표시 항목</td><td>채널명 · 배지 · 점유율 변화 수치</td></tr>
+        <tr><td>임계값</td><td>±20% (초기 설정값, 추후 재조정 가능)</td></tr>
+        <tr><td>더보기 이동</td><td>성과 분석 &gt; 채널별</td></tr>
+      </tbody>
+    </table>
+    <blockquote>기획전·이벤트 등 외부 프로모션 정보는 자동 수집 불가로 미제공. 이상 감지 신호 자체만 표시하고 원인 해석은 담당자가 직접 판단.</blockquote>
+
+    <h3>리뷰 급증 TOP 5</h3>
+    <p>최근 7일 기준, 전 채널 합산 리뷰 급증 상위 5개 상품을 순위별로 나열한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>집계 기준</td><td>최근 7일 · 전 채널 합산 · 주간 리뷰 증가 건수 내림차순</td></tr>
+        <tr><td>표시 항목</td><td>순위 · 상품명 · 카테고리·브랜드 · 주간 리뷰 증가 건수</td></tr>
+
+        <tr><td>상품 클릭</td><td>상품 상세 팝업 진입</td></tr>
+        <tr><td>더보기 이동</td><td>트렌딩 탭</td></tr>
+      </tbody>
+    </table>
+
+    <h3>경쟁사 채널별 동향</h3>
+    <p>채널 내 신규 입점·점유율 변동이 감지된 경쟁사 동향을 채널 기준으로 나열한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>표시 항목</td><td>채널명 · 경쟁사명 · 동향 설명 (신규 입점 / 가격 인하 / 기획전 등) · 점유율 변화 수치</td></tr>
+        <tr><td>정렬</td><td>점유율 변화 내림차순</td></tr>
+        <tr><td>더보기 이동</td><td>경쟁사 탭</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <!-- 브랜드 매니저 뷰 -->
+    <h2 id="sec-overview-brand">브랜드 매니저 뷰</h2>
+    <div class="purpose-box" style="border-left-color:var(--rose)">
+      자사 브랜드들의 활성도와 성장·하락 추세를 브랜드 단위로 파악한다.
+    </div>
+
+    <h3>화면 구성</h3>
+    <div class="wireframe">브랜드 활성도 요약 (KPI 카드 × 4)
+──────────────────────────────────────────────
+브랜드 활성도 순위 (좌상) │ 자사 브랜드 현황 (우상)
+브랜드별 리뷰 급증 (좌하) │ 경쟁 브랜드 동향 (우하)</div>
+
+    <h3>KPI 카드 4개</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>카드</th><th>지표 정의</th><th>더보기 이동</th></tr></thead>
+      <tbody>
+        <tr><td>평균 브랜드 활성도</td><td>자사 16개 브랜드 활성도 지수의 평균값</td><td>성과 분석 &gt; 브랜드별</td></tr>
+        <tr><td>상위 브랜드</td><td>이번 주 브랜드 활성도 지수 1위 브랜드명</td><td>성과 분석 &gt; 브랜드별</td></tr>
+        <tr><td>성장 브랜드 수</td><td>전주 대비 브랜드 활성도 지수가 상승한 자사 브랜드 수</td><td>성과 분석 &gt; 브랜드별</td></tr>
+        <tr><td>하락 브랜드 수</td><td>전주 대비 브랜드 활성도 지수가 하락한 자사 브랜드 수</td><td>성과 분석 &gt; 브랜드별</td></tr>
+      </tbody>
+    </table>
+
+    <h3>브랜드 활성도 순위</h3>
+    <p>자사 브랜드의 활성도 점수를 순위별로 가로 바 차트로 비교한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>표시 범위</td><td>활성도 상위 6개 브랜드</td></tr>
+        <tr><td>표시 항목</td><td>브랜드명 · 가로 바 차트 · 활성도 점수 · 전주 대비 등락 (▲/▼)</td></tr>
+        <tr><td>집계 기준</td><td>리뷰 수 × 취급 채널 수 × 전주 대비 증감률</td></tr>
+        <tr><td>더보기 이동</td><td>성과 분석 &gt; 브랜드별</td></tr>
+      </tbody>
+    </table>
+
+    <h3>자사 브랜드 현황</h3>
+    <p>전 채널 상품 수 기준으로 자사 16개 브랜드의 규모를 비교한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>표시 범위</td><td>상품 수 상위 6개 브랜드 기본 노출. "10개 브랜드 더보기" 버튼으로 전체 확인</td></tr>
+        <tr><td>표시 항목</td><td>브랜드명 · 가로 바 차트 · 상품 수</td></tr>
+        <tr><td>집계 기준</td><td>전 채널 등록 상품 수</td></tr>
+        <tr><td>더보기 이동</td><td>성과 분석 &gt; 브랜드별</td></tr>
+      </tbody>
+    </table>
+
+    <h3>브랜드별 리뷰 급증</h3>
+    <p>최근 7일 기준, 브랜드 단위로 합산한 리뷰 급증 순위를 나열한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>집계 기준</td><td>최근 7일 · 브랜드 단위 합산 · 주간 리뷰 증가 건수 내림차순</td></tr>
+        <tr><td>표시 항목</td><td>순위 · 브랜드명 · 대표 상품명 · 주간 리뷰 증가 건수</td></tr>
+
+        <tr><td>더보기 이동</td><td>트렌딩 탭</td></tr>
+      </tbody>
+    </table>
+
+    <h3>경쟁 브랜드 동향</h3>
+    <p>동일 카테고리 기준 주시 등급 경쟁 브랜드의 최근 동향을 요약한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>내용</th></tr></thead>
+      <tbody>
+        <tr><td>표시 범위</td><td>주시 등급 경쟁사 최대 4개</td></tr>
+        <tr><td>표시 항목</td><td>브랜드명 · 동향 설명 · 점유율 변화 수치</td></tr>
+        <tr><td>기준</td><td>동일 카테고리 경쟁 브랜드 기준</td></tr>
+        <tr><td>더보기 이동</td><td>경쟁사 탭</td></tr>
+      </tbody>
+    </table>
+
+    <h3>브랜드 활성도 지수</h3>
+    <p>리뷰 수 × 취급 채널 수 × 전주 대비 증감률로 산출한 0~100점 종합 지수. 브랜드의 이커머스 전반적 건강도를 단일 수치로 표현한다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>구간</th><th>표시</th></tr></thead>
+      <tbody>
+        <tr><td>70점 이상</td><td>강조 (우수)</td></tr>
+        <tr><td>50~70점</td><td>보조 강조 (양호)</td></tr>
+        <tr><td>50점 미만</td><td>기본 (미흡)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       3. 성과 분석 > 채널별
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-channel">
+    <div class="section-header">
+      <span class="section-number">3</span>
+      <span class="section-title">성과 분석 &gt; 채널별</span>
+      <span class="section-subtitle">성과 분석 서브탭 1</span>
+    </div>
+
+    <div class="purpose-box">
+      7개 이커머스 채널에서 아모레퍼시픽의 성과를 채널 단위로 비교하고 분석한다. 어느 채널에서 잘 되고 있는지, 각 채널에서 우리 브랜드 순위는 어떻게 되는지를 파악하는 화면.
+    </div>
+
+    <h2>화면 구성</h2>
+    <div class="wireframe">채널 선택 탭 (전체 + 7개 채널)          [Excel 다운로드]
+───────────────────────────────────────────────────────
+↓ [전체] 선택 시
+  전체 채널 비교 표 (변동값 인라인 포함)
+  인사이트 요약 카드 2개
+  채널 통합 조회
+
+↓ [개별 채널] 선택 시
+  KPI 카드 × 4
+  아모레 브랜드 순위 표
+  리뷰 키워드 인사이트 (채널 MD 직군 전용)
+  채널 순위 현황</div>
+
+    <h2>전체 채널 비교 표 (전체 탭)</h2>
+    <table class="spec-table">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>채널</td><td>채널명</td></tr>
+        <tr><td>자사 상품수</td><td>해당 채널 자사 상품 수. 하단에 전주 대비 변동 인라인 표시</td></tr>
+        <tr><td>리뷰 점유율</td><td>채널 전체 화장품 리뷰 중 자사 비율. 하단에 변동 인라인 표시</td></tr>
+        <tr><td>총 리뷰</td><td>자사 상품 누적 리뷰 수</td></tr>
+        <tr><td>평균 판매가</td><td>자사 상품 평균 할인가. 하단에 변동 인라인 표시</td></tr>
+        <tr><td>평균 할인율</td><td>정가 대비 평균 할인율. 하단에 변동 인라인 표시</td></tr>
+        <tr><td>이상 감지</td><td><strong>채널 MD 직군 전용.</strong> reviewAlert 기반 ▲/▼ 배지 표시</td></tr>
+        <tr><td>상세 →</td><td>클릭 시 해당 채널 단독 분석으로 전환</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--text-muted);">※ 변동값은 화면에서 해당 셀 숫자 하단에 작게 인라인 표시. 상승/하락/동일 각각 구분 표시. Excel 다운로드 시 별도 컬럼으로 분리 제공.</p>
+
+    <h3>정렬 기준</h3>
+    <div class="rule-box">
+      <div class="rule-box-title">채널 순서</div>
+      <ul>
+        <li>고정 순서: 네이버 → 쿠팡 → 올리브영 → 지마켓 → 11번가 → 카카오 → 옥션</li>
+        <li>사용자 정렬 변경 불가</li>
+      </ul>
+    </div>
+
+    <h2>개별 채널 분석 화면</h2>
+
+    <h3>KPI 카드 4개</h3>
+    <p>선택 채널의 자사 핵심 수치 4개를 요약. 전주 대비 변동 포함.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>지표</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>자사 상품수</td><td>해당 채널 자사 등록 상품 수</td></tr>
+        <tr><td>리뷰 점유율</td><td>채널 전체 화장품 중 자사 비율</td></tr>
+        <tr><td>평균 판매가</td><td>자사 상품 평균 할인가</td></tr>
+        <tr><td>평균 할인율</td><td>정가 대비 평균 할인율</td></tr>
+      </tbody>
+    </table>
+
+    <h3>아모레 브랜드 순위 표</h3>
+    <p>해당 채널에서 자사 브랜드별 성과를 순위로 나열.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>상품수</td><td>해당 채널 브랜드 등록 상품 수</td></tr>
+        <tr><td>총 리뷰</td><td>누적 리뷰 수</td></tr>
+        <tr><td>리뷰 점유율</td><td>채널 내 해당 브랜드 비율</td></tr>
+        <tr><td>평균 판매가</td><td>할인 적용 후 평균 가격</td></tr>
+      </tbody>
+    </table>
+
+    <h3>리뷰 키워드 인사이트 (채널 MD 직군 전용)</h3>
+    <p>채널 MD 직군에게만 표시. 해당 채널에서 자사 상품 리뷰에 자주 등장한 긍정·부정 키워드 Top 5를 바 차트로 제공한다.</p>
+
+    <h3>채널 순위 현황</h3>
+    <p>채널 내 자사 리뷰 점유율 순위(이번 주) + 전주 대비 순위 등락을 표로 보여준다.</p>
+
+    <h2>데이터 기준</h2>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>기준</th></tr></thead>
+      <tbody>
+        <tr><td>수집 주기</td><td>일 1회 (전일 기준)</td></tr>
+        <tr><td>리뷰 점유율 계산</td><td>해당 채널 전체 화장품 리뷰 대비 자사 비율</td></tr>
+        <tr><td>채널 이상 감지 기준</td><td>전주 대비 리뷰 수 ±20% 이상 변동</td></tr>
+        <tr><td>리뷰 인사이트 대상 상품</td><td>해당 채널 리뷰 수 상위 10개 상품 (채널 MD 전용)</td></tr>
+        <tr><td>키워드 분석 범위</td><td>최근 30일 이내 작성된 리뷰</td></tr>
+        <tr><td>키워드 갱신 주기</td><td>주 1회 (월요일 기준)</td></tr>
+        <tr><td>최소 리뷰 수 기준</td><td>채널별 리뷰 10건 미만 시 "리뷰 데이터 부족" 안내 표시, 인사이트 미제공</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Excel 다운로드</h2>
+    <p>파일명: <code>채널별성과_YYYYMMDD_HH-MM-SS.xlsx</code></p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th></tr></thead>
+      <tbody>
+        <tr><td>채널 / 자사 상품수 / 상품수 변동 / 리뷰 점유율(%) / 점유율 변동 / 총 리뷰 / 평균 판매가(원) / 평균가 변동 / 평균 할인율(%) / 할인율 변동 / 이상 감지</td></tr>
+      </tbody>
+    </table>
+
+    <div class="todo-box">
+      <div class="todo-box-title">미결 / 추후 개선</div>
+      <ul>
+        <li>채널별 브랜드 순위 데이터 현재 모든 채널에서 동일 → 실서비스 시 채널별 분리</li>
+        <li>리뷰 키워드 데이터 현재 더미 → 실서비스 시 텍스트 분석 API 연동 필요</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       4. 성과 분석 > 브랜드별
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-brand">
+    <div class="section-header">
+      <span class="section-number">4</span>
+      <span class="section-title">성과 분석 &gt; 브랜드별</span>
+      <span class="section-subtitle">성과 분석 서브탭 2</span>
+    </div>
+
+    <div class="purpose-box">
+      아모레퍼시픽 16개 브랜드의 이커머스 성과를 브랜드 단위로 비교하고, 특정 브랜드를 선택해 상품·채널·시장 위치까지 드릴다운하는 분석 흐름을 제공한다.
+    </div>
+
+    <h2>화면 구성</h2>
+    <div class="wireframe">↓ 브랜드 목록 화면
+  전 채널 합산 보기 / 채널별 보기 탭 전환      [Excel 다운로드]
+  16개 브랜드 성과 목록표
+
+↓ 브랜드 선택 후 드릴다운
+  ← 브랜드 분석  [브랜드명]
+  서브탭: [상품현황] [채널성과] [시장위치/카테고리]</div>
+
+    <h2>16개 브랜드 성과 목록표</h2>
+    <table class="spec-table">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>상품수</td><td>전 채널 합산 (채널 중복 제거)</td></tr>
+        <tr><td>리뷰 점유율</td><td>자사 전체 리뷰 중 해당 브랜드 비율. 1~3위 강조</td></tr>
+        <tr><td>전주 대비</td><td>점유율 전주 대비 증감</td></tr>
+        <tr><td>총 리뷰</td><td>전 채널 누적 리뷰 수</td></tr>
+        <tr><td>평균 판매가</td><td>전 채널 할인가 평균</td></tr>
+        <tr><td>채널 분포</td><td>네이버·쿠팡·올리브영·기타 비율 4색 막대</td></tr>
+      </tbody>
+    </table>
+    <div class="rule-box">
+      <div class="rule-box-title">정렬 기준</div>
+      <ul><li>리뷰 점유율 기준 내림차순 고정. 사용자 정렬 변경 불가.</li></ul>
+    </div>
+
+    <h2>Excel 다운로드</h2>
+    <p>버튼 위치: 전 브랜드 성과 목록 헤더 우측. 현재 선택된 보기(전 채널 합산 / 채널별) 기준 데이터가 다운로드된다.</p>
+    <p>파일명: <code>브랜드별성과_YYYYMMDD_HH-MM-SS.xlsx</code></p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th></tr></thead>
+      <tbody>
+        <tr><td>순위 / 브랜드 / 자사 여부 / 리뷰 점유율(%) / 점유율 전주 대비 / 총 리뷰(건) / 상품수 / 평균 판매가(원) / 브랜드 활성도 점수</td></tr>
+      </tbody>
+    </table>
+    <div class="rule-box">
+      <div class="rule-box-title">활용 가치</div>
+      <ul>
+        <li>아모레퍼시픽 16개 브랜드 성과를 한 시트에서 비교 가능. 경영진 보고 및 브랜드 간 성과 비교 자료로 활용</li>
+        <li>브랜드 활성도 점수 컬럼 포함으로 정성 판단 없이 수치 기반 브랜드 우선순위 설정 가능</li>
+        <li>날짜별 파일을 누적 저장하면 브랜드별 성과 추이를 주간 단위로 추적 가능</li>
+      </ul>
+    </div>
+
+    <h2>브랜드 드릴다운 — 서브탭 4개</h2>
+
+    <h3>서브탭 1 — 상품 현황</h3>
+    <p>해당 브랜드 개별 상품의 채널 분포와 성과. 카테고리/채널/상품명 3종 필터(AND 조건) 적용 가능.</p>
+
+    <h3>서브탭 2 — 채널 성과</h3>
+    <p>채널별 해당 브랜드 리뷰 점유율·상품수·평균가를 비교. 채널별 시각화 포함.</p>
+
+    <h3>서브탭 3 — 시장 위치</h3>
+    <p>채널 선택 후 해당 채널 내 카테고리별 경쟁 현황. 브랜드 포지셔닝맵(가격대 × 리뷰볼륨), 리뷰 점유율 파이차트, 경쟁 브랜드 순위표를 제공한다.</p>
+
+    <h3>서브탭 4 — 리뷰 인사이트 <span class="badge badge-navy">브랜드 매니저 전용</span></h3>
+    <p>브랜드 매니저 직군에게만 표시되는 서브탭. 해당 브랜드 상품 리뷰에서 자주 등장하는 긍정·부정 키워드를 분석해 제공한다. 기준: 최근 30일 리뷰.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>구성 요소</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>채널 필터</td><td>전체 / 네이버 / 쿠팡 / 올리브영 선택. 선택 채널 기준으로 키워드 데이터 전환</td></tr>
+        <tr><td>긍정 키워드 TOP 5</td><td>가로 막대 차트 + 언급 건수 표시</td></tr>
+        <tr><td>부정 키워드 TOP 5</td><td>가로 막대 차트 + 언급 건수 표시</td></tr>
+        <tr><td>채널별 키워드 비교 테이블</td><td>키워드 · 구분(긍정/부정) · 채널별 언급 강도(4단계) 비교</td></tr>
+      </tbody>
+    </table>
+
+    <div class="todo-box">
+      <div class="todo-box-title">미결 / 추후 개선</div>
+      <ul>
+        <li>채널별 필터 현재 미동작 → 추후 구현</li>
+        <li>리뷰 키워드 데이터 현재 더미 → 실서비스 시 텍스트 분석 API 연동 필요</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       5. 성과 분석 > 카테고리별
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-category">
+    <div class="section-header">
+      <span class="section-number">5</span>
+      <span class="section-title">성과 분석 &gt; 카테고리별</span>
+      <span class="section-subtitle">성과 분석 서브탭 3</span>
+    </div>
+
+    <div class="purpose-box">
+      스킨케어·메이크업 등 8개 카테고리 단위로 시장 성장률과 자사 경쟁 위치를 파악한다. 진입 기회가 있는 카테고리를 빠르게 식별하는 것이 목적.
+    </div>
+
+    <h2>화면 구성</h2>
+    <div class="wireframe">카테고리 선택 탭 (스킨케어 / 메이크업 / 헤어케어 / 바디케어 / 선케어 / 향수 / 네일 / 맨즈케어)
+────────────────────────────────────────────────────────
+시장 급성장 카테고리 표 (리뷰·찜 기준 전환 가능)
+카테고리 내 경쟁 브랜드 순위표                          [Excel 다운로드]</div>
+
+    <h2>시장 급성장 카테고리 표</h2>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>카테고리</td><td>카테고리명</td></tr>
+        <tr><td>현재 리뷰 / 현재 찜</td><td>지표 선택에 따라 전환</td></tr>
+        <tr><td>이전 리뷰 / 이전 찜</td><td>전주 동일 시점 값</td></tr>
+        <tr><td>주간 증가량</td><td>전주 대비 절대 증가량</td></tr>
+        <tr><td>증가율</td><td>전주 대비 증가율 (%)</td></tr>
+        <tr><td>판매가</td><td>대표 채널 평균 판매가</td></tr>
+      </tbody>
+    </table>
+    <p>리뷰 기준 / 찜 기준 지표 전환 버튼 제공. 정렬 기준: 주간 증가량 내림차순 고정.</p>
+
+    <h2>카테고리 내 경쟁 브랜드 순위표</h2>
+    <p>선택된 카테고리 + 채널 기준으로 상위 브랜드 점유율을 순위표로 제공. 채널 선택 드롭다운으로 조회 채널 변경 가능.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>순위 / 브랜드</td><td>자사 브랜드 행은 배경 강조</td></tr>
+        <tr><td>상품수</td><td>해당 채널 등록 상품 수</td></tr>
+        <tr><td>리뷰 점유율</td><td>카테고리 내 비율</td></tr>
+        <tr><td>전주 대비</td><td>점유율 전주 대비 증감</td></tr>
+        <tr><td>총 리뷰</td><td>누적 리뷰 수</td></tr>
+        <tr><td>평균 판매가</td><td>할인 적용 후 가격</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Excel 다운로드</h2>
+    <p>버튼 위치: 카테고리 내 경쟁 브랜드 순위표 헤더 우측. 현재 선택된 카테고리·채널 기준 데이터가 다운로드된다.</p>
+    <p>파일명: <code>카테고리별성과_YYYYMMDD_HH-MM-SS.xlsx</code></p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th></tr></thead>
+      <tbody>
+        <tr><td>순위 / 브랜드 / 자사 여부 / 채널 / 카테고리 / 리뷰 점유율(%) / 점유율 전주 대비 / 총 리뷰(건) / 상품수 / 평균 판매가(원)</td></tr>
+      </tbody>
+    </table>
+    <div class="rule-box">
+      <div class="rule-box-title">활용 가치</div>
+      <ul>
+        <li>채널·카테고리 조합별 경쟁 구도 스냅샷 저장 가능. 월간 파일을 누적해 포지셔닝 변화 추적에 활용</li>
+        <li>파일 내 채널·카테고리 컬럼이 포함되어 있어 여러 조합을 병합 후 피벗 분석 가능</li>
+        <li>카테고리 기획 또는 신규 진입 검토 시 경쟁 브랜드 현황 근거 자료로 제출 가능</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       6. 경쟁사
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-competitor">
+    <div class="section-header">
+      <span class="section-number">6</span>
+      <span class="section-title">경쟁사</span>
+      <span class="section-subtitle">경쟁 브랜드 모니터링</span>
+    </div>
+
+    <div class="purpose-box">
+      이커머스 내 경쟁 브랜드의 움직임을 점유율·입점 현황·리뷰 증감 기준으로 모니터링한다. 위협이 되는 경쟁사를 자동으로 감지해 주시 신호를 제공한다.
+    </div>
+
+    <h2>화면 구성</h2>
+    <div class="wireframe">채널 필터 드롭다운 (전체 / 개별 채널)           [Excel 다운로드]
+KPI 카드 × 3 (직군에 따라 카드 3 변경)
+채널 MD 전용: 채널별 경쟁사 강세 매트릭스
+경쟁사 현황 테이블</div>
+
+    <h2>KPI 카드 3개 — 직군별 차이</h2>
+    <p>카드 1·2는 전 직군 공통. 카드 3만 직군별로 다르다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>카드</th><th>내용</th><th>대상 직군</th></tr></thead>
+      <tbody>
+        <tr><td>카드 1 — 주시 필요 브랜드</td><td>이상 신호 감지된 경쟁 브랜드 수. 아누아·닥터지 외 N개</td><td>전 직군</td></tr>
+        <tr><td>카드 2 — 자사 합산 점유율</td><td>선택 채널 기준 자사 전체 브랜드 점유율 합산. 동적 계산</td><td>전 직군</td></tr>
+        <tr><td>카드 3 — 점유율 하락 경쟁사</td><td>전주 대비 하락한 경쟁 브랜드 수 + "기회 포착 가능"</td><td>전사·전략·브랜드</td></tr>
+        <tr><td>카드 3 — 채널 집중 경쟁 브랜드</td><td>2개 이상 채널 TOP3 진입 브랜드 수. 아누아·닥터지 외 N개</td><td>채널 MD</td></tr>
+      </tbody>
+    </table>
+
+    <h2>채널별 경쟁사 강세 매트릭스 (채널 MD 전용)</h2>
+    <p>채널 × 순위 매트릭스. 각 채널의 TOP3 브랜드와 자사 순위를 한 표에서 비교한다. 채널 MD 직군에게만 노출.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>채널</td><td>7개 채널명</td></tr>
+        <tr><td>1위 / 2위 / 3위</td><td>해당 채널 리뷰 점유율 TOP3 브랜드</td></tr>
+        <tr><td>자사 순위</td><td>해당 채널에서 자사의 점유율 순위</td></tr>
+        <tr><td>전주 대비</td><td>자사 순위 전주 대비 등락</td></tr>
+      </tbody>
+    </table>
+
+    <h2>경쟁사 현황 테이블</h2>
+    <table class="spec-table">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>순위 / 브랜드</td><td>자사 브랜드 행은 배경 강조 + 자사 배지</td></tr>
+        <tr><td>리뷰 점유율</td><td>선택 채널 기준. 채널 변경 시 전체 테이블 동적 재계산</td></tr>
+        <tr><td>점유율 전주 대비</td><td>전주 동일 시점 대비 증감</td></tr>
+        <tr><td>순위 등락</td><td>전주 대비 점유율 순위 변화. ▲/▼ + 계단 수</td></tr>
+        <tr><td>총 리뷰 / 리뷰 증감</td><td>누적 리뷰 수 + 전주 대비 증감률</td></tr>
+        <tr><td>상품수</td><td>해당 채널 등록 상품 수</td></tr>
+        <tr><td>평균 판매가</td><td>할인 적용 후 평균 가격</td></tr>
+        <tr><td>주요 동향</td><td>이상 감지 배지 (주시 / 기회 / 정보 중 우선순위 1개만 표시)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>이상 감지 배지 우선순위 (9단계)</h3>
+    <table class="spec-table compact">
+      <thead><tr><th>#</th><th>배지</th><th>감지 조건</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="badge badge-warn">다중 채널 신규 입점 · 급성장</span></td><td>3개 이상 채널 동시 신규 입점</td></tr>
+        <tr><td>2</td><td><span class="badge badge-warn">[채널명] 신규 입점</span></td><td>1~2개 채널 신규 입점</td></tr>
+        <tr><td>3</td><td><span class="badge badge-warn">[채널명] 입점 확대</span></td><td>특정 채널 취급 상품 수 전주 대비 2배 이상</td></tr>
+        <tr><td>4</td><td><span class="badge badge-warn">[채널명] 중심 리뷰 급증</span></td><td>리뷰 증가율 +25% 이상</td></tr>
+        <tr><td>5</td><td><span class="badge badge-warn">점유율 급등 · 주시 필요</span></td><td>점유율 변화 +2.0%p 이상</td></tr>
+        <tr><td>6</td><td><span class="badge badge-warn">점유율 상승 · 주시</span></td><td>점유율 변화 +1.0%p 이상</td></tr>
+        <tr><td>7</td><td><span class="badge badge-good">리뷰 급감 · 약세</span></td><td>리뷰 감소율 -25% 이하</td></tr>
+        <tr><td>8</td><td><span class="badge badge-good">점유율 하락세</span></td><td>경쟁 브랜드 점유율 -0.3%p 이하</td></tr>
+        <tr><td>9</td><td><span class="badge badge-info">[채널명] 비중 높음</span></td><td>특정 채널 리뷰 비중 40%+ AND 리뷰 증가율 5%+</td></tr>
+      </tbody>
+    </table>
+    <blockquote>우선순위 순서대로 첫 번째 해당 조건을 메인 배지로 표시. 복수 조건 해당 시 메인 배지에 <code>+N</code>을 표기하며, 배지 hover 시 나머지 조건 목록을 툴팁으로 노출. 어느 조건에도 해당하지 않으면 배지 미표시. 임계값은 모두 초기 설정값이며 실서비스 데이터 패턴 확인 후 재조정 예정.</blockquote>
+
+    <h3>직군별 기본 정렬</h3>
+    <div class="rule-box">
+      <div class="rule-box-title">정렬 기준</div>
+      <ul>
+        <li><strong>전략기획 직군:</strong> 점유율 상승폭 내림차순 — 가장 빠르게 성장하는 경쟁사가 상단에 자동 노출</li>
+        <li><strong>기타 직군 (전사·채널 MD·브랜드 매니저):</strong> 리뷰 점유율 내림차순</li>
+      </ul>
+    </div>
+
+    <h2>채널 필터</h2>
+    <p>상단 채널 드롭다운 변경 시 경쟁사 테이블 점유율이 해당 채널 기준으로 동적 재계산된다. 자사 KPI 카드 2번(자사 합산 점유율)도 함께 갱신.</p>
+
+    <h2>Excel 다운로드</h2>
+    <p>파일명: <code>경쟁사현황_YYYYMMDD_HH-MM-SS.xlsx</code></p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th></tr></thead>
+      <tbody>
+        <tr><td>순위 / 브랜드 / 자사 여부 / 리뷰 점유율(%) / 점유율 전주 대비 / 순위 등락 / 총 리뷰(건) / 리뷰 증감 / 상품 수 / 평균 판매가(원) / 주요 동향</td></tr>
+      </tbody>
+    </table>
+
+    <div class="scenario-box">
+      "이번 주에 갑자기 쿠팡에서 아누아가 올라왔는데 우리 순위가 어떻게 됐는지 확인하고 싶다"<br>
+      채널 필터 → 쿠팡 선택 → 아누아 행 주시 배지 확인 → 우리 자사 행 순위 등락 확인
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       7. 트렌딩
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-trending">
+    <div class="section-header">
+      <span class="section-number">7</span>
+      <span class="section-title">트렌딩</span>
+      <span class="section-subtitle">급상승 상품 모니터링</span>
+    </div>
+
+    <div class="purpose-box">
+      전 채널에서 이번 주 리뷰 또는 찜 수가 급격히 증가한 상품을 순위별로 보여준다. 시장에서 지금 이 순간 뜨고 있는 것이 무엇인지 파악하는 화면.
+    </div>
+
+    <h2>화면 구성</h2>
+    <div class="wireframe">필터: [지표 선택] [카테고리] [아모레만 보기]
+기준 기간 안내 (D-0~D-6 vs D-7~D-13)
+이번 주 주목 성분  (스킨케어·바디케어·선케어·헤어케어·맨즈케어 카테고리에서만 표시)
+급성장 상품 순위 테이블                                  [Excel 다운로드]</div>
+
+    <h2>필터</h2>
+    <table class="spec-table compact">
+      <thead><tr><th>필터</th><th>옵션</th><th>적용 방식</th></tr></thead>
+      <tbody>
+        <tr><td>지표 선택</td><td>리뷰 급증 / 찜 급증</td><td>즉시 적용. 정렬 기준도 함께 전환</td></tr>
+        <tr><td>카테고리</td><td>전체 / 8개 카테고리</td><td>즉시 적용</td></tr>
+        <tr><td>아모레만 보기</td><td>ON / OFF 토글</td><td>ON 시 자사 브랜드 상품만 표시</td></tr>
+      </tbody>
+    </table>
+
+    <h2>이번 주 주목 성분</h2>
+    <p>리뷰 급증 상품에 공통으로 포함된 성분을 집계해 순위별로 보여주는 인사이트 블록. 지금 시장에서 어떤 성분이 주목받고 있는지 파악하는 데 사용한다.</p>
+
+    <div class="rule-box">
+      <div class="rule-box-title">노출 조건</div>
+      <ul>
+        <li>카테고리 필터 = 전체 · 스킨케어 · 바디케어 · 선케어 · 헤어케어 · 맨즈케어 → 성분 블록 표시</li>
+        <li>카테고리 필터 = 메이크업 · 향수 · 네일 → 성분 블록 대신 "선택한 카테고리는 성분 분석을 제공하지 않습니다" 안내 표시</li>
+        <li>전체 카테고리 선택 시: 스킨케어·바디케어 등 성분 분석 가능 카테고리만 집계됨을 부가 안내로 표시</li>
+        <li>지표 선택(리뷰/찜) 전환과 무관하게 항상 리뷰 급증 상품 기준으로 집계</li>
+      </ul>
+    </div>
+
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>성분명</td><td>순위 번호와 함께 표시 (순위 번호는 로즈 색상 강조)</td></tr>
+        <tr><td>증가율(%)</td><td>전주 대비 해당 성분 포함 급증 상품들의 리뷰 증가율. +30% 이상: 강조(빨강), +15% 이상: 경고(주황), 그 외: 일반(노랑)</td></tr>
+        <tr><td>관련 상품 수</td><td>해당 성분을 포함하는 이번 주 리뷰 급증 상품 수</td></tr>
+        <tr><td>관련 브랜드 수</td><td>관련 상품이 속한 브랜드 수</td></tr>
+        <tr><td>대표 상품명</td><td>관련 상품 중 리뷰 증가량 1위 상품명</td></tr>
+        <tr><td>자사 포함 여부</td><td>아모레퍼시픽 브랜드 상품이 포함된 경우 "자사 포함" 배지 표시</td></tr>
+        <tr><td>카테고리</td><td>대표 상품의 카테고리 표시</td></tr>
+      </tbody>
+    </table>
+    <div class="rule-box">
+      <div class="rule-box-title">집계 기준</div>
+      <ul>
+        <li>정렬: 증가율 내림차순 고정 (사용자 변경 불가)</li>
+        <li>집계 범위: 경쟁사 포함 전 채널 (채널 필터 적용 안 됨)</li>
+        <li>기준 지표: 리뷰 급증 상품 기준 고정 (지표 선택 필터와 무관)</li>
+      </ul>
+    </div>
+
+    <h2>급성장 상품 순위 테이블</h2>
+    <table class="spec-table">
+      <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>순위</td><td>1~3위 강조</td></tr>
+        <tr><td>상품명</td><td>클릭 시 상품 상세 팝업 열림</td></tr>
+        <tr><td>카테고리 / 브랜드</td><td>맥락 정보</td></tr>
+        <tr><td>현재 리뷰 / 이전 리뷰</td><td>최근 7일(D-0~D-6) vs 직전 7일(D-7~D-13)</td></tr>
+        <tr><td>주간 증가량</td><td>전주 대비 절대 증가 건수</td></tr>
+        <tr><td>증가율</td><td>전주 대비 증가율. +4% 초과: 강조 배지, 이하: 일반 배지</td></tr>
+        <tr><td>판매가</td><td>대표 채널 현재 할인가</td></tr>
+      </tbody>
+    </table>
+    <div class="rule-box">
+      <div class="rule-box-title">정렬 기준</div>
+      <ul>
+        <li>리뷰 기준: 주간 증가량(delta) 내림차순</li>
+        <li>찜 기준: 찜 주간 증가량 내림차순</li>
+        <li>사용자 정렬 변경 불가</li>
+      </ul>
+    </div>
+
+    <div class="scenario-box">
+      "월요일 아침, 지난 주에 갑자기 주목받은 상품이 뭔지 확인하고 싶다"<br>
+      트렌딩 진입 → 리뷰 급증 1위 상품 클릭 → 상세 팝업에서 가격 변동 시점과 리뷰 급증 연계 확인<br>
+      "아모레 브랜드 중에서 이번 주 가장 뜨는 상품은 뭐지?" → 아모레만 보기 ON
+    </div>
+
+    <h2>Excel 다운로드</h2>
+    <p>버튼 위치: 급성장 상품 순위 테이블 헤더 우측. 현재 선택된 필터(카테고리, 자사만 보기, 지표) 기준 목록이 다운로드된다.</p>
+    <p>파일명: <code>트렌딩리뷰급증_YYYYMMDD_HH-MM-SS.xlsx</code> / <code>트렌딩찜급증_YYYYMMDD_HH-MM-SS.xlsx</code> (선택 지표에 따라 자동 전환)</p>
+    <table class="spec-table compact">
+      <thead><tr><th>컬럼</th></tr></thead>
+      <tbody>
+        <tr><td>순위 / 상품명 / 브랜드 / 자사 여부 / 카테고리 / 현재 리뷰(찜)(건) / 이전 리뷰(찜)(건) / 주간 증가량(건) / 증가율(%) / 판매가(원)</td></tr>
+      </tbody>
+    </table>
+    <div class="rule-box">
+      <div class="rule-box-title">활용 가치</div>
+      <ul>
+        <li>이번 주 급상승 상품 목록을 마케팅·상품기획팀에 공유하거나 트렌드 브리핑 자료로 활용</li>
+        <li>"아모레만 보기 ON" 후 다운로드하면 자사 급상승 상품만 정리된 파일 생성 → 브랜드별 대응 검토에 활용</li>
+        <li>리뷰·찜 두 지표를 각각 다운로드해 비교 분석 가능 (바이럴 vs 관심도 차이 파악)</li>
+      </ul>
+    </div>
+
+    <h2>상품 상세 팝업</h2>
+    <p>개별 상품이 나열되는 화면에서 상품명 클릭 시 팝업으로 열림. 노출 위치는 아래 4곳이다.</p>
+    <table class="spec-table compact">
+      <thead><tr><th>위치</th><th>맥락</th></tr></thead>
+      <tbody>
+        <tr><td>홈 대시보드 &gt; 리뷰 급증 TOP 5</td><td>Overview에서 급증 상품 발견 시 즉시 상세 확인</td></tr>
+        <tr><td>트렌딩 &gt; 상품 목록</td><td>급상승 상품의 가격 변동과 리뷰 급증 연관성 확인</td></tr>
+        <tr><td>성과 분석 &gt; 채널별 &gt; 채널 통합 조회</td><td>채널별 검색 결과에서 특정 상품 이력 조회</td></tr>
+        <tr><td>성과 분석 &gt; 브랜드별 &gt; 상품 현황</td><td>브랜드 드릴다운 중 개별 상품 이력 확인</td></tr>
+      </tbody>
+    </table>
+    <table class="spec-table compact">
+      <thead><tr><th>항목</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td>상품 기본 정보</td><td>상품명 · 브랜드 · 카테고리 · 현재 판매가 · 리뷰 수</td></tr>
+        <tr><td>기간 선택</td><td>1주 / 1개월 / 2개월 / 3개월. 기본값: 1주</td></tr>
+        <tr><td>가격 추이 차트</td><td>선택 기간 내 정가·할인가 변화</td></tr>
+        <tr><td>리뷰 추이 차트</td><td>선택 기간 내 누적 리뷰 수 변화</td></tr>
+        <tr><td>히스토리 테이블</td><td>날짜별 정가 / 할인가 / 리뷰 수 / 찜 수</td></tr>
+      </tbody>
+    </table>
+
+    <div class="todo-box">
+      <div class="todo-box-title">미결 / 추후 개선</div>
+      <ul>
+        <li>찜 데이터 현재 더미 → 실서비스 시 채널 API 연동 필요</li>
+        <li>상품 상세 팝업 데이터 현재 고정값 → 실서비스 시 상품 ID 기반 동적 조회</li>
+        <li>성분 데이터 현재 더미 → 실서비스 시 상품 성분 DB 또는 외부 성분 분석 API 연동 필요</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════
+       8. 부록: 수치 기준 협의 항목
+  ═════════════════════════════════════ -->
+  <section class="section" id="sec-thresholds">
+    <div class="section-header">
+      <span class="section-number">8</span>
+      <span class="section-title">수치 기준 협의 항목</span>
+    </div>
+
+    <div class="purpose-box">
+      이 서비스에 적용된 판단 기준 수치들은 <strong>서비스 제공자가 설정한 초기값</strong>으로 각 수치는 계약사의 실제 데이터 규모, 브랜드 포트폴리오, 업무 기준에 따라 조정 가능.
+    </div>
+
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th style="width:22%">항목</th>
+          <th style="width:28%">초기 설정값</th>
+          <th style="width:28%">설정 근거</th>
+          <th style="width:22%">협의 방향</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>채널 이상 감지 임계값</strong><br><small style="color:var(--text-muted)">채널별 탭, Overview</small></td>
+          <td>전주 대비 ±20% 이상 변동</td>
+          <td>리테일 KPI 모니터링에서 통용되는 "유의미한 변화" 기준으로 설정. 업종·브랜드 규모에 따라 달라짐</td>
+          <td>계약사 채널 데이터 평균 변동 폭을 기준으로 재설정</td>
+        </tr>
+        <tr>
+          <td><strong>채널 성장/보합/하락 분류 기준</strong><br><small style="color:var(--text-muted)">전략기획 Overview</small></td>
+          <td>+3%p 이상: 성장<br>±3%p 이내: 보합<br>-3%p 이하: 하락</td>
+          <td>초기 설정값. 외부 표준 없음</td>
+          <td>계약사 시장 점유율 규모 및 변동 패턴 기반 재정의</td>
+        </tr>
+        <tr>
+          <td><strong>카테고리 기회 신호 로직</strong><br><small style="color:var(--text-muted)">전략기획 Overview, 카테고리별 탭</small></td>
+          <td>시장 성장률 상위 3개 카테고리 + 자사 점유율 하위 3개 카테고리가 겹치는 항목 → "진입 기회"</td>
+          <td>BCG 매트릭스의 고성장·저점유 = 투자 필요 영역 로직을 단순화한 것. 상위/하위 3개 기준은 임의 설정</td>
+          <td>계약사의 전략 우선순위 기준(성장률 임계값, 점유율 기준선 등)으로 조정</td>
+        </tr>
+        <tr>
+          <td><strong>경쟁사 동향 감지 임계값</strong><br><small style="color:var(--text-muted)">경쟁사 탭</small></td>
+          <td>점유율 +2.0%p 이상: 급등<br>리뷰 +25% 이상: 급증<br>신규 입점 3채널 이상: 주시</td>
+          <td>FMCG 업계에서 점유율 1~2%p 변동은 유의미한 수준으로 취급. 리뷰·입점 수치는 초기 설정값</td>
+          <td>계약사가 실제로 "경계 수준"으로 판단하는 변동 폭 기준으로 재설정</td>
+        </tr>
+        <tr>
+          <td><strong>리뷰 인사이트 분석 범위</strong><br><small style="color:var(--text-muted)">채널별·브랜드별 리뷰 인사이트</small></td>
+          <td>최근 30일 이내 리뷰<br>주 1회 월요일 갱신<br>최소 10건 미만 시 미제공</td>
+          <td>이커머스 분석에서 30일 롤링 윈도우는 일반적인 기준. 최소 건수 기준은 초기 설정값</td>
+          <td>분석 목적(트렌드 감지 vs 누적 평판)에 따라 기간 조정. 최소 건수는 통계적 유의성 기준으로 재설정 권장</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="todo-box">
+      <div class="todo-box-title">계약사와의 협의 포인트</div>
+      <ul>
+        <li>위 수치들은 서비스 시연·검토용 초기값으로 계약사의 실제 운영 기준과 다를 수 있음.</li>
+        <li>도입 전 실무 담당자(채널 MD·브랜드 매니저·전략기획) 인터뷰를 통해 각 직군의 변동 기준 수집 권장.</li>
+        <li>초기 계약 시 기본값으로 운영하되, 3~6개월 운영 데이터 기반으로 임계값 재조정 가능.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>

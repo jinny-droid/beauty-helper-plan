@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>아모레퍼시픽 Commerce Insight — 비즈니스 로직 정의서</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css');
+    body { font-family: Pretendard, -apple-system, sans-serif; background: #F7F3EE; color: #1A2B4A; }
+    .navy { color: #1A2B4A; }
+    .rose { color: #C8748A; }
+
+    .tab-chip { display: inline-block; padding: 3px 10px; border-radius: 20px; background: #1A2B4A; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .03em; }
+    .sub-chip { display: inline-block; padding: 2px 9px; border-radius: 12px; background: #EEF3FF; color: #1A2B4A; font-size: 11px; font-weight: 600; border: 1px solid #C8D8F0; margin-right: 4px; }
+    .persona-chip-md { display: inline-block; padding: 2px 9px; border-radius: 12px; background: rgba(37,99,235,0.1); color: #1D4ED8; font-size: 11px; font-weight: 700; border: 1px solid rgba(37,99,235,0.2); margin-right: 4px; }
+    .persona-chip-brand { display: inline-block; padding: 2px 9px; border-radius: 12px; background: rgba(200,116,138,0.12); color: #9D174D; font-size: 11px; font-weight: 700; border: 1px solid rgba(200,116,138,0.3); margin-right: 4px; }
+    .persona-chip-strategy { display: inline-block; padding: 2px 9px; border-radius: 12px; background: rgba(5,150,105,0.1); color: #065F46; font-size: 11px; font-weight: 700; border: 1px solid rgba(5,150,105,0.2); margin-right: 4px; }
+    .persona-chip-all { display: inline-block; padding: 2px 9px; border-radius: 12px; background: #F1F5F9; color: #475569; font-size: 11px; font-weight: 700; border: 1px solid #CBD5E1; margin-right: 4px; }
+    .dev-badge { display: inline-block; padding: 1px 7px; border-radius: 10px; background: #FEF3C7; color: #92400E; font-size: 10px; font-weight: 700; margin-left: 6px; }
+    .input-badge { display: inline-block; padding: 1px 7px; border-radius: 10px; background: #DCFCE7; color: #166534; font-size: 10px; font-weight: 700; margin-left: 4px; }
+    .calc-badge { display: inline-block; padding: 1px 7px; border-radius: 10px; background: #EDE9FE; color: #5B21B6; font-size: 10px; font-weight: 700; margin-left: 4px; }
+
+    .section-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(26,43,74,0.07); overflow: hidden; margin-bottom: 32px; }
+    .section-header { padding: 18px 28px 16px; border-bottom: 1px solid #F0EBF0; background: #F7F3EE; display: flex; align-items: center; gap: 12px; }
+    .section-body { padding: 0; }
+    .section-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #1A2B4A; color: #C8748A; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+    .sub-section { padding: 10px 28px 8px; font-size: 11px; font-weight: 700; color: #C8748A; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid #F0EBF0; background: #FFFBFB; display: flex; align-items: center; gap: 8px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: #F7F3EE; }
+    thead th { padding: 10px 16px; text-align: left; font-weight: 700; font-size: 11px; color: #8899AA; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid #EEE; }
+    tbody tr { border-bottom: 1px solid #F5F0EE; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 14px 16px; vertical-align: top; line-height: 1.6; }
+    .field-name { font-weight: 700; color: #1A2B4A; white-space: nowrap; font-family: 'Courier New', monospace; font-size: 12px; }
+    .metric-name { font-weight: 700; color: #1A2B4A; }
+    .formula { background: #F7F3EE; border-left: 3px solid #C8748A; padding: 8px 12px; border-radius: 4px; font-size: 12px; color: #333; margin-top: 6px; font-family: 'Courier New', monospace; line-height: 1.7; white-space: pre-wrap; }
+    .note { font-size: 11px; color: #9AA8BB; margin-top: 4px; }
+    .threshold { font-size: 11px; color: #D97706; margin-top: 4px; font-weight: 600; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #C8748A; border-radius: 3px; }
+
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- 헤더 -->
+  <div style="background:#1A2B4A;" class="text-white py-12 px-8 text-center">
+    <p class="text-xs tracking-widest mb-2" style="color:#C8748A">아모레퍼시픽 · Commerce Insight</p>
+    <h1 class="text-2xl font-black tracking-widest mb-2">비즈니스 로직 정의서</h1>
+    <p class="text-sm text-gray-300 mb-2">수식·입력값·계산값·임계값 기준</p>
+    <p class="text-xs mb-6" style="color:#C8748A; letter-spacing:.1em">ver.1 · 2026-04-14 · 직군별 뷰(프로토타입2) 기준</p>
+    <div class="flex justify-center gap-4 text-xs text-gray-400 flex-wrap">
+      <span>기준: amore-insight-persona-prototype.html</span>
+      <span>·</span>
+      <span>내부 전용</span>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-6 py-10">
+
+    <!-- 범례 -->
+    <div style="background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:28px; border: 1px solid #EEE;">
+      <p class="text-xs font-bold navy mb-3 uppercase tracking-wider">배지 범례</p>
+      <div class="legend">
+        <span><span class="input-badge">입력값</span> DB/API에서 직접 수집하는 원천 데이터 필드</span>
+        <span><span class="calc-badge">계산값</span> 입력값을 가공·연산해 도출하는 파생 지표</span>
+        <span><span class="dev-badge">협의 필요</span> 임계값·가중치 등 계약 전 확정 필요 항목</span>
+      </div>
+    </div>
+
+    <!-- 1. 계산 지표 -->
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-num">1</span>
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">계산 로직</p>
+          <h2 class="text-base font-bold navy">파생 지표 수식 정의</h2>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 리뷰 점유율</div>
+        <table>
+          <thead><tr><th style="width:20%">지표명</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">채널 내 자사 점유율</span></td>
+              <td>
+                <div class="formula">share(%) = 자사 전체 리뷰 수 ÷ 채널 전체 화장품 리뷰 수 × 100</div>
+              </td>
+              <td class="text-gray-500 text-sm">분모: 채널 전체 화장품 totalReviews. 소수점 1자리 반올림.</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">브랜드별 점유율 (전체 대비)</span></td>
+              <td>
+                <div class="formula">share(%) = 브랜드 전 채널 리뷰 합산 ÷ 7채널 전체 화장품 리뷰 합산 × 100</div>
+              </td>
+              <td class="text-gray-500 text-sm">Overview·경쟁사 탭 기준</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">브랜드별 점유율 (자사 내)</span></td>
+              <td>
+                <div class="formula">share(%) = 해당 브랜드 전 채널 리뷰 ÷ 자사 16개 브랜드 전체 리뷰 합산 × 100</div>
+              </td>
+              <td class="text-gray-500 text-sm">브랜드별 성과 탭 전용. 분모가 다름 주의.</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">경쟁사 테이블 점유율</span><br><span style="font-size:11px;color:#888">(채널 선택 시 동적 재계산)</span></td>
+              <td>
+                <div class="formula">computedReviews = 선택 채널 === '전체'
+  ? 브랜드 전 채널 reviews 합산
+  : 브랜드 ch[선택채널]
+
+computedShare(%) = computedReviews ÷ Σ(테이블 내 모든 브랜드 computedReviews) × 100</div>
+              </td>
+              <td class="text-gray-500 text-sm">채널 변경 시 전체 테이블 재계산. 분모는 테이블에 표시된 브랜드들의 합산.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 브랜드 활성도 지수 <span class="dev-badge">협의 필요</span> 가중치</div>
+        <table>
+          <thead><tr><th style="width:20%">항목</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">healthScore<br>(0~100점)</span></td>
+              <td>
+                <div class="formula">// 각 항목 정규화 (전체 브랜드 최대값 기준 0~1)
+normReviews   = reviews / max(모든 브랜드 reviews)
+normChannels  = channelCount / 7
+normGrowth    = max(0, chgShareValue) / max(모든 브랜드 chgShareValue)
+  // 감소(음수)는 0으로 처리
+
+healthScore = round(
+  normReviews  × 50 +
+  normChannels × 30 +
+  normGrowth   × 20
+)</div>
+                <p class="threshold">⚠️ 가중치(50/30/20)는 초기 설계값. 계약 전 재협의 필요.</p>
+              </td>
+              <td class="text-gray-500 text-sm">표시 기준:<br>70점↑ = navy 배경(우수)<br>50~70 = 분홍 배경(양호)<br>50↓ = 회색(미흡)</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">healthTrend<br>(전주 대비 등락)</span></td>
+              <td>
+                <div class="formula">healthTrend = 이번 주 healthScore - 전주 healthScore</div>
+              </td>
+              <td class="text-gray-500 text-sm">양수: ▲N점, 음수: ▼N점 표시</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 채널 이상 감지 <span class="dev-badge">협의 필요</span> 임계값</div>
+        <table>
+          <thead><tr><th style="width:20%">상태</th><th style="width:45%">감지 조건</th><th>표시</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">급증 (rise)</span></td>
+              <td>
+                <div class="formula">changeRate = (thisWeek.totalReviews - prevWeek.totalReviews)
+               / prevWeek.totalReviews × 100
+reviewAlert = changeRate >= 20 ? 'rise' : ...</div>
+                <p class="threshold">⚠️ 임계값 +20%는 초기 설정값. 채널 데이터 패턴 분석 후 재조정 가능.</p>
+              </td>
+              <td class="text-gray-500 text-sm">초록 ▲ 배지 + 변화율 수치</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">급감 (drop)</span></td>
+              <td>
+                <div class="formula">reviewAlert = changeRate <= -20 ? 'drop' : null</div>
+                <p class="threshold">⚠️ 임계값 -20%는 초기 설정값.</p>
+              </td>
+              <td class="text-gray-500 text-sm">빨강 ▼ 배지 + 변화율 수치</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 트렌딩 증가량·증가율</div>
+        <table>
+          <thead><tr><th style="width:20%">지표명</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">delta (증가량)</span></td>
+              <td>
+                <div class="formula">delta = current - prev
+// current: 최근 7일(D-0~D-6) 전 채널 합산 리뷰 수
+// prev:    직전 7일(D-7~D-13) 전 채널 합산 리뷰 수
+// 단위: 건/주</div>
+              </td>
+              <td class="text-gray-500 text-sm">표시: "+342건/주" 형식</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">pct (증가율)</span></td>
+              <td>
+                <div class="formula">pct = (current - prev) / prev × 100</div>
+              </td>
+              <td class="text-gray-500 text-sm">pct > 4%: 빨간 배지<br>pct ≤ 4%: 주황 배지</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">정렬 기준</span></td>
+              <td>
+                <div class="formula">리뷰 기준: delta 내림차순
+찜 기준: zzimDelta 내림차순 (trendMetric === 'zzim' 선택 시)</div>
+              </td>
+              <td class="text-gray-500 text-sm">찜 데이터 필드 구조는 리뷰와 동일 (current/prev/delta)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 성분 증가율 (ingredientData.pct)</div>
+        <table>
+          <thead><tr><th style="width:20%">지표명</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">pct (성분 증가율)</span></td>
+              <td>
+                <div class="formula">pct = 해당 성분 포함 상품들의 delta 합계 / prev 합계 × 100
+// delta 합계: 해당 성분 포함 급증 상품 전체의 (current - prev) 합
+// prev 합계: 해당 성분 포함 급증 상품 전체의 prev 합
+// 단위: %</div>
+              </td>
+              <td class="text-gray-500 text-sm">pct ≥ 30%: 빨간 배지<br>pct ≥ 15%: 주황 배지<br>그 외: 노란 배지</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">정렬 기준</span></td>
+              <td>
+                <div class="formula">pct 내림차순 고정</div>
+              </td>
+              <td class="text-gray-500 text-sm">지표(리뷰/찜) 전환과 무관. 항상 리뷰 급증 상품 기준 집계.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 순위 등락 (rankChange)</div>
+        <table>
+          <thead><tr><th style="width:20%">지표명</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">rankChange</span></td>
+              <td>
+                <div class="formula">rankChange = 전주 점유율 순위 - 이번 주 점유율 순위
+// 양수: 순위 상승 (예: 8위 → 5위 = +3)
+// 음수: 순위 하락 (예: 3위 → 5위 = -2)
+// 0: 변동 없음 → "—" 표시</div>
+              </td>
+              <td class="text-gray-500 text-sm">순위 기준: 리뷰 점유율 내림차순.<br>▲3위 = 3계단 상승 표시.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 카테고리 기회 신호</div>
+        <table>
+          <thead><tr><th style="width:20%">지표명</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">시장 성장률</span></td>
+              <td>
+                <div class="formula">catGrowth(%) = (이번 주 카테고리 전체 리뷰 - 전주) / 전주 × 100</div>
+              </td>
+              <td class="text-gray-500 text-sm">실 매출 대신 리뷰 증가율을 시장 성장 대리 지표로 사용</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">진입 기회 배지</span></td>
+              <td>
+                <div class="formula">isOpportunity =
+  rank_desc(catGrowth) <= 3      // 시장 성장률 상위 3개
+  AND
+  rank_asc(apShareInCat) <= 3    // 자사 카테고리 점유율 하위 3개
+
+// 최대 3개 카테고리에 "진입 기회" 배지 표시</div>
+                <p class="threshold">⚠️ 상위/하위 3개 기준은 초기 설정값.</p>
+              </td>
+              <td class="text-gray-500 text-sm">8개 카테고리 중 조건 동시 충족 항목만 배지 표시</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="calc-badge">계산값</span> 브랜드 포지셔닝맵 좌표</div>
+        <table>
+          <thead><tr><th style="width:20%">축</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">X축 (가격대)</span></td>
+              <td>
+                <div class="formula">px = (avgPrice - minPrice) / (maxPrice - minPrice) × 76 + 10
+// 단위: % (CSS left 값)</div>
+              </td>
+              <td class="text-gray-500 text-sm">낮은 가격 → 왼쪽. min/max는 해당 카테고리 전체 브랜드 기준.</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">Y축 (리뷰 볼륨)</span></td>
+              <td>
+                <div class="formula">py = (1 - (reviews - minReviews) / (maxReviews - minReviews)) × 68 + 12
+// 단위: % (CSS top 값, 역순)</div>
+              </td>
+              <td class="text-gray-500 text-sm">리뷰 많을수록 위. 역산 구조.</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">원 크기</span></td>
+              <td>
+                <div class="formula">size = 카테고리 내 리뷰 점유율 (상대 크기, 고정 범위 내 스케일)</div>
+              </td>
+              <td class="text-gray-500 text-sm">자사: 네이비(#1A2B4A) / AP 브랜드: 로즈(#C8748A) / 경쟁사: 회색</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+
+    <!-- 2. 경쟁사 이상 감지 배지 -->
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-num">2</span>
+        <div>
+          <span class="tab-chip mr-2">경쟁사</span>
+          <span class="text-base font-bold navy">이상 감지 배지 — 우선순위 및 조건</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="sub-section"><span class="calc-badge">계산값</span> alertType 판별 로직 (독립 조건 전체 수집 → 우선순위 순 정렬 → 첫 번째를 메인 배지로 표시. 복수 해당 시 +N 표기 + hover 툴팁으로 나머지 노출)</div>
+        <table>
+          <thead><tr><th style="width:5%">#</th><th style="width:28%">표시 텍스트</th><th style="width:8%">배지</th><th style="width:40%">감지 조건</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">1</td>
+              <td><span class="metric-name">다중 채널 신규 입점 · 급성장</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td>
+                <div class="formula">newChs = chKeys.filter(c =>
+  prevChProducts[c] === 0 && chProducts[c] > 0
+)
+newChs.length >= 3</div>
+              </td>
+              <td class="text-gray-500 text-sm">3개 이상 채널 동시 신규 입점</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">2</td>
+              <td><span class="metric-name">[채널명] 신규 입점</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td>
+                <div class="formula">newChs.length >= 1 && newChs.length < 3
+// [채널명] = newChs[0].name (동적 치환)</div>
+              </td>
+              <td class="text-gray-500 text-sm">1~2개 채널 신규 입점</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">3</td>
+              <td><span class="metric-name">[채널명] 입점 확대</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td>
+                <div class="formula">chKeys.some(c =>
+  chProducts[c] >= prevChProducts[c] * 2
+)
+// [채널명] = 해당 조건 채널명 (동적 치환)</div>
+              </td>
+              <td class="text-gray-500 text-sm">특정 채널 취급 상품 수 전주 대비 2배 이상</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">4</td>
+              <td><span class="metric-name">[채널명] 중심 리뷰 급증</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td>
+                <div class="formula">parseFloat(chgReviews) >= 25
+// [채널명] = 리뷰 수 최다 채널명 (ch 객체 max값 기준)</div>
+                <p class="threshold">⚠️ 임계값 +25%는 초기 설정값.</p>
+              </td>
+              <td class="text-gray-500 text-sm">전주 대비 리뷰 증가율 ≥ +25%</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">5</td>
+              <td><span class="metric-name">점유율 급등 · 주시 필요</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td>
+                <div class="formula">!isAP && parseFloat(chgShare) >= 2.0</div>
+                <p class="threshold">⚠️ 임계값 +2.0%p는 초기 설정값.</p>
+              </td>
+              <td class="text-gray-500 text-sm">비자사 기준. 전주 대비 점유율 변화 ≥ +2%p</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">6</td>
+              <td><span class="metric-name">점유율 상승 · 주시</span></td>
+              <td><span style="background:#fee2e2;color:#dc2626;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">주시</span></td>
+              <td>
+                <div class="formula">!isAP && parseFloat(chgShare) >= 1.0</div>
+                <p class="threshold">⚠️ 임계값 +1.0%p는 초기 설정값.</p>
+              </td>
+              <td class="text-gray-500 text-sm">비자사. +1.0%p 이상 +2.0%p 미만</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">7</td>
+              <td><span class="metric-name">리뷰 급감 · 약세</span></td>
+              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">기회</span></td>
+              <td>
+                <div class="formula">!isAP && parseFloat(chgReviews) <= -25</div>
+                <p class="threshold">⚠️ 임계값 -25%는 초기 설정값.</p>
+              </td>
+              <td class="text-gray-500 text-sm">비자사. 전주 대비 리뷰 감소율 ≤ -25%</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">8</td>
+              <td><span class="metric-name">점유율 하락세</span></td>
+              <td><span style="background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">기회</span></td>
+              <td>
+                <div class="formula">!isAP && parseFloat(chgShare) <= -0.3</div>
+                <p class="threshold">⚠️ 임계값 -0.3%p는 초기 설정값.</p>
+              </td>
+              <td class="text-gray-500 text-sm">비자사. 점유율 감소 경쟁사</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs">9</td>
+              <td><span class="metric-name">[채널명] 비중 높음</span></td>
+              <td><span style="background:#f3f4f6;color:#6b7280;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700">정보</span></td>
+              <td>
+                <div class="formula">singleChRatio = max(ch[c]) / Σ(ch) > 0.4
+&& parseFloat(chgReviews) > 5</div>
+              </td>
+              <td class="text-gray-500 text-sm">특정 채널 리뷰 비중 40%+ AND 리뷰 증가율 5%+</td>
+            </tr>
+            <tr>
+              <td class="text-gray-400 font-bold text-xs" style="color:#cbd5e1">—</td>
+              <td><span class="text-gray-400 text-sm">배지 미표시</span></td>
+              <td>—</td>
+              <td>
+                <div class="formula">// 위 1~9 조건 모두 미해당
+alert = ''  // 빈 값 반환, 배지 미렌더링</div>
+              </td>
+              <td class="text-gray-500 text-sm">기본값. x-show="br.alert"로 배지 숨김 처리</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section"><span class="persona-chip-md">채널 MD</span> 채널별 TOP3 경쟁 브랜드 매트릭스</div>
+        <table>
+          <thead><tr><th style="width:20%">지표명</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">채널별 TOP3</span></td>
+              <td>
+                <div class="formula">// 5개 채널(네이버·쿠팡·올리브영·지마켓·11번가) 각각
+channelTOP3[ch] = competeTable
+  .filter(b => !b.isAP)
+  .sort((a,b) => b.ch[ch] - a.ch[ch])
+  .slice(0, 3)</div>
+              </td>
+              <td class="text-gray-500 text-sm">비자사 브랜드 대상. 채널별 리뷰 수 내림차순 상위 3개.</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">다중 채널 주시 배지</span></td>
+              <td>
+                <div class="formula">multiChannelWarn = 브랜드가 TOP3에 포함된 채널 수 >= 2</div>
+              </td>
+              <td class="text-gray-500 text-sm">2개 이상 채널 동시 TOP3 → "주시" 배지 자동 표시</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- 3. 직군별 뷰 분기 -->
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-num">3</span>
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">페르소나</p>
+          <h2 class="text-base font-bold navy">직군별 뷰 분기 조건</h2>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <div class="sub-section">persona 파라미터 값 정의</div>
+        <table>
+          <thead><tr><th style="width:18%">값</th><th style="width:22%">직군</th><th style="width:60%">설명</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">'executive'</span></td><td>전사 보기 (기본)</td><td class="text-gray-500 text-sm">전사 KPI 4개(합산 점유율·성장률·성장 채널·주시 경쟁사) + 점유율 추이 차트 + 3컬럼 신호 요약(채널·브랜드·시장). 직군 특화 세부 지표 미노출.</td></tr>
+            <tr><td><span class="field-name">'md'</span></td><td>채널 MD</td><td class="text-gray-500 text-sm">채널 성과 현황·이상감지·MD KPI 노출. 브랜드 활성도·전략 분석 미노출.</td></tr>
+            <tr><td><span class="field-name">'brand'</span></td><td>브랜드 매니저</td><td class="text-gray-500 text-sm">브랜드 활성도·리뷰 인사이트·BM KPI 노출. 채널 MD 전용 섹션 미노출.</td></tr>
+            <tr><td><span class="field-name">'strategy'</span></td><td>전략기획</td><td class="text-gray-500 text-sm">시장 점유율 추이·경쟁사 정렬(상승폭)·카테고리 기회·전략 KPI 노출.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">Overview 탭 — 직군별 노출 섹션</div>
+        <table>
+          <thead><tr><th style="width:30%">섹션</th><th style="width:18%">executive</th><th style="width:18%">md</th><th style="width:18%">brand</th><th>strategy</th></tr></thead>
+          <tbody>
+            <tr><td>전사 KPI 4개 (합산 점유율·성장률·성장채널수·주시경쟁사수)</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td></tr>
+            <tr><td>전사 인사이트 요약 문장</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td></tr>
+            <tr><td>자사 점유율 추이 차트 (자사 vs 경쟁사 1·2위 6개월)</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td></tr>
+            <tr><td>3컬럼 신호 요약 (채널 신호·브랜드 신호·시장 신호)</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td></tr>
+            <tr><td>채널 MD KPI (채널 분포·이상감지·리뷰급증·경쟁사 채널 동향)</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td></tr>
+            <tr><td>브랜드 매니저 KPI (활성도 순위·브랜드 현황·리뷰 급증·경쟁 브랜드)</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td></tr>
+            <tr><td>전략기획 KPI (합산 점유율·성장률·성장채널수·주시경쟁사수)</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td></tr>
+            <tr><td>전략기획 채널 성장률 현황 (성장/보합/하락)</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td></tr>
+            <tr><td>전략기획 카테고리 기회 지수</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">성과 분석 탭 — 직군별 추가 노출 섹션</div>
+        <table>
+          <thead><tr><th style="width:30%">섹션</th><th style="width:18%">executive</th><th style="width:18%">md</th><th style="width:18%">brand</th><th>strategy</th></tr></thead>
+          <tbody>
+            <tr><td>채널별 공통 지표 (비교표·KPI 카드·브랜드 순위·채널 통합 조회)</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+            <tr><td>채널별 — 이상 감지 배지 <span class="persona-chip-md" style="font-size:10px">MD</span></td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td></tr>
+            <tr><td>채널별 — 리뷰 인사이트 (긍정/부정 키워드 TOP3) <span class="persona-chip-md" style="font-size:10px">MD</span></td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td></tr>
+            <tr><td>브랜드별 공통 지표 (성과 테이블·드릴다운)</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+            <tr><td>브랜드별 — 활성도 지수 컬럼 + 기간별 추이 차트 <span class="persona-chip-brand" style="font-size:10px">BM</span></td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td></tr>
+            <tr><td>브랜드별 드릴다운 — 리뷰 인사이트 탭 ④ <span class="persona-chip-brand" style="font-size:10px">BM</span></td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td></tr>
+            <tr><td>카테고리별 공통 지표</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+            <tr><td>카테고리별 — 성장성 요약 바 (pill 클릭 필터) <span class="persona-chip-strategy" style="font-size:10px">전략</span></td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">경쟁사 탭 — 직군별 정렬 기준</div>
+        <table>
+          <thead><tr><th style="width:20%">직군</th><th style="width:45%">기본 정렬</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td><span class="persona-chip-all">executive · md · brand</span></td><td><div class="formula">리뷰 점유율 (computedShare) 내림차순</div></td><td class="text-gray-500 text-sm">기본값</td></tr>
+            <tr><td><span class="persona-chip-strategy">전략기획</span></td><td><div class="formula">점유율 변화폭 (chgShare 절대값) 내림차순
+→ 가장 빠르게 치고 올라오는 경쟁사 상단 노출</div></td><td class="text-gray-500 text-sm">strategy 진입 시 자동 적용</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">전략기획 채널 성장률 상태 분기</div>
+        <table>
+          <thead><tr><th style="width:18%">상태</th><th style="width:45%">조건</th><th>표시</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">성장</span></td>
+              <td><div class="formula">채널 자사 점유율 변화 >= +3%p</div><p class="threshold">⚠️ 임계값 +3%p는 초기 설정값.</p></td>
+              <td class="text-gray-500 text-sm">초록 배지 + ▲X% 표시</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">보합</span></td>
+              <td><div class="formula">-3%p < 변화폭 < +3%p</div></td>
+              <td class="text-gray-500 text-sm">회색 배지</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">하락</span></td>
+              <td><div class="formula">채널 자사 점유율 변화 <= -3%p</div></td>
+              <td class="text-gray-500 text-sm">빨간 배지 + ▼X% 표시</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+
+    <!-- 4. 화면 탭 구조 및 필터 -->
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-num">4</span>
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">탭 구조 · 필터</p>
+          <h2 class="text-base font-bold navy">화면 탭 및 상태값 정의</h2>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <div class="sub-section">메인 탭 (tab)</div>
+        <table>
+          <thead><tr><th style="width:20%">값</th><th style="width:22%">화면명</th><th>주요 콘텐츠</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">'overview'</span></td><td>Overview</td><td class="text-gray-500 text-sm">직군별 KPI 카드 · 채널/브랜드 TOP · 트렌딩 TOP5 · 경쟁사 주시 목록</td></tr>
+            <tr><td><span class="field-name">'merged-a'</span></td><td>성과 분석</td><td class="text-gray-500 text-sm">채널별/브랜드별/카테고리별 상세 드릴다운</td></tr>
+            <tr><td><span class="field-name">'compete'</span></td><td>경쟁사</td><td class="text-gray-500 text-sm">경쟁사 점유율·순위·이상감지 테이블</td></tr>
+            <tr><td><span class="field-name">'trending'</span></td><td>트렌딩</td><td class="text-gray-500 text-sm">리뷰/찜 급증 상품 리스트 · 주목 성분</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">성과 분석 서브탭 (mergedATab)</div>
+        <table>
+          <thead><tr><th style="width:20%">값</th><th style="width:22%">화면명</th><th>주요 필터/상태</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">'channel'</span></td><td>채널별</td><td class="text-gray-500 text-sm">channelTab (채널 선택), channelSubTab ('ranking')</td></tr>
+            <tr><td><span class="field-name">'brand'</span></td><td>브랜드별</td><td class="text-gray-500 text-sm">selectedBrand, drilldownCat, drilldownChannel, drilldownQuery, drilldownPage(20개 단위)</td></tr>
+            <tr><td><span class="field-name">'category'</span></td><td>카테고리별</td><td class="text-gray-500 text-sm">선택 카테고리 필터</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">브랜드 드릴다운 서브탭 (4개)</div>
+        <table>
+          <thead><tr><th style="width:20%">탭</th><th style="width:22%">화면명</th><th>주요 데이터</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">① 상품 현황</span></td><td>상품 × 채널 매트릭스</td><td class="text-gray-500 text-sm">상품별 채널 판매가·리뷰 수. 최저가 채널 로즈 강조. 클릭 시 상품 상세 팝업.</td></tr>
+            <tr><td><span class="field-name">② 채널 성과</span></td><td>취급 채널별 실적</td><td class="text-gray-500 text-sm">채널별 리뷰 점유율·평균가·리뷰 수·상품 수</td></tr>
+            <tr><td><span class="field-name">③ 시장 위치</span></td><td>포지셔닝맵</td><td class="text-gray-500 text-sm">가격-리뷰 산점도, 가격대 분포, 카테고리 내 점유율</td></tr>
+            <tr><td><span class="field-name">④ 리뷰 인사이트</span></td><td>감성 키워드 분석</td><td class="text-gray-500 text-sm"><span class="persona-chip-brand" style="font-size:10px">BM 전용</span> 긍/부정 비중·키워드 TOP5·채널별 강도 매트릭스</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">경쟁사 탭 필터</div>
+        <table>
+          <thead><tr><th style="width:22%">상태값</th><th style="width:12%">타입</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">competeQuery</span></td><td>string</td><td class="text-gray-500 text-sm">브랜드명 검색 (부분 일치, 실시간)</td></tr>
+            <tr><td><span class="field-name">brandChannel</span></td><td>string</td><td class="text-gray-500 text-sm">채널 선택. 점유율 재계산 트리거. 기본값: 'all'</td></tr>
+            <tr><td><span class="field-name">apOnly</span></td><td>boolean</td><td class="text-gray-500 text-sm">자사 브랜드만 보기. true 시 isAP === true 필터링</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">트렌딩 탭 필터</div>
+        <table>
+          <thead><tr><th style="width:22%">상태값</th><th style="width:12%">타입</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">trendMetric</span></td><td>string</td><td class="text-gray-500 text-sm">'review' (리뷰 기준) / 'zzim' (찜 기준). 전환 시 delta 재정렬.</td></tr>
+            <tr><td><span class="field-name">trendCat</span></td><td>string</td><td class="text-gray-500 text-sm">카테고리 선택. '' = 전체. 성분 블록 노출 조건 제어. 메이크업·향수·네일 선택 시 성분 블록 미노출.</td></tr>
+            <tr><td><span class="field-name">apOnly</span></td><td>boolean</td><td class="text-gray-500 text-sm">자사 상품만 보기. isAP === true 필터</td></tr>
+            <tr><td><span class="field-name">trendChannel</span></td><td>string</td><td class="text-gray-500 text-sm">채널 선택. 해당 채널 기준 current/prev 재집계.</td></tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+
+    <!-- 5. 상품 상세 팝업 -->
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-num">5</span>
+        <div>
+          <span class="tab-chip mr-2" style="background:#8899AA">공통</span>
+          <span class="text-base font-bold navy">상품 상세 팝업</span>
+          <span class="text-xs text-gray-400 ml-2">— 상품명 클릭 시 열림</span>
+        </div>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead><tr><th style="width:20%">영역</th><th style="width:45%">데이터 및 수식</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="metric-name">기간 선택</span><br><span style="font-size:11px;color:#888">1주/1개월/2개월/3개월</span></td>
+              <td>
+                <div class="formula">1주    = 최근 7일 (일별 데이터)
+1개월 = 최근 30일
+2개월 = 최근 60일
+3개월 = 최근 90일</div>
+              </td>
+              <td class="text-gray-500 text-sm">차트·히스토리 테이블 기간 범위 연동</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">가격 추이 차트</span></td>
+              <td>
+                <div class="formula">X축: 날짜 (일 단위)
+Y축: 가격 (원)
+정가 선 (회색) + 할인가 선 (네이비)</div>
+              </td>
+              <td class="text-gray-500 text-sm">할인가 하락 구간 = 프로모션 기간 파악</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">리뷰 추이 차트</span></td>
+              <td>
+                <div class="formula">X축: 날짜 (일 단위)
+Y축: 누적 리뷰 수</div>
+              </td>
+              <td class="text-gray-500 text-sm">기울기 급증 구간 = 바이럴·프로모션 효과 시점</td>
+            </tr>
+            <tr>
+              <td><span class="metric-name">히스토리 테이블</span></td>
+              <td>
+                <div class="formula">날짜 | 정가 | 할인가 | 누적 리뷰 수 | 누적 찜 수</div>
+              </td>
+              <td class="text-gray-500 text-sm">일 단위 스냅샷 저장 필요. 차트 이상 구간 수치 확인용.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- 데이터 기준 안내 -->
+    <div class="rounded-xl p-5 mb-4" style="background:#EEF3FF; border-left: 4px solid #1A2B4A;">
+      <p class="text-xs font-bold navy mb-3 uppercase tracking-wider">📌 데이터 수집 기준</p>
+      <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-xs text-gray-600">
+        <div>· 갱신 주기: 일 1회 (매일 전일 데이터 기준)</div>
+        <div>· 기준 채널: 네이버·쿠팡·올리브영·지마켓·11번가·카카오·옥션 (7개)</div>
+        <div>· 리뷰: 각 채널 상품 페이지 누적 리뷰 수 크롤링</div>
+        <div>· 찜: 각 채널 상품 페이지 누적 찜/위시리스트 수</div>
+        <div>· 가격: 쿠폰·카드사 즉시할인 제외한 표시 판매가</div>
+        <div>· 리뷰 인사이트: 주 1회 갱신 (월요일 기준)</div>
+        <div>· 현재 버전: 샘플 데이터 (실제 수치와 다를 수 있음)</div>
+        <div>· 임계값 항목: 계약 전 계약사와 별도 협의 필요</div>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-gray-300 pb-8 mt-6">Beauty Dome · 지표 및 데이터 정의서 · 개발용 · 2026-04-14 · Internal Use Only</p>
+
+  </div>
+</body>
+</html>
