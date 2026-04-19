@@ -139,7 +139,7 @@
           <p class="text-xs tracking-widest" style="color:#C8748A">COMMERCE INSIGHT</p>
         </div>
         <nav class="flex gap-8 text-sm">
-          <button @click="tab='overview'; $nextTick(()=>{ if(persona==='strategy') renderStrategyShareChart(); if(persona==='executive') renderExecutiveShareChart(); })" :class="tab==='overview'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">Overview</button>
+          <button @click="tab='overview'; $nextTick(()=>{ if(persona==='strategy') renderStrategyShareChart(); if(persona==='executive') renderExecutiveShareChart(); })" :class="tab==='overview'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">대시보드</button>
           <button @click="tab='merged-a'; mergedATab='channel'; mergedABrandView='brand'" :class="tab==='merged-a'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">성과 분석</button>
           <button @click="tab='compete'" :class="tab==='compete'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">경쟁사</button>
           <button @click="tab='trending'" :class="tab==='trending'?'tab-active':'text-gray-400 hover:text-white'" class="transition pb-1">트렌딩</button>
@@ -656,11 +656,15 @@
 
         <!-- 요약 KPI -->
         <div class="grid grid-cols-3 gap-4 mb-5">
-          <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #E53E3E">
-            <p class="text-xs text-gray-400 uppercase tracking-wider">주시 필요 브랜드<i class="info-btn" data-tip="점유율 급등·신규 입점 등 이상 신호가 감지된 경쟁 브랜드 수">i</i></p>
+          <div class="rounded-xl p-4 shadow-sm cursor-pointer transition-all select-none"
+            :class="competeAlertFilter ? 'ring-2 ring-red-400' : 'bg-white hover:shadow-md'"
+            :style="competeAlertFilter ? 'border-left:3px solid #E53E3E; background:#FFF5F5' : 'border-left:3px solid #E53E3E; background:#fff'"
+            @click="competeDeclineFilter=false; competeAlertFilter=!competeAlertFilter">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">주시 필요 브랜드<i class="info-btn" data-tip="점유율 급등·신규 입점 등 이상 신호가 감지된 경쟁 브랜드 수. 클릭하면 해당 브랜드만 필터 조회합니다">i</i></p>
             <p class="text-2xl font-black mt-1" style="color:#E53E3E"
               x-text="competeTableComputed.filter(c=>!c.isAP&&c.alertType==='warn').length+'개'"></p>
-            <p class="text-xs text-red-400 mt-1">아누아 · 닥터지 외 3개</p>
+            <p class="text-xs mt-1" :class="competeAlertFilter ? 'text-red-500 font-semibold' : 'text-red-400'"
+              x-text="competeAlertFilter ? '▶ 필터 적용 중 — 클릭해서 해제' : '아누아 · 닥터지 외 3개'"></p>
           </div>
           <div class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #1A2B4A">
             <p class="text-xs text-gray-400 uppercase tracking-wider">자사 합산 점유율<i class="info-btn" data-tip="선택된 채널 기준 자사 전체 브랜드 리뷰 점유율 합산">i</i></p>
@@ -669,99 +673,34 @@
             <p class="text-xs text-gray-400 mt-1"
               x-text="(brandChannel==='all'?'전 채널':channels.find(c=>c.key===brandChannel)?.name||'') + ' 기준'"></p>
           </div>
-          <!-- KPI 3 — 기본/전략기획 -->
-          <div x-show="persona !== 'md' && persona !== 'brand'" class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #48BB78">
-            <p class="text-xs text-gray-400 uppercase tracking-wider">점유율 하락 경쟁사<i class="info-btn" data-tip="전주 대비 리뷰 점유율이 하락한 경쟁 브랜드 수">i</i></p>
+          <!-- KPI 3 — 전 직군 공통 -->
+          <div class="rounded-xl p-4 shadow-sm cursor-pointer transition-all select-none"
+            :class="competeDeclineFilter ? 'ring-2 ring-green-400' : 'bg-white hover:shadow-md'"
+            :style="competeDeclineFilter ? 'border-left:3px solid #48BB78; background:#F0FFF4' : 'border-left:3px solid #48BB78; background:#fff'"
+            @click="competeAlertFilter=false; competeDeclineFilter=!competeDeclineFilter">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">점유율 하락 경쟁사<i class="info-btn" data-tip="전주 대비 리뷰 점유율이 하락한 경쟁 브랜드 수. 클릭하면 해당 브랜드만 필터 조회합니다">i</i></p>
             <p class="text-2xl font-black mt-1" style="color:#48BB78"
               x-text="competeTableComputed.filter(c=>!c.isAP&&c.chgShare.startsWith('-')).length+'개'"></p>
-            <p class="text-xs text-gray-400 mt-1">기회 포착 가능</p>
+            <p class="text-xs mt-1" :class="competeDeclineFilter ? 'text-green-600 font-semibold' : 'text-gray-400'"
+              x-text="competeDeclineFilter ? '▶ 필터 적용 중 — 클릭해서 해제' : '기회 포착 가능'"></p>
           </div>
-          <!-- KPI 3 — 채널 MD -->
-          <div x-show="persona === 'md'" class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #4169E1">
-            <p class="text-xs text-gray-400 uppercase tracking-wider">채널 집중 경쟁 브랜드<i class="info-btn" data-tip="2개 이상 채널에서 리뷰 점유율 TOP3에 진입한 경쟁 브랜드 수">i</i></p>
-            <p class="text-2xl font-black mt-1" style="color:#4169E1">3개</p>
-            <p class="text-xs text-gray-400 mt-1">아누아 · 닥터지 외 1개</p>
-          </div>
-          <!-- KPI 3 — 브랜드 매니저 -->
-          <div x-show="persona === 'brand'" class="bg-white rounded-xl p-4 shadow-sm" style="border-left:3px solid #48BB78">
-            <p class="text-xs text-gray-400 uppercase tracking-wider">점유율 하락 경쟁사<i class="info-btn" data-tip="전주 대비 리뷰 점유율이 하락한 경쟁 브랜드 수">i</i></p>
-            <p class="text-2xl font-black mt-1" style="color:#48BB78"
-              x-text="competeTableComputed.filter(c=>!c.isAP&&c.chgShare.startsWith('-')).length+'개'"></p>
-            <p class="text-xs text-gray-400 mt-1">기회 포착 가능</p>
-          </div>
-        </div>
-
-        <!-- 채널 MD 전용: 채널별 경쟁사 강세 매트릭스 -->
-        <div x-show="persona === 'md'" class="bg-white rounded-xl shadow-sm overflow-hidden mb-5">
-          <div class="flex items-center justify-between p-4 border-b">
-            <h3 class="font-bold navy text-sm">채널별 TOP3 경쟁 브랜드 현황</h3>
-            <span class="text-xs text-gray-400">채널별 리뷰 점유율 기준 · 2026-04-01 기준</span>
-          </div>
-          <table class="w-full text-xs">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="py-2.5 px-4 text-left navy font-semibold">채널</th>
-                <th class="py-2.5 px-4 text-center navy font-semibold">1위</th>
-                <th class="py-2.5 px-4 text-center navy font-semibold">2위</th>
-                <th class="py-2.5 px-4 text-center navy font-semibold">3위</th>
-                <th class="py-2.5 px-4 text-center navy font-semibold">자사 순위<i class="info-btn" data-tip="해당 채널에서 자사의 리뷰 점유율 순위">i</i></th>
-                <th class="py-2.5 px-4 text-center navy font-semibold">전주 대비<i class="info-btn" data-tip="전주 동일 시점 대비 자사 순위 변동">i</i></th>
-              </tr>
-            </thead>
-            <tbody class="divide-y">
-              <tr class="hover:bg-gray-50">
-                <td class="py-3 px-4 font-semibold navy">네이버</td>
-                <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium">이니스프리</span></td>
-                <td class="py-3 px-4 text-center text-gray-600">라네즈</td>
-                <td class="py-3 px-4 text-center text-gray-600">헤라</td>
-                <td class="py-3 px-4 text-center"><span class="font-bold navy">4위</span></td>
-                <td class="py-3 px-4 text-center text-blue-500 font-semibold">▼1위</td>
-              </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="py-3 px-4 font-semibold navy">쿠팡</td>
-                <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium">닥터지</span></td>
-                <td class="py-3 px-4 text-center text-gray-600">이니스프리</td>
-                <td class="py-3 px-4 text-center text-gray-600">토리든</td>
-                <td class="py-3 px-4 text-center"><span class="font-bold navy">6위</span></td>
-                <td class="py-3 px-4 text-center text-red-500 font-semibold">▲1위</td>
-              </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="py-3 px-4 font-semibold navy">올리브영</td>
-                <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium">라네즈</span></td>
-                <td class="py-3 px-4 text-center text-gray-600">헤라</td>
-                <td class="py-3 px-4 text-center text-gray-600">설화수</td>
-                <td class="py-3 px-4 text-center"><span class="font-bold navy">2위</span></td>
-                <td class="py-3 px-4 text-center text-gray-400">—</td>
-              </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="py-3 px-4 font-semibold navy">지마켓</td>
-                <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium">토리든</span></td>
-                <td class="py-3 px-4 text-center text-gray-600">닥터지</td>
-                <td class="py-3 px-4 text-center text-gray-600">이니스프리</td>
-                <td class="py-3 px-4 text-center"><span class="font-bold navy">7위</span></td>
-                <td class="py-3 px-4 text-center text-blue-500 font-semibold">▼2위</td>
-              </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="py-3 px-4 font-semibold navy">11번가</td>
-                <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium">이니스프리</span></td>
-                <td class="py-3 px-4 text-center text-gray-600">헤라</td>
-                <td class="py-3 px-4 text-center text-gray-600">라네즈</td>
-                <td class="py-3 px-4 text-center"><span class="font-bold navy">5위</span></td>
-                <td class="py-3 px-4 text-center text-red-500 font-semibold">▲1위</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="text-xs text-gray-400 px-4 py-3 border-t">빨간 배지: 2개 이상 채널에서 TOP3에 진입한 집중 경쟁 브랜드</p>
         </div>
 
         <!-- 경쟁사 테이블 -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <!-- 필터 활성 배너 -->
+          <div x-show="competeAlertFilter" class="flex items-center justify-between px-4 py-2.5 text-xs border-b" style="background:#FFF5F5; color:#C53030">
+            <span>⚠ 주시 필요 브랜드 필터 적용 중 — TOP 20 외 이상 감지 브랜드 포함 전체 표시</span>
+            <button @click="competeAlertFilter=false" class="ml-3 px-2 py-0.5 rounded font-semibold border border-red-300 hover:bg-red-100 transition">필터 해제</button>
+          </div>
+          <div x-show="competeDeclineFilter" class="flex items-center justify-between px-4 py-2.5 text-xs border-b" style="background:#F0FFF4; color:#276749">
+            <span>▼ 점유율 하락 경쟁사 필터 적용 중 — 전주 대비 점유율이 하락한 경쟁 브랜드 전체 표시</span>
+            <button @click="competeDeclineFilter=false" class="ml-3 px-2 py-0.5 rounded font-semibold border border-green-400 hover:bg-green-100 transition">필터 해제</button>
+          </div>
           <div class="flex items-center justify-between p-4 border-b">
             <div class="flex items-center gap-3 flex-1">
               <div>
-                <h3 class="font-bold navy text-sm whitespace-nowrap">경쟁 브랜드 현황 ·
-                  <span x-text="brandChannel==='all'?'전 채널 합산':(channels.find(c=>c.key===brandChannel)?.name||'')+ ' 기준'"></span>
-                </h3>
+                <h3 class="font-bold navy text-sm">경쟁 브랜드 현황</h3>
                 <p class="text-xs text-gray-400 mt-0.5">점유율·리뷰 변동값은 전주 대비 기준입니다</p>
               </div>
               <div class="flex items-center gap-2 flex-1 max-w-xs">
@@ -780,25 +719,26 @@
                 <th class="py-2.5 px-3 text-left navy font-semibold">#</th>
                 <th class="py-2.5 px-3 text-left navy font-semibold">브랜드</th>
                 <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 점유율<i class="info-btn" data-tip="전체 뷰티 카테고리 리뷰 중 해당 브랜드가 차지하는 비율">i</i></th>
-                <th class="py-2.5 px-3 text-right navy font-semibold">점유율 전주 대비<i class="info-btn" data-tip="전주 동일 시점 대비 점유율 증감">i</i></th>
-                <th class="py-2.5 px-3 text-right navy font-semibold">순위 등락<i class="info-btn" data-tip="전주 대비 리뷰 점유율 순위 변동">i</i></th>
-                <th class="py-2.5 px-3 text-right navy font-semibold">총 리뷰<i class="info-btn" data-tip="해당 채널·브랜드에 누적된 리뷰 수">i</i></th>
-                <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 증감<i class="info-btn" data-tip="전주 대비 리뷰 수 증감률">i</i></th>
+                <th class="py-2.5 px-3 text-right navy font-semibold">점유율 변동<i class="info-btn" data-tip="전주 동일 시점 대비 점유율 증감">i</i></th>
                 <th class="py-2.5 px-3 text-right navy font-semibold">상품 수<i class="info-btn" data-tip="해당 채널에 등록된 브랜드 상품 수">i</i></th>
-                <th class="py-2.5 px-3 text-right navy font-semibold">평균 판매가<i class="info-btn" data-tip="할인 적용 후 실제 거래된 평균 가격">i</i></th>
-                <th class="py-2.5 px-3 text-left navy font-semibold">주요 동향<i class="info-btn" data-tip="입점 현황·점유율 변동을 기반으로 자동 산출한 경쟁 신호">i</i></th>
+                <th class="py-2.5 pl-6 pr-3 text-left navy font-semibold">주요 동향<i class="info-btn" data-tip="입점 현황·점유율 변동을 기반으로 자동 산출한 경쟁 신호">i</i></th>
               </tr>
             </thead>
             <tbody>
               <tr x-show="competeTableFiltered.length === 0">
-                <td colspan="10" class="py-10 text-center text-gray-400 text-xs">
+                <td colspan="6" class="py-10 text-center text-gray-400 text-xs">
                   <p class="font-semibold mb-1" x-text="'&quot;' + competeQuery + '&quot;' + ' 브랜드를 찾을 수 없어요'"></p>
                   <p>현재 모니터링 중인 브랜드 목록에 없습니다</p>
                 </td>
               </tr>
               <template x-for="(br, i) in competeTableFiltered" :key="br.name">
                 <tr class="border-t transition" :class="br.isAP ? 'ap-row hover:bg-blue-100' : 'hover:bg-gray-50'">
-                  <td class="py-2.5 px-3 font-bold" :class="br.isAP?'navy':'text-gray-500'" x-text="i+1"></td>
+                  <td class="py-2.5 px-3" :class="br.isAP?'navy':'text-gray-500'">
+                    <span class="font-bold" x-text="br.globalRank"></span>
+                    <span x-show="br.rankChange < 0" class="text-red-500 text-xs ml-1" x-text="'▲' + Math.abs(br.rankChange)"></span>
+                    <span x-show="br.rankChange > 0" class="text-blue-500 text-xs ml-1" x-text="'▼' + br.rankChange"></span>
+                    <span x-show="br.rankChange === 0" class="text-gray-300 text-xs ml-1">—</span>
+                  </td>
                   <td class="py-2.5 px-3 font-semibold" :class="br.isAP?'navy':'text-gray-700'">
                     <span x-text="br.name"></span>
                     <span x-show="br.isAP" class="ap-badge">자사</span>
@@ -814,18 +754,8 @@
                   <td class="py-2.5 px-3 text-right font-semibold"
                     :class="br.chgShare.startsWith('+') ? 'text-red-500' : br.chgShare.startsWith('-') ? 'text-blue-500' : 'text-gray-400'"
                     x-text="br.chgShare"></td>
-                  <td class="py-2.5 px-3 text-right font-semibold">
-                    <span x-show="br.rankChange < 0" class="text-red-500" x-text="'▲' + Math.abs(br.rankChange) + '위'"></span>
-                    <span x-show="br.rankChange > 0" class="text-blue-500" x-text="'▼' + br.rankChange + '위'"></span>
-                    <span x-show="br.rankChange === 0" class="text-gray-300">—</span>
-                  </td>
-                  <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-600'" x-text="(br.computedReviews/10000).toFixed(1)+'만'"></td>
-                  <td class="py-2.5 px-3 text-right font-semibold"
-                    :class="br.chgReviews.startsWith('+') ? 'text-red-500' : 'text-blue-500'"
-                    x-text="br.chgReviews"></td>
                   <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-600'" x-text="br.products.toLocaleString()"></td>
-                  <td class="py-2.5 px-3 text-right" :class="br.isAP?'font-semibold navy':'text-gray-600'" x-text="br.avgPrice.toLocaleString()+'원'"></td>
-                  <td class="py-2.5 px-3">
+                  <td class="py-2.5 pl-6 pr-3">
                     <div x-show="br.alert" class="alert-badge-wrap">
                       <span class="px-2 py-0.5 rounded-full text-xs font-medium"
                         :class="{
@@ -1837,6 +1767,8 @@
         toast: null,
         crossQuery: '', crossResults: [],
         competeQuery: '',
+        competeAlertFilter: false,
+        competeDeclineFilter: false,
         strategyChannelGrowth: [
           { name:'네이버',    growth: 2.1, status:'growth'  },
           { name:'쿠팡',     growth: 3.4, status:'growth'  },
@@ -1937,6 +1869,51 @@
             ch:{naver:62000,coupang:52000,oliveyoung:42000,gmarket:18000,street:12000,kakao:8000,auction:4000},
             chProducts:{naver:42,coupang:38,oliveyoung:28,gmarket:8,street:6,kakao:4,auction:3},
             prevChProducts:{naver:28,coupang:22,oliveyoung:0,gmarket:0,street:0,kakao:0,auction:0}},
+          {name:'클리오',    products:287,reviews:184000,avgPrice:32000,isAP:false,chgShare:'-0.2%p',chgReviews:'+3.1%',rankChange:1,
+            ch:{naver:72000,coupang:58000,oliveyoung:32000,gmarket:10000,street:6000,kakao:4000,auction:2000},
+            chProducts:{naver:72,coupang:68,oliveyoung:56,gmarket:28,street:18,kakao:8,auction:5},
+            prevChProducts:{naver:72,coupang:68,oliveyoung:56,gmarket:28,street:18,kakao:8,auction:5}},
+          {name:'에뛰드',    products:214,reviews:172000,avgPrice:22000,isAP:true, chgShare:'+0.2%p',chgReviews:'+1.4%',rankChange:0,
+            ch:{naver:58000,coupang:42000,oliveyoung:52000,gmarket:8000,street:6000,kakao:4000,auction:2000},
+            chProducts:{naver:68,coupang:48,oliveyoung:52,gmarket:18,street:12,kakao:6,auction:4},
+            prevChProducts:{naver:64,coupang:44,oliveyoung:48,gmarket:18,street:12,kakao:6,auction:4}},
+          {name:'믹순',      products:112,reviews:158000,avgPrice:26000,isAP:false,chgShare:'+0.4%p',chgReviews:'+5.2%',rankChange:-1,
+            ch:{naver:48000,coupang:38000,oliveyoung:52000,gmarket:8000,street:6000,kakao:4000,auction:2000},
+            chProducts:{naver:28,coupang:22,oliveyoung:38,gmarket:6,street:4,kakao:2,auction:1},
+            prevChProducts:{naver:28,coupang:22,oliveyoung:38,gmarket:6,street:4,kakao:2,auction:1}},
+          {name:'바이오더마', products:98, reviews:146000,avgPrice:28000,isAP:false,chgShare:'-0.3%p',chgReviews:'-1.8%',rankChange:1,
+            ch:{naver:52000,coupang:42000,oliveyoung:38000,gmarket:6000,street:4000,kakao:2000,auction:2000},
+            chProducts:{naver:24,coupang:18,oliveyoung:22,gmarket:4,street:2,kakao:1,auction:1},
+            prevChProducts:{naver:24,coupang:18,oliveyoung:22,gmarket:4,street:2,kakao:1,auction:1}},
+          {name:'닥터방기원', products:76, reviews:136000,avgPrice:32000,isAP:false,chgShare:'+0.1%p',chgReviews:'+2.4%',rankChange:0,
+            ch:{naver:52000,coupang:48000,oliveyoung:22000,gmarket:6000,street:4000,kakao:2000,auction:2000},
+            chProducts:{naver:18,coupang:22,oliveyoung:12,gmarket:4,street:2,kakao:1,auction:1},
+            prevChProducts:{naver:18,coupang:22,oliveyoung:12,gmarket:4,street:2,kakao:1,auction:1}},
+          {name:'에스트라',  products:64, reviews:126000,avgPrice:42000,isAP:false,chgShare:'-0.2%p',chgReviews:'+0.8%',rankChange:1,
+            ch:{naver:48000,coupang:32000,oliveyoung:34000,gmarket:4000,street:3000,kakao:3000,auction:2000},
+            chProducts:{naver:16,coupang:12,oliveyoung:18,gmarket:2,street:1,kakao:1,auction:1},
+            prevChProducts:{naver:16,coupang:12,oliveyoung:18,gmarket:2,street:1,kakao:1,auction:1}},
+          {name:'마몽드',    products:168,reviews:116000,avgPrice:28000,isAP:true, chgShare:'-0.6%p',chgReviews:'-3.2%',rankChange:2,
+            ch:{naver:42000,coupang:28000,oliveyoung:30000,gmarket:8000,street:4000,kakao:2000,auction:2000},
+            chProducts:{naver:48,coupang:32,oliveyoung:42,gmarket:18,street:12,kakao:8,auction:6},
+            prevChProducts:{naver:48,coupang:32,oliveyoung:42,gmarket:18,street:12,kakao:8,auction:6}},
+          {name:'아이오페',  products:142,reviews:106000,avgPrice:45000,isAP:true, chgShare:'-0.4%p',chgReviews:'+1.2%',rankChange:1,
+            ch:{naver:42000,coupang:22000,oliveyoung:30000,gmarket:5000,street:4000,kakao:2000,auction:1000},
+            chProducts:{naver:38,coupang:22,oliveyoung:32,gmarket:12,street:8,kakao:4,auction:3},
+            prevChProducts:{naver:36,coupang:20,oliveyoung:30,gmarket:12,street:8,kakao:4,auction:3}},
+          {name:'에스티로더',products:214,reviews:96000, avgPrice:168000,isAP:false,chgShare:'-0.8%p',chgReviews:'-5.4%',rankChange:2,
+            ch:{naver:38000,coupang:18000,oliveyoung:28000,gmarket:4000,street:4000,kakao:2000,auction:2000},
+            chProducts:{naver:52,coupang:28,oliveyoung:68,gmarket:18,street:12,kakao:8,auction:6},
+            prevChProducts:{naver:52,coupang:28,oliveyoung:68,gmarket:18,street:12,kakao:8,auction:6}},
+          {name:'달바',      products:87, reviews:87000, avgPrice:52000,isAP:false,chgShare:'+0.3%p',chgReviews:'+4.8%',rankChange:0,
+            ch:{naver:32000,coupang:24000,oliveyoung:22000,gmarket:3000,street:3000,kakao:2000,auction:1000},
+            chProducts:{naver:22,coupang:16,oliveyoung:24,gmarket:4,street:2,kakao:1,auction:1},
+            prevChProducts:{naver:20,coupang:14,oliveyoung:22,gmarket:4,street:2,kakao:1,auction:1}},
+          /* ── 21위 이하: 기본 뷰(TOP 20)에서는 미노출, 이상 감지 필터 ON 시 노출 ── */
+          {name:'바이오힐보',products:82, reviews:72000, avgPrice:38000,isAP:false,chgShare:'+2.8%p',chgReviews:'+38.2%',rankChange:-6,
+            ch:{naver:18000,coupang:12000,oliveyoung:34000,gmarket:3000,street:2000,kakao:2000,auction:1000},
+            chProducts:{naver:18,coupang:12,oliveyoung:32,gmarket:2,street:1,kakao:1,auction:1},
+            prevChProducts:{naver:12,coupang:8,oliveyoung:0,gmarket:2,street:1,kakao:1,auction:1}},
         ],
 
         channelRankMap: {
@@ -2572,6 +2549,8 @@
           const time = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
           const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
           const refDate = `${yesterday.getFullYear()}-${pad(yesterday.getMonth()+1)}-${pad(yesterday.getDate())}`;
+          const compareDay = new Date(now); compareDay.setDate(compareDay.getDate() - 8);
+          const compareDate = `${compareDay.getFullYear()}-${pad(compareDay.getMonth()+1)}-${pad(compareDay.getDate())}`;
           const rows = this.channelAll.map(ch => ({
             '채널': ch.name,
             '자사 상품수': ch.products,
@@ -2585,7 +2564,7 @@
             '할인율 변동': ch.chgDiscount,
             '이상 감지': ch.reviewAlert === 'rise' ? '▲ 리뷰 급증' : ch.reviewAlert === 'drop' ? '▼ 리뷰 급감' : '—',
           }));
-          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate}`]]);
+          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate} · 변동값 비교 기준: ${compareDate} (전주)`]]);
           XLSX.utils.sheet_add_json(ws, rows, { origin: 1 });
           ws['!cols'] = [12,12,12,16,12,10,16,12,14,12,12].map(w => ({ wch: w }));
           const wb = XLSX.utils.book_new();
@@ -2600,6 +2579,8 @@
           const time = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
           const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
           const refDate = `${yesterday.getFullYear()}-${pad(yesterday.getMonth()+1)}-${pad(yesterday.getDate())}`;
+          const compareDay = new Date(now); compareDay.setDate(compareDay.getDate() - 8);
+          const compareDate = `${compareDay.getFullYear()}-${pad(compareDay.getMonth()+1)}-${pad(compareDay.getDate())}`;
           const rows = this.amoreBrandsFull.map((br, i) => ({
             '순위': i + 1,
             '브랜드': br.name,
@@ -2610,7 +2591,7 @@
             '브랜드 활성도 (점)': br.healthScore,
             '활성도 전주 대비': br.healthTrend,
           }));
-          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate}`]]);
+          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate} · 변동값 비교 기준: ${compareDate} (전주)`]]);
           XLSX.utils.sheet_add_json(ws, rows, { origin: 1 });
           ws['!cols'] = [6,14,10,16,14,16,16,14].map(w => ({ wch: w }));
           const wb = XLSX.utils.book_new();
@@ -2625,22 +2606,23 @@
           const time = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
           const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
           const refDate = `${yesterday.getFullYear()}-${pad(yesterday.getMonth()+1)}-${pad(yesterday.getDate())}`;
+          const compareDay = new Date(now); compareDay.setDate(compareDay.getDate() - 8);
+          const compareDate = `${compareDay.getFullYear()}-${pad(compareDay.getMonth()+1)}-${pad(compareDay.getDate())}`;
           const rows = this.competeTableComputed.map((br, i) => ({
             '순위': i + 1,
             '브랜드': br.name,
             '자사 여부': br.isAP ? '자사' : '—',
             '리뷰 점유율 (%)': br.computedShare,
-            '점유율 전주 대비': br.chgShare,
-            '순위 등락': br.rankChange < 0 ? `▲${Math.abs(br.rankChange)}위` : br.rankChange > 0 ? `▼${br.rankChange}위` : '—',
+            '점유율 변동': br.chgShare,
             '총 리뷰 (건)': br.computedReviews,
-            '리뷰 증감': br.chgReviews,
+            '리뷰 증감 (건)': br.chgReviewsAbs >= 0 ? '+' + br.chgReviewsAbs.toLocaleString() : br.chgReviewsAbs.toLocaleString(),
+            '순위 등락': br.rankChange < 0 ? `▲${Math.abs(br.rankChange)}위` : br.rankChange > 0 ? `▼${br.rankChange}위` : '—',
             '상품 수': br.products,
-            '평균 판매가 (원)': br.avgPrice,
             '주요 동향': br.alert,
           }));
-          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate}`]]);
+          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate} · 변동값 비교 기준: ${compareDate} (전주)`]]);
           XLSX.utils.sheet_add_json(ws, rows, { origin: 1 });
-          ws['!cols'] = [6,14,8,16,16,10,12,10,8,16,28].map(w => ({ wch: w }));
+          ws['!cols'] = [6,14,8,16,8,28].map(w => ({ wch: w }));
           const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, '경쟁사 현황');
           XLSX.writeFile(wb, `경쟁사현황_${date}_${time}.xlsx`);
@@ -2680,6 +2662,8 @@
           const time = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
           const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
           const refDate = `${yesterday.getFullYear()}-${pad(yesterday.getMonth()+1)}-${pad(yesterday.getDate())}`;
+          const compareDay = new Date(now); compareDay.setDate(compareDay.getDate() - 8);
+          const compareDate = `${compareDay.getFullYear()}-${pad(compareDay.getMonth()+1)}-${pad(compareDay.getDate())}`;
           const chLabel = this.catChannel === 'all' ? '전체' : ({naver:'네이버',coupang:'쿠팡',oliveyoung:'올리브영'})[this.catChannel];
           const rows = this.catBrands.map((br, i) => ({
             '순위': i + 1,
@@ -2688,12 +2672,12 @@
             '채널': chLabel,
             '카테고리': this.selectedCat,
             '리뷰 점유율 (%)': br.share,
-            '점유율 전주 대비': br.chgShare,
+            '점유율 변동': br.chgShare,
             '총 리뷰 (건)': br.reviews,
             '상품 수': br.products,
             '평균 판매가 (원)': br.avgPrice,
           }));
-          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate}`]]);
+          const ws = XLSX.utils.aoa_to_sheet([[`데이터 기준일: ${refDate} · 변동값 비교 기준: ${compareDate} (전주)`]]);
           XLSX.utils.sheet_add_json(ws, rows, { origin: 1 });
           ws['!cols'] = [6,14,8,8,10,16,16,12,8,16].map(w => ({ wch: w }));
           const wb = XLSX.utils.book_new();
@@ -2714,8 +2698,16 @@
 
             const cp = br.chProducts || {};
             const pp = br.prevChProducts || {};
-            const chgShareVal = parseFloat(br.chgShare);
-            const chgReviewsVal = parseFloat(br.chgReviews);
+
+            // 채널 선택 시 변동값 임의 변동 (프로토타입 시연용)
+            const chIdx = key === 'all' ? 0 : ['naver','coupang','oliveyoung','gmarket','street','kakao','auction'].indexOf(key) + 1;
+            const brNameSum = br.name.split('').reduce((s, c) => s + c.charCodeAt(0), 0);
+            const shareOffset = key === 'all' ? 0 : ((brNameSum * chIdx) % 21 - 10) * 0.1;
+            const reviewOffset = key === 'all' ? 0 : ((brNameSum * chIdx * 3) % 31 - 15) * 0.5;
+            const chgShareVal = parseFloat(br.chgShare) + shareOffset;
+            const chgReviewsVal = parseFloat(br.chgReviews) + reviewOffset;
+            const chgShare = (chgShareVal >= 0 ? '+' : '') + chgShareVal.toFixed(1) + '%p';
+            const chgReviews = (chgReviewsVal >= 0 ? '+' : '') + chgReviewsVal.toFixed(1) + '%';
             const alerts = [];
 
             // Rule 1: 채널 신규 입점
@@ -2765,22 +2757,42 @@
             const alert = alerts.length > 0 ? alerts[0].text : '';
             const alertType = alerts.length > 0 ? alerts[0].type : 'info';
             const alertsExtra = alerts.slice(1);
+            const chgReviewsAbs = !isNaN(chgReviewsVal)
+              ? Math.round(computedReviews / (1 + chgReviewsVal / 100) * (chgReviewsVal / 100))
+              : 0;
 
-            return { ...br, computedReviews, computedShare, alert, alertType, alertsExtra };
+            return { ...br, computedReviews, computedShare, chgShare, chgReviews, chgReviewsAbs, alert, alertType, alertsExtra };
           });
         },
 
         get competeTableFiltered() {
           const q = this.competeQuery.trim().toLowerCase();
-          let rows = q ? this.competeTableComputed.filter(br => br.name.toLowerCase().includes(q)) : this.competeTableComputed;
-          if (this.persona === 'strategy') {
-            rows = [...rows].sort((a, b) => {
-              if (a.isAP && !b.isAP) return -1;
-              if (!a.isAP && b.isAP) return 1;
-              return a.rankChange - b.rankChange;
-            });
+          const all = this.competeTableComputed;
+          const rankMap = new Map(all.map((br, i) => [br.name, i + 1]));
+          let rows = all;
+
+          // 이상 감지 필터: TOP 20 제한 없이 alertType==='warn' 경쟁 브랜드 전체 (전체 순위 유지)
+          if (this.competeAlertFilter) {
+            rows = rows.filter(br => !br.isAP && br.alertType === 'warn');
+            rows = q ? rows.filter(br => br.name.toLowerCase().includes(q)) : rows;
+            return rows.map(br => ({ ...br, globalRank: rankMap.get(br.name) }));
           }
-          return rows;
+
+          // 점유율 하락 필터: TOP 20 제한 없이 점유율 하락 경쟁 브랜드 전체 (전체 순위 유지)
+          if (this.competeDeclineFilter) {
+            rows = rows.filter(br => !br.isAP && br.chgShare.startsWith('-'));
+            rows = q ? rows.filter(br => br.name.toLowerCase().includes(q)) : rows;
+            return rows.map(br => ({
+              ...br,
+              globalRank: rankMap.get(br.name),
+              alert: br.alert || '점유율 하락세',
+              alertType: br.alert ? br.alertType : 'good',
+            }));
+          }
+
+          rows = q ? rows.filter(br => br.name.toLowerCase().includes(q)) : rows;
+          rows = q ? rows : rows.slice(0, 20);
+          return rows.map(br => ({ ...br, globalRank: rankMap.get(br.name) }));
         },
 
         get drilldownChannelStats() {

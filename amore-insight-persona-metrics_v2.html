@@ -418,30 +418,6 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
           </tbody>
         </table>
 
-        <div class="sub-section"><span class="persona-chip-md">채널 MD</span> 채널별 TOP3 경쟁 브랜드 매트릭스</div>
-        <table>
-          <thead><tr><th style="width:20%">지표명</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><span class="metric-name">채널별 TOP3</span></td>
-              <td>
-                <div class="formula">// 5개 채널(네이버·쿠팡·올리브영·지마켓·11번가) 각각
-channelTOP3[ch] = competeTable
-  .filter(b => !b.isAP)
-  .sort((a,b) => b.ch[ch] - a.ch[ch])
-  .slice(0, 3)</div>
-              </td>
-              <td class="text-gray-500 text-sm">비자사 브랜드 대상. 채널별 리뷰 수 내림차순 상위 3개.</td>
-            </tr>
-            <tr>
-              <td><span class="metric-name">다중 채널 주시 배지</span></td>
-              <td>
-                <div class="formula">multiChannelWarn = 브랜드가 TOP3에 포함된 채널 수 >= 2</div>
-              </td>
-              <td class="text-gray-500 text-sm">2개 이상 채널 동시 TOP3 → "주시" 배지 자동 표시</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
 
@@ -499,13 +475,11 @@ channelTOP3[ch] = competeTable
           </tbody>
         </table>
 
-        <div class="sub-section">경쟁사 탭 — 직군별 정렬 기준</div>
+        <div class="sub-section">경쟁사 탭 — 기본 정렬 기준</div>
         <table>
           <thead><tr><th style="width:20%">직군</th><th style="width:45%">기본 정렬</th><th>비고</th></tr></thead>
           <tbody>
-            <tr><td><span class="persona-chip-all">executive · md · brand</span></td><td><div class="formula">리뷰 점유율 (computedShare) 내림차순</div></td><td class="text-gray-500 text-sm">기본값</td></tr>
-            <tr><td><span class="persona-chip-strategy">전략기획</span></td><td><div class="formula">점유율 변화폭 (chgShare 절대값) 내림차순
-→ 가장 빠르게 치고 올라오는 경쟁사 상단 노출</div></td><td class="text-gray-500 text-sm">strategy 진입 시 자동 적용</td></tr>
+            <tr><td><span class="persona-chip-all">전체 직군 공통</span></td><td><div class="formula">리뷰 점유율 (computedShare) 내림차순</div></td><td class="text-gray-500 text-sm">직군 무관 동일 적용</td></tr>
           </tbody>
         </table>
 
@@ -585,6 +559,8 @@ channelTOP3[ch] = competeTable
             <tr><td><span class="field-name">competeQuery</span></td><td>string</td><td class="text-gray-500 text-sm">브랜드명 검색 (부분 일치, 실시간)</td></tr>
             <tr><td><span class="field-name">brandChannel</span></td><td>string</td><td class="text-gray-500 text-sm">채널 선택. 점유율 재계산 트리거. 기본값: 'all'</td></tr>
             <tr><td><span class="field-name">apOnly</span></td><td>boolean</td><td class="text-gray-500 text-sm">자사 브랜드만 보기. true 시 isAP === true 필터링</td></tr>
+            <tr><td><span class="field-name">competeAlertFilter</span></td><td>boolean</td><td class="text-gray-500 text-sm">주시 필요 브랜드 KPI 카드 클릭 시 활성. alertType === 'warn' 브랜드만 표시. TOP 20 슬라이스 없이 전체 노출. competeDeclineFilter와 상호 배타적.</td></tr>
+            <tr><td><span class="field-name">competeDeclineFilter</span></td><td>boolean</td><td class="text-gray-500 text-sm">점유율 하락 경쟁사 KPI 카드 클릭 시 활성. chgShare 음수인 비자사 브랜드 전체 표시. 배지 없는 행도 "점유율 하락세" 배지 자동 부여. competeAlertFilter와 상호 배타적.</td></tr>
           </tbody>
         </table>
 
