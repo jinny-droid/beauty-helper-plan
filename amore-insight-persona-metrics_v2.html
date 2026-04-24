@@ -141,6 +141,7 @@ healthScore = round(
   normGrowth   × 20
 )</div>
                 <p class="threshold">⚠️ 가중치(50/30/20)는 초기 설계값. 계약 전 재협의 필요.</p>
+                <p class="threshold">※ 스펙에서 기술된 "리뷰수 × 채널수 × 증감률 승산 방식"과 달리, 메트릭스는 각 항목을 전체 브랜드 최대값 기준으로 정규화(0~1)한 후 가중 합산하는 방식 사용. 최종 점수는 0~100 범위로 제한됨.</p>
               </td>
               <td class="text-gray-500 text-sm">표시 기준:<br>70점↑ = navy 배경(우수)<br>50~70 = 분홍 배경(양호)<br>50↓ = 회색(미흡)</td>
             </tr>
@@ -439,12 +440,12 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
           <tbody>
             <tr><td><span class="field-name">'executive'</span></td><td>전사 보기 (기본)</td><td class="text-gray-500 text-sm">전사 KPI 4개(합산 점유율·성장률·성장 채널·주시 경쟁사) + 점유율 추이 차트 + 3컬럼 신호 요약(채널·브랜드·시장). 직군 특화 세부 지표 미노출.</td></tr>
             <tr><td><span class="field-name">'md'</span></td><td>채널 MD</td><td class="text-gray-500 text-sm">채널 성과 현황·이상감지·MD KPI 노출. 브랜드 활성도·전략 분석 미노출.</td></tr>
-            <tr><td><span class="field-name">'brand'</span></td><td>브랜드 매니저</td><td class="text-gray-500 text-sm">브랜드 활성도·리뷰 인사이트·BM KPI 노출. 채널 MD 전용 섹션 미노출.</td></tr>
+            <tr><td><span class="field-name">'brand'</span></td><td>브랜드 매니저</td><td class="text-gray-500 text-sm">브랜드 활성도·리뷰 인사이트·BM KPI 노출.</td></tr>
             <tr><td><span class="field-name">'strategy'</span></td><td>전략기획</td><td class="text-gray-500 text-sm">시장 점유율 추이·경쟁사 정렬(상승폭)·카테고리 기회·전략 KPI 노출.</td></tr>
           </tbody>
         </table>
 
-        <div class="sub-section">Overview 탭 — 직군별 노출 섹션</div>
+        <div class="sub-section">종합 현황 탭 — 직군별 노출 섹션</div>
         <table>
           <thead><tr><th style="width:30%">섹션</th><th style="width:18%">executive</th><th style="width:18%">md</th><th style="width:18%">brand</th><th>strategy</th></tr></thead>
           <tbody>
@@ -465,13 +466,12 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
           <thead><tr><th style="width:30%">섹션</th><th style="width:18%">executive</th><th style="width:18%">md</th><th style="width:18%">brand</th><th>strategy</th></tr></thead>
           <tbody>
             <tr><td>채널별 공통 지표 (비교표·KPI 카드·브랜드 순위·채널 통합 조회)</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
-            <tr><td>채널별 — 이상 감지 배지 <span class="persona-chip-md" style="font-size:10px">MD</span></td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td></tr>
-            <tr><td>채널별 — 리뷰 인사이트 (긍정/부정 키워드 TOP3) <span class="persona-chip-md" style="font-size:10px">MD</span></td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td><td class="text-center">—</td></tr>
+            <tr><td>채널별 — 이상 감지 배지</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+            <tr><td>채널별 — 리뷰 인사이트 (긍정/부정 키워드 TOP3)</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
             <tr><td>브랜드별 공통 지표 (성과 테이블·드릴다운)</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
-            <tr><td>브랜드별 — 활성도 지수 컬럼 + 기간별 추이 차트 <span class="persona-chip-brand" style="font-size:10px">BM</span></td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td></tr>
-            <tr><td>브랜드별 드릴다운 — 리뷰 인사이트 탭 ④ <span class="persona-chip-brand" style="font-size:10px">BM</span></td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td><td class="text-center">—</td></tr>
-            <tr><td>카테고리별 공통 지표</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
-            <tr><td>카테고리별 — 성장성 요약 바 (pill 클릭 필터) <span class="persona-chip-strategy" style="font-size:10px">전략</span></td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">—</td><td class="text-center">✓</td></tr>
+            <tr><td>브랜드별 — 활성도 지수 컬럼 + 기간별 추이 차트</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+            <tr><td>브랜드별 드릴다운 — 리뷰 인사이트 탭 ④</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
+            <tr><td>카테고리별 공통 지표 (KPI 카드 3열 · 브랜드별 리뷰 점유율 TOP 10)</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td><td class="text-center">✓</td></tr>
           </tbody>
         </table>
 
@@ -483,17 +483,96 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
           </tbody>
         </table>
 
+        <div class="sub-section">종합 현황 KPI 카드 — 직군별 클릭 이동 로직</div>
+        <table>
+          <thead><tr><th style="width:14%">직군</th><th style="width:22%">카드명</th><th style="width:30%">클릭 이동</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td rowspan="4"><strong>전사 보기</strong></td>
+              <td>자사 점유율</td><td>클릭 비활성화</td><td class="text-gray-500 text-sm">카드 하단 추이 차트로 대체 확인 가능</td>
+            </tr>
+            <tr><td>시장 성장률</td><td>성과 분석 &gt; 상품 카테고리 분석 카드 (section-i) 하이라이트 포커싱</td><td class="text-gray-500 text-sm">selectedCat='전체' 상태로 진입</td></tr>
+            <tr><td>성장 채널</td><td>감지 채널 1개 → 해당 채널 성과 직접이동 / 복수 → 성장 채널 모달 (채널명·점유율 변동) → 선택 시 채널 성과 이동</td><td class="text-gray-500 text-sm">showGrowthModal 제어</td></tr>
+            <tr><td>주시 경쟁사</td><td>경쟁사 탭 + competeAlertFilter=true</td><td class="text-gray-500 text-sm">competeDeclineFilter는 false로 초기화</td></tr>
+            <tr>
+              <td rowspan="3"><strong>전략기획</strong></td>
+              <td>자사 점유율</td><td>클릭 비활성화</td><td class="text-gray-500 text-sm">카드 하단 추이 차트로 대체 확인 가능</td>
+            </tr>
+            <tr><td>시장 성장률</td><td>성과 분석 &gt; 상품 카테고리 분석 카드 (section-i) 하이라이트 포커싱</td><td class="text-gray-500 text-sm">selectedCat='전체' 상태로 진입</td></tr>
+            <tr><td>주시 경쟁사</td><td>경쟁사 탭 + competeAlertFilter=true</td><td class="text-gray-500 text-sm">competeDeclineFilter는 false로 초기화</td></tr>
+            <tr>
+              <td rowspan="3"><strong>채널 MD</strong></td>
+              <td>성장 채널</td><td>감지 채널 1개 → 해당 채널 성과 직접이동 / 복수 → 성장 채널 모달 → 선택 시 채널 성과 이동</td><td class="text-gray-500 text-sm">showGrowthModal 제어</td>
+            </tr>
+            <tr><td>점유율 하락 채널</td><td>감지 채널 1개 → 해당 채널 성과 직접이동 / 복수 → 하락 채널 모달 → 선택 시 채널 성과 이동</td><td class="text-gray-500 text-sm">showDeclineModal 제어</td></tr>
+            <tr><td>리뷰 급증 채널</td><td>해당 채널 성과 직접이동 (단일 채널 고정)</td><td class="text-gray-500 text-sm">channelTab을 해당 채널 key로 설정</td></tr>
+            <tr>
+              <td rowspan="4"><strong>브랜드 매니저</strong></td>
+              <td>평균 브랜드 활성도</td><td>성과 분석 &gt; 아모레퍼시픽 브랜드 분석 카드 (section-g) 하이라이트 포커싱</td><td class="text-gray-500 text-sm"></td>
+            </tr>
+            <tr><td>활성도 1위 브랜드</td><td>성과 분석 &gt; 브랜드 드릴다운 직접 이동</td><td class="text-gray-500 text-sm">amoreBrandsFull[0] 기준 openBrandDrilldown 호출</td></tr>
+            <tr><td>성장 브랜드</td><td>성장 브랜드 모달 (브랜드명·활성도 상승폭) → 선택 시 브랜드 드릴다운 이동</td><td class="text-gray-500 text-sm">showGrowthBrandModal 제어</td></tr>
+            <tr><td>하락 브랜드</td><td>하락 브랜드 모달 → 선택 시 브랜드 드릴다운 이동</td><td class="text-gray-500 text-sm">showDeclineBrandModal 제어</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">종합 현황 하단 섹션 인터랙션</div>
+        <table>
+          <thead><tr><th style="width:14%">직군</th><th style="width:22%">섹션</th><th style="width:30%">인터랙션</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr>
+              <td rowspan="2"><strong>채널 MD</strong></td>
+              <td>채널별 상품 분포</td><td>더 보기 → 성과 분석 &gt; 채널 성과 카드 (section-cd) 하이라이트 포커싱</td><td class="text-gray-500 text-sm">channelTab='all' 상태로 진입</td>
+            </tr>
+            <tr><td>채널 이상 감지 현황</td><td>행 클릭 → 해당 채널 성과 직접이동. 더 보기 버튼 없음</td><td class="text-gray-500 text-sm">showAlertModal 대신 channelTab 직접 전환</td></tr>
+            <tr>
+              <td rowspan="3"><strong>전사 보기</strong></td>
+              <td>채널 이상 감지 현황</td><td>행 클릭 → 해당 채널 성과 직접이동. 더 보기 버튼 없음</td><td class="text-gray-500 text-sm">채널 MD와 동일 패턴</td>
+            </tr>
+            <tr><td>브랜드 활성도 순위</td><td>더 보기 → 성과 분석 &gt; 아모레퍼시픽 브랜드 분석 카드 (section-g) 하이라이트 포커싱</td><td class="text-gray-500 text-sm"></td></tr>
+            <tr><td>경쟁 브랜드 동향</td><td>더 보기 → 경쟁사 탭 이동</td><td class="text-gray-500 text-sm"></td></tr>
+            <tr>
+              <td><strong>전략기획</strong></td>
+              <td>채널별 성장률 현황</td><td>행 클릭 없음. 더 보기 없음 (독립 정보)</td><td class="text-gray-500 text-sm">성과 분석에 동일 형식 카드 없어 이동 목적지 없음</td>
+            </tr>
+            <tr>
+              <td><strong>전략기획</strong></td>
+              <td>카테고리별 기회 지수</td><td>더 보기 → 성과 분석 &gt; 상품 카테고리 분석 카드 (section-i) 하이라이트 포커싱</td><td class="text-gray-500 text-sm"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">채널 상세 페이지 — KPI 카드</div>
+        <table>
+          <thead><tr><th style="width:25%">항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>카드 구성</td><td class="text-gray-500 text-sm">총 리뷰수 / 리뷰 점유율 / 상품수 / 평균 할인율 (4개 고정)</td></tr>
+            <tr><td>수치 하단 보조 문구</td><td class="text-gray-500 text-sm">없음. "전주 대비" 문구 제거. 전주 대비 기준은 info 버튼 툴팁에 포함</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">채널 상세 페이지 — 브랜드별 성과 비교 테이블</div>
+        <table>
+          <thead><tr><th style="width:25%">항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>대체 전</td><td class="text-gray-500 text-sm">상품별 리뷰 현황 테이블</td></tr>
+            <tr><td>컬럼</td><td class="text-gray-500 text-sm">브랜드 / 총 리뷰수 / 전주 대비 증감(건수 + %) / 신호 (±20% 이상 시 ▲급증/▼급감)</td></tr>
+            <tr><td>기본 정렬</td><td class="text-gray-500 text-sm">변동 규모 내림차순 (전주 대비 증감 절댓값 기준)</td></tr>
+            <tr><td>대상 범위</td><td class="text-gray-500 text-sm">선택된 채널 내 자사·경쟁사 브랜드 전체. 상위 제한 없음</td></tr>
+          </tbody>
+        </table>
+
         <div class="sub-section">전략기획 채널 성장률 상태 분기</div>
         <table>
           <thead><tr><th style="width:18%">상태</th><th style="width:45%">조건</th><th>표시</th></tr></thead>
           <tbody>
             <tr>
-              <td><span class="metric-name">성장</span></td>
+              <td><span class="metric-name">상승</span></td>
               <td><div class="formula">채널 자사 점유율 변화 >= +3%p</div><p class="threshold">⚠️ 임계값 +3%p는 초기 설정값.</p></td>
               <td class="text-gray-500 text-sm">초록 배지 + ▲X% 표시</td>
             </tr>
             <tr>
-              <td><span class="metric-name">보합</span></td>
+              <td><span class="metric-name">유지</span></td>
               <td><div class="formula">-3%p < 변화폭 < +3%p</div></td>
               <td class="text-gray-500 text-sm">회색 배지</td>
             </tr>
@@ -524,20 +603,19 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
         <table>
           <thead><tr><th style="width:20%">값</th><th style="width:22%">화면명</th><th>주요 콘텐츠</th></tr></thead>
           <tbody>
-            <tr><td><span class="field-name">'overview'</span></td><td>Overview</td><td class="text-gray-500 text-sm">직군별 KPI 카드 · 채널/브랜드 TOP · 트렌딩 TOP5 · 경쟁사 주시 목록</td></tr>
-            <tr><td><span class="field-name">'merged-a'</span></td><td>성과 분석</td><td class="text-gray-500 text-sm">채널별/브랜드별/카테고리별 상세 드릴다운</td></tr>
+            <tr><td><span class="field-name">'overview'</span></td><td>종합 현황</td><td class="text-gray-500 text-sm">직군별 KPI 카드 · 채널/브랜드 TOP · 트렌딩 TOP5 · 경쟁사 주시 목록</td></tr>
+            <tr><td><span class="field-name">'merged-a'</span></td><td>성과 분석</td><td class="text-gray-500 text-sm">6개 카드 구성 (채널 요약 KPI · 채널 성과 · 채널 통합 조회 · 브랜드 점유율 추이 · 아모레퍼시픽 브랜드 분석 · 상품 카테고리 분석)</td></tr>
             <tr><td><span class="field-name">'compete'</span></td><td>경쟁사</td><td class="text-gray-500 text-sm">경쟁사 점유율·순위·이상감지 테이블</td></tr>
             <tr><td><span class="field-name">'trending'</span></td><td>트렌딩</td><td class="text-gray-500 text-sm">리뷰/찜 급증 상품 리스트 · 주목 성분</td></tr>
           </tbody>
         </table>
 
-        <div class="sub-section">성과 분석 서브탭 (mergedATab)</div>
+        <div class="sub-section">성과 분석 뷰 상태 (mergedABrandView)</div>
         <table>
           <thead><tr><th style="width:20%">값</th><th style="width:22%">화면명</th><th>주요 필터/상태</th></tr></thead>
           <tbody>
-            <tr><td><span class="field-name">'channel'</span></td><td>채널별</td><td class="text-gray-500 text-sm">channelTab (채널 선택), channelSubTab ('ranking')</td></tr>
-            <tr><td><span class="field-name">'brand'</span></td><td>브랜드별</td><td class="text-gray-500 text-sm">selectedBrand, drilldownCat, drilldownChannel, drilldownQuery, drilldownPage(20개 단위)</td></tr>
-            <tr><td><span class="field-name">'category'</span></td><td>카테고리별</td><td class="text-gray-500 text-sm">선택 카테고리 필터</td></tr>
+            <tr><td><span class="field-name">'brand'</span></td><td>6개 카드 목록</td><td class="text-gray-500 text-sm">channelTab (채널 선택), selectedCat (카테고리 선택), selectedBrand (브랜드 선택)</td></tr>
+            <tr><td><span class="field-name">'drilldown'</span></td><td>브랜드 드릴다운</td><td class="text-gray-500 text-sm">selectedBrand, drilldownTab, drilldownCat, drilldownChannel, drilldownQuery, drilldownPage(20개 단위)</td></tr>
           </tbody>
         </table>
 
@@ -545,10 +623,10 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
         <table>
           <thead><tr><th style="width:20%">탭</th><th style="width:22%">화면명</th><th>주요 데이터</th></tr></thead>
           <tbody>
-            <tr><td><span class="field-name">① 상품 현황</span></td><td>상품 × 채널 매트릭스</td><td class="text-gray-500 text-sm">상품별 채널 판매가·리뷰 수. 최저가 채널 로즈 강조. 클릭 시 상품 상세 팝업.</td></tr>
-            <tr><td><span class="field-name">② 채널 성과</span></td><td>취급 채널별 실적</td><td class="text-gray-500 text-sm">채널별 리뷰 점유율·평균가·리뷰 수·상품 수</td></tr>
+            <tr><td><span class="field-name">① 상품 현황</span></td><td>상품 × 채널 매트릭스</td><td class="text-gray-500 text-sm">상품별 채널 판매가·리뷰 수. 최저가 채널 로즈 강조. 클릭 시 상품 상세 팝업.<br><br>KPI 카드 3개:<br>· 평균 리뷰수 = 해당 브랜드 전 채널 합산 총 리뷰 ÷ 상품 수<br>· 평균 가격 = 상품별 최저가의 평균<br>· 최저가 채널 = 채널별 평균 판매가 중 가장 낮은 채널명</td></tr>
+            <tr><td><span class="field-name">② 채널 성과</span></td><td>취급 채널별 실적</td><td class="text-gray-500 text-sm">채널별 리뷰 점유율·평균가·리뷰수·상품수. 채널별 바 차트 시각화 + 채널 순위 테이블 제공.<br><br>KPI 카드 3개:<br>· 취급 채널 수 = 해당 브랜드가 상품·리뷰를 보유한 채널 수 (7개 중)<br>· 채널 합산 총 리뷰수 = 전 채널 누적 리뷰 합계<br>· 최저가 채널명 = 채널별 평균 판매가 중 가장 낮은 채널명</td></tr>
             <tr><td><span class="field-name">③ 시장 위치</span></td><td>포지셔닝맵</td><td class="text-gray-500 text-sm">가격-리뷰 산점도, 가격대 분포, 카테고리 내 점유율</td></tr>
-            <tr><td><span class="field-name">④ 리뷰 인사이트</span></td><td>감성 키워드 분석</td><td class="text-gray-500 text-sm"><span class="persona-chip-brand" style="font-size:10px">BM 전용</span> 긍/부정 비중·키워드 TOP5·채널별 강도 매트릭스</td></tr>
+            <tr><td><span class="field-name">④ 리뷰 인사이트</span></td><td>감성 키워드 분석</td><td class="text-gray-500 text-sm">긍/부정 비중·키워드 TOP5·채널별 강도 매트릭스. 전 직군 공통 표시</td></tr>
           </tbody>
         </table>
 
@@ -556,8 +634,8 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
         <table>
           <thead><tr><th style="width:22%">상태값</th><th style="width:12%">타입</th><th>설명</th></tr></thead>
           <tbody>
-            <tr><td><span class="field-name">competeQuery</span></td><td>string</td><td class="text-gray-500 text-sm">브랜드명 검색 (부분 일치, 실시간)</td></tr>
-            <tr><td><span class="field-name">brandChannel</span></td><td>string</td><td class="text-gray-500 text-sm">채널 선택. 점유율 재계산 트리거. 기본값: 'all'</td></tr>
+            <tr><td><span class="field-name">competeQuery</span></td><td>string</td><td class="text-gray-500 text-sm">브랜드명 검색 (부분 일치, 실시간). 검색 시 기본 TOP 20 제한 해제 → 매칭되는 전체 브랜드 표시. 결과 없음 시 안내 문구 노출.</td></tr>
+            <tr><td><span class="field-name">brandChannel</span></td><td>string</td><td class="text-gray-500 text-sm">채널 선택. 기본값: 'all'. 변경 시 리뷰 점유율·점유율 변동·상품수·주요 동향 배지 전체 동적 재계산. KPI 카드(자사 점유율) 포함 경쟁 브랜드 현황 테이블의 모든 컬럼에 영향.</td></tr>
             <tr><td><span class="field-name">apOnly</span></td><td>boolean</td><td class="text-gray-500 text-sm">자사 브랜드만 보기. true 시 isAP === true 필터링</td></tr>
             <tr><td><span class="field-name">competeAlertFilter</span></td><td>boolean</td><td class="text-gray-500 text-sm">주시 필요 브랜드 KPI 카드 클릭 시 활성. alertType === 'warn' 브랜드만 표시. TOP 20 슬라이스 없이 전체 노출. competeDeclineFilter와 상호 배타적.</td></tr>
             <tr><td><span class="field-name">competeDeclineFilter</span></td><td>boolean</td><td class="text-gray-500 text-sm">점유율 하락 경쟁사 KPI 카드 클릭 시 활성. chgShare 음수인 비자사 브랜드 전체 표시. 배지 없는 행도 "점유율 하락세" 배지 자동 부여. competeAlertFilter와 상호 배타적.</td></tr>
