@@ -122,28 +122,34 @@ computedShare(%) = computedReviews ÷ Σ(테이블 내 모든 브랜드 computed
           </tbody>
         </table>
 
-        <div class="sub-section"><span class="calc-badge">계산값</span> 브랜드 활성도 지수 <span class="dev-badge">협의 필요</span> 가중치</div>
+        <div class="sub-section"><span class="calc-badge">계산값</span> 브랜드 활성도 지수</div>
         <table>
           <thead><tr><th style="width:20%">항목</th><th style="width:45%">수식</th><th>비고</th></tr></thead>
           <tbody>
             <tr>
               <td><span class="metric-name">healthScore<br>(0~100점)</span></td>
               <td>
-                <div class="formula">// 각 항목 정규화 (전체 브랜드 최대값 기준 0~1)
-normReviews   = reviews / max(모든 브랜드 reviews)
-normChannels  = channelCount / 7
-normGrowth    = max(0, chgShareValue) / max(모든 브랜드 chgShareValue)
-  // 감소(음수)는 0으로 처리
+                <div class="formula">// ① 리뷰 볼륨 점수 (0~100)
+reviewScore = reviews / max(모든 브랜드 reviews) × 100
 
+// ② 취급 채널 수 점수 (0~100)
+channelScore = channelCount / 7 × 100
+
+// ③ 전주 대비 리뷰 증감 점수 (0~100)
+// 전주 대비 증감률을 -30%~+30% 범위로 클리핑 후 선형 변환
+// 0% 변동 = 50점, +30% 이상 = 100점, -30% 이하 = 0점
+clipped = max(-30, min(30, chgReviewPct))
+momentumScore = (clipped + 30) / 60 × 100
+
+// 최종 점수 (가중 평균)
 healthScore = round(
-  normReviews  × 50 +
-  normChannels × 30 +
-  normGrowth   × 20
+  reviewScore   × 0.4 +
+  channelScore  × 0.3 +
+  momentumScore × 0.3
 )</div>
-                <p class="threshold">⚠️ 가중치(50/30/20)는 초기 설계값. 계약 전 재협의 필요.</p>
-                <p class="threshold">※ 스펙에서 기술된 "리뷰수 × 채널수 × 증감률 승산 방식"과 달리, 메트릭스는 각 항목을 전체 브랜드 최대값 기준으로 정규화(0~1)한 후 가중 합산하는 방식 사용. 최종 점수는 0~100 범위로 제한됨.</p>
+                <p class="threshold">※ 세 요소를 각각 0~100으로 정규화한 뒤 가중 평균하므로 최종 점수는 항상 0~100 범위 내에서 산출됨. 모든 요소가 동시에 최고값을 기록하지 않는 한 100점은 사실상 나오지 않으며, 상위 브랜드는 통상 70~85점 구간에서 형성됨.</p>
               </td>
-              <td class="text-gray-500 text-sm">표시 기준:<br>70점↑ = navy 배경(우수)<br>50~70 = 분홍 배경(양호)<br>50↓ = 회색(미흡)</td>
+              <td class="text-gray-500 text-sm">표시 기준:<br>70점↑ = navy 배경(우수)<br>50~70 = 분홍 배경(양호)<br>50↓ = 회색(미흡)<br><br>가중치: 리뷰 볼륨 40% / 취급 채널 수 30% / 전주 대비 리뷰 증감 30%</td>
             </tr>
             <tr>
               <td><span class="metric-name">healthTrend<br>(전주 대비 등락)</span></td>
@@ -492,7 +498,7 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
               <td>자사 점유율</td><td>클릭 비활성화</td><td class="text-gray-500 text-sm">카드 하단 추이 차트로 대체 확인 가능</td>
             </tr>
             <tr><td>시장 성장률</td><td>성과 분석 &gt; 상품 카테고리 분석 카드 (section-i) 하이라이트 포커싱</td><td class="text-gray-500 text-sm">selectedCat='전체' 상태로 진입</td></tr>
-            <tr><td>성장 채널</td><td>감지 채널 1개 → 해당 채널 성과 직접이동 / 복수 → 성장 채널 모달 (채널명·점유율 변동) → 선택 시 채널 성과 이동</td><td class="text-gray-500 text-sm">showGrowthModal 제어</td></tr>
+            <tr><td>성장 채널</td><td>채널 성과 전체 탭 이동 + channelGrowthFilter=true 활성화</td><td class="text-gray-500 text-sm">channelDeclineFilter=false로 초기화. 필터 칩 표시</td></tr>
             <tr><td>주시 경쟁사</td><td>경쟁사 탭 + competeAlertFilter=true</td><td class="text-gray-500 text-sm">competeDeclineFilter는 false로 초기화</td></tr>
             <tr>
               <td rowspan="3"><strong>전략기획</strong></td>
@@ -502,17 +508,17 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
             <tr><td>주시 경쟁사</td><td>경쟁사 탭 + competeAlertFilter=true</td><td class="text-gray-500 text-sm">competeDeclineFilter는 false로 초기화</td></tr>
             <tr>
               <td rowspan="3"><strong>채널 MD</strong></td>
-              <td>성장 채널</td><td>감지 채널 1개 → 해당 채널 성과 직접이동 / 복수 → 성장 채널 모달 → 선택 시 채널 성과 이동</td><td class="text-gray-500 text-sm">showGrowthModal 제어</td>
+              <td>성장 채널</td><td>채널 성과 전체 탭 이동 + channelGrowthFilter=true 활성화</td><td class="text-gray-500 text-sm">channelDeclineFilter=false로 초기화. 필터 칩 표시</td>
             </tr>
-            <tr><td>점유율 하락 채널</td><td>감지 채널 1개 → 해당 채널 성과 직접이동 / 복수 → 하락 채널 모달 → 선택 시 채널 성과 이동</td><td class="text-gray-500 text-sm">showDeclineModal 제어</td></tr>
+            <tr><td>점유율 하락 채널</td><td>채널 성과 전체 탭 이동 + channelDeclineFilter=true 활성화</td><td class="text-gray-500 text-sm">channelGrowthFilter=false로 초기화. 필터 칩 표시</td></tr>
             <tr><td>리뷰 급증 채널</td><td>해당 채널 성과 직접이동 (단일 채널 고정)</td><td class="text-gray-500 text-sm">channelTab을 해당 채널 key로 설정</td></tr>
             <tr>
               <td rowspan="4"><strong>브랜드 매니저</strong></td>
               <td>평균 브랜드 활성도</td><td>성과 분석 &gt; 아모레퍼시픽 브랜드 분석 카드 (section-g) 하이라이트 포커싱</td><td class="text-gray-500 text-sm"></td>
             </tr>
             <tr><td>활성도 1위 브랜드</td><td>성과 분석 &gt; 브랜드 드릴다운 직접 이동</td><td class="text-gray-500 text-sm">amoreBrandsFull[0] 기준 openBrandDrilldown 호출</td></tr>
-            <tr><td>성장 브랜드</td><td>성장 브랜드 모달 (브랜드명·활성도 상승폭) → 선택 시 브랜드 드릴다운 이동</td><td class="text-gray-500 text-sm">showGrowthBrandModal 제어</td></tr>
-            <tr><td>하락 브랜드</td><td>하락 브랜드 모달 → 선택 시 브랜드 드릴다운 이동</td><td class="text-gray-500 text-sm">showDeclineBrandModal 제어</td></tr>
+            <tr><td>성장 브랜드</td><td>아모레퍼시픽 브랜드 분석 (section-g) 스크롤 + brandHealthFilter='growth' 활성화</td><td class="text-gray-500 text-sm">필터 칩 표시. 해제 시 brandHealthFilter='all'</td></tr>
+            <tr><td>하락 브랜드</td><td>아모레퍼시픽 브랜드 분석 (section-g) 스크롤 + brandHealthFilter='decline' 활성화</td><td class="text-gray-500 text-sm">필터 칩 표시. 해제 시 brandHealthFilter='all'</td></tr>
           </tbody>
         </table>
 
@@ -627,6 +633,17 @@ alert = ''  // 빈 값 반환, 배지 미렌더링</div>
             <tr><td><span class="field-name">② 채널 성과</span></td><td>취급 채널별 실적</td><td class="text-gray-500 text-sm">채널별 리뷰 점유율·평균가·리뷰수·상품수. 채널별 바 차트 시각화 + 채널 순위 테이블 제공.<br><br>KPI 카드 3개:<br>· 취급 채널 수 = 해당 브랜드가 상품·리뷰를 보유한 채널 수 (7개 중)<br>· 채널 합산 총 리뷰수 = 전 채널 누적 리뷰 합계<br>· 최저가 채널명 = 채널별 평균 판매가 중 가장 낮은 채널명</td></tr>
             <tr><td><span class="field-name">③ 시장 위치</span></td><td>포지셔닝맵</td><td class="text-gray-500 text-sm">가격-리뷰 산점도, 가격대 분포, 카테고리 내 점유율</td></tr>
             <tr><td><span class="field-name">④ 리뷰 인사이트</span></td><td>감성 키워드 분석</td><td class="text-gray-500 text-sm">긍/부정 비중·키워드 TOP5·채널별 강도 매트릭스. 전 직군 공통 표시</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-section">성과 분석 탭 필터</div>
+        <table>
+          <thead><tr><th style="width:22%">상태값</th><th style="width:12%">타입</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">channelGrowthFilter</span></td><td>boolean</td><td class="text-gray-500 text-sm">채널별 성과 비교 테이블에서 성장 채널만 표시. true 시 chgShare '+' 시작 채널만 필터링. channelDeclineFilter와 상호 배타적. 순위는 전체 배열(channelAll) 기준 indexOf 유지.</td></tr>
+            <tr><td><span class="field-name">channelDeclineFilter</span></td><td>boolean</td><td class="text-gray-500 text-sm">채널별 성과 비교 테이블에서 점유율 하락 채널만 표시. true 시 chgShare '-' 시작 채널만 필터링. channelGrowthFilter와 상호 배타적.</td></tr>
+            <tr><td><span class="field-name">brandHealthFilter</span></td><td>string</td><td class="text-gray-500 text-sm">아모레퍼시픽 브랜드 분석 테이블 필터. 'all'(기본) / 'growth'(healthTrend '+' 시작 브랜드만) / 'decline'(healthTrend '-' 시작 브랜드만). 순위는 전체 배열(amoreBrandsFull) 기준 indexOf 유지.</td></tr>
+            <tr><td><span class="field-name">brandPerfFilter</span></td><td>string</td><td class="text-gray-500 text-sm">채널 상세 내 브랜드별 성과 비교 테이블 필터. 'all'(기본) / 'growth'(전주 대비 증감 '+' 시작 브랜드만). 채널 선택 시 초기화되지 않음.</td></tr>
           </tbody>
         </table>
 

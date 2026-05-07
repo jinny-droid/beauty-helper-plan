@@ -177,10 +177,12 @@
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">시장 성장률<i class="info-btn" data-tip="전주 대비 전체 뷰티 시장 리뷰 수 증감률">i</i></p>
               <p class="text-3xl font-black mt-2" style="color:#4CAF82">+8.6%</p>
             </div>
-            <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #4169E1" @click="channelAll.filter(c=>c.chgShare.startsWith('+')).length===1 ? (tab='merged-a', channelTab=channelAll.find(c=>c.chgShare.startsWith('+')).key) : showGrowthModal=true">
+            <div class="bg-white rounded-xl p-5 shadow-sm clickable"
+              :style="channelGrowthFilter ? 'border-left:4px solid #4169E1; background:#EEF2FF' : 'border-left:4px solid #4169E1'"
+              @click="tab='merged-a'; channelTab='all'; channelGrowthFilter=true; channelDeclineFilter=false">
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">성장 채널<i class="info-btn" data-tip="전주 대비 점유율이 상승한 채널 수">i</i></p>
               <p class="text-3xl font-black mt-2" style="color:#4169E1">4 / 7</p>
-              <p class="text-xs mt-1" style="color:#4169E1">올리브영 · 쿠팡 외 2개</p>
+              <p class="text-xs mt-1" :class="channelGrowthFilter ? 'font-semibold' : ''" style="color:#4169E1" x-text="channelGrowthFilter ? '▶ 필터 적용 중 — 클릭해서 이동' : '올리브영 · 쿠팡 외 2개'"></p>
             </div>
             <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #ef5350" @click="tab='compete'; competeDeclineFilter=false; competeAlertFilter=true">
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">주시 경쟁사<i class="info-btn" data-tip="최근 7일 기준 점유율 급등·신규 입점 등 이상 신호가 감지된 경쟁 브랜드 수">i</i></p>
@@ -249,6 +251,7 @@
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold navy text-sm">채널별 성장률 현황</h3>
               </div>
+              <p class="text-xs text-gray-400 mb-3">전주 대비 · 7개 채널 리뷰 점유율 증감</p>
               <div class="space-y-2">
                 <template x-for="ch in strategyChannelGrowth" :key="ch.name">
                   <div class="flex items-center justify-between py-2 border-b last:border-0">
@@ -313,15 +316,19 @@
         <!-- KPI Cards — 채널 MD 뷰 -->
         <div x-show="persona === 'md'" class="mb-6">
           <div class="grid grid-cols-3 gap-4">
-            <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #4CAF82" @click="channelAll.filter(c=>c.chgShare.startsWith('+')).length===1 ? (tab='merged-a', channelTab=channelAll.find(c=>c.chgShare.startsWith('+')).key) : showGrowthModal=true">
+            <div class="bg-white rounded-xl p-5 shadow-sm clickable"
+              :style="channelGrowthFilter ? 'border-left:4px solid #4CAF82; background:#F0FFF4' : 'border-left:4px solid #4CAF82'"
+              @click="tab='merged-a'; channelTab='all'; channelGrowthFilter=true; channelDeclineFilter=false">
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">성장 채널<i class="info-btn" data-tip="전주 대비 점유율이 상승한 채널 수">i</i></p>
               <p class="text-3xl font-black mt-2" style="color:#4CAF82">4개</p>
-              <p class="text-xs mt-1" style="color:#4CAF82">올리브영 · 쿠팡 외 2개</p>
+              <p class="text-xs mt-1" :class="channelGrowthFilter ? 'font-semibold' : ''" style="color:#4CAF82" x-text="channelGrowthFilter ? '▶ 필터 적용 중 — 클릭해서 이동' : '올리브영 · 쿠팡 외 2개'"></p>
             </div>
-            <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #ef5350" @click="channelAll.filter(c=>c.chgShare.startsWith('-')).length===1 ? (tab='merged-a', channelTab=channelAll.find(c=>c.chgShare.startsWith('-')).key) : showDeclineModal=true">
+            <div class="bg-white rounded-xl p-5 shadow-sm clickable"
+              :style="channelDeclineFilter ? 'border-left:4px solid #ef5350; background:#FFF5F5' : 'border-left:4px solid #ef5350'"
+              @click="tab='merged-a'; channelTab='all'; channelDeclineFilter=true; channelGrowthFilter=false">
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">점유율 하락 채널<i class="info-btn" data-tip="전주 대비 점유율이 하락한 채널 수">i</i></p>
               <p class="text-3xl font-black mt-2" style="color:#ef5350">2개</p>
-              <p class="text-xs mt-1 text-red-400">지마켓 · 옥션</p>
+              <p class="text-xs mt-1" :class="channelDeclineFilter ? 'font-semibold text-red-500' : 'text-red-400'" x-text="channelDeclineFilter ? '▶ 필터 적용 중 — 클릭해서 이동' : '지마켓 · 옥션'"></p>
             </div>
             <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #C8748A" @click="tab='merged-a'; channelTab='oliveyoung'">
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">리뷰 급증 채널<i class="info-btn" data-tip="전주 대비 리뷰 수 20% 이상 증가한 채널">i</i></p>
@@ -336,7 +343,7 @@
           <p class="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider">브랜드 활성도 요약</p>
           <div class="grid grid-cols-4 gap-4">
             <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #1A2B4A" @click="tab='merged-a'; highlightCard='g'; $nextTick(()=>{ document.getElementById('section-g')?.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>highlightCard=null,2700); renderBrandTrendChart(); })">
-              <p class="text-xs text-gray-400 uppercase tracking-wider has-info">평균 브랜드 활성도<i class="info-btn" data-tip="이번 주 기준 · 리뷰 수 × 취급 채널 수 × 전주 대비 증감률로 산출한 종합 지수">i</i></p>
+              <p class="text-xs text-gray-400 uppercase tracking-wider has-info">평균 브랜드 활성도<i class="info-btn" data-tip="이번 주 기준 · 리뷰 볼륨(40%) + 취급 채널 수(30%) + 전주 대비 리뷰 증감(30%) 가중 평균으로 산출한 0~100점 종합 지수. 리뷰 볼륨 점수는 이번 주 전체 브랜드 중 최다 리뷰 기준 상대 점수로 산출됨">i</i></p>
               <p class="text-3xl font-black navy mt-2">58점</p>
               <p class="text-xs mt-1" style="color:#4CAF82">↑ 3점</p>
             </div>
@@ -345,15 +352,19 @@
               <p class="text-2xl font-black mt-2" style="color:#4CAF82">설화수</p>
               <p class="text-xs mt-1" style="color:#4CAF82">활성도 83점 ▲2점</p>
             </div>
-            <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #4CAF82" @click="showGrowthBrandModal=true">
+            <div class="bg-white rounded-xl p-5 shadow-sm clickable"
+              :style="brandHealthFilter==='growth' ? 'border-left:4px solid #4CAF82; background:#F0FFF4' : 'border-left:4px solid #4CAF82'"
+              @click="tab='merged-a'; brandHealthFilter='growth'; highlightCard='g'; $nextTick(()=>{ document.getElementById('section-g')?.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>highlightCard=null,2700); renderBrandTrendChart(); })">
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">성장 브랜드<i class="info-btn" data-tip="전주 대비 브랜드 활성도 지수가 상승한 자사 브랜드 수">i</i></p>
               <p class="text-3xl font-black mt-2" style="color:#4CAF82">7개</p>
-              <p class="text-xs mt-1" style="color:#4CAF82">설화수 · 라네즈 외 5개</p>
+              <p class="text-xs mt-1" :class="brandHealthFilter==='growth' ? 'font-semibold' : ''" style="color:#4CAF82" x-text="brandHealthFilter==='growth' ? '▶ 필터 적용 중 — 클릭해서 이동' : '설화수 · 라네즈 외 5개'"></p>
             </div>
-            <div class="bg-white rounded-xl p-5 shadow-sm clickable" style="border-left:4px solid #ef5350" @click="showDeclineBrandModal=true">
+            <div class="bg-white rounded-xl p-5 shadow-sm clickable"
+              :style="brandHealthFilter==='decline' ? 'border-left:4px solid #ef5350; background:#FFF5F5' : 'border-left:4px solid #ef5350'"
+              @click="tab='merged-a'; brandHealthFilter='decline'; highlightCard='g'; $nextTick(()=>{ document.getElementById('section-g')?.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>highlightCard=null,2700); renderBrandTrendChart(); })">
               <p class="text-xs text-gray-400 uppercase tracking-wider has-info">하락 브랜드<i class="info-btn" data-tip="전주 대비 브랜드 활성도 지수가 하락한 자사 브랜드 수">i</i></p>
               <p class="text-3xl font-black mt-2" style="color:#ef5350">4개</p>
-              <p class="text-xs mt-1 text-red-400">이니스프리·마몽드 등</p>
+              <p class="text-xs mt-1" :class="brandHealthFilter==='decline' ? 'font-semibold text-red-500' : 'text-red-400'" x-text="brandHealthFilter==='decline' ? '▶ 필터 적용 중 — 클릭해서 이동' : '이니스프리·마몽드 등'"></p>
             </div>
           </div>
         </div>
@@ -386,7 +397,7 @@
               <h3 class="font-bold navy text-sm">브랜드 활성도 순위</h3>
               <button @click="tab='merged-a'; highlightCard='g'; $nextTick(()=>{ document.getElementById('section-g')?.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>highlightCard=null,2700); renderBrandTrendChart(); })" class="text-xs rose hover:underline">더 보기 →</button>
             </div>
-            <p class="text-xs text-gray-400 mb-3">이번 주 기준 · 리뷰 수 × 채널 수 × 증감률 환산</p>
+            <p class="text-xs text-gray-400 mb-3">이번 주 기준 · 활성도 상위 6개 브랜드</p>
             <template x-for="(br, i) in amoreBrandsFull.slice(0,6)" :key="br.name">
               <div class="flex items-center gap-2 mb-2">
                 <span class="text-xs font-semibold navy w-16" x-text="br.name"></span>
@@ -396,7 +407,7 @@
                 <span class="text-xs font-bold w-8 text-right" :class="br.healthScore>=70?'navy':'text-gray-500'" x-text="br.healthScore"></span>
                 <span class="text-xs w-8"
                   :class="br.healthTrend.startsWith('+') ? 'text-green-500' : br.healthTrend==='0' ? 'text-gray-400' : 'text-red-500'"
-                  x-text="br.healthTrend==='0'?'±0점':(br.healthTrend.startsWith('+')?'▲':'▼')+br.healthTrend.replace(/[+-]/,'')+'점'"></span>
+                  x-text="br.healthTrend==='0'?'-':(br.healthTrend.startsWith('+')?'▲':'▼')+br.healthTrend.replace(/[+-]/,'')+'점'"></span>
               </div>
             </template>
           </div>
@@ -426,14 +437,11 @@
               <h3 class="font-bold navy text-sm">채널별 자사 상품수</h3>
               <button @click="tab='merged-a'; channelTab='all'; highlightCard='cd'; $nextTick(()=>{ document.getElementById('section-cd')?.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>highlightCard=null,2700); })" class="text-xs rose hover:underline">더 보기 →</button>
             </div>
-            <p class="text-xs text-gray-400 mb-3">기준일 현재 · 자사 상품 기준 · 최다 채널 대비 상대 비율</p>
+            <p class="text-xs text-gray-400 mb-3">기준일 현재 · 자사 상품 기준</p>
             <template x-for="ch in channelDist" :key="ch.name">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-xs w-14 text-gray-600" x-text="ch.name"></span>
-                <div class="flex-1 bg-gray-100 rounded h-2.5">
-                  <div class="h-2.5 rounded" style="background:#1A2B4A" :style="{width: (ch.count/channelDistMax*100)+'%'}"></div>
-                </div>
-                <span class="text-xs text-gray-500 w-10 text-right" x-text="ch.count.toLocaleString()"></span>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs text-gray-600" x-text="ch.name"></span>
+                <span class="text-xs text-gray-500 font-semibold" x-text="ch.count.toLocaleString()+'개'"></span>
               </div>
             </template>
           </div>
@@ -507,7 +515,7 @@
               <h3 class="font-bold navy text-sm">브랜드 활성도 순위</h3>
               <button @click="tab='merged-a'; highlightCard='g'; $nextTick(()=>{ document.getElementById('section-g')?.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>highlightCard=null,2700); renderBrandTrendChart(); })" class="text-xs rose hover:underline">더 보기 →</button>
             </div>
-            <p class="text-xs text-gray-400 mb-3">이번 주 기준 · 리뷰 수 × 채널 수 × 증감률 환산</p>
+            <p class="text-xs text-gray-400 mb-3">이번 주 기준 · 활성도 상위 6개 브랜드</p>
             <template x-for="(br, i) in amoreBrandsFull.slice(0,6)" :key="br.name">
               <div class="flex items-center gap-2 mb-2">
                 <span class="text-xs font-semibold navy w-16" x-text="br.name"></span>
@@ -517,7 +525,7 @@
                 <span class="text-xs font-bold w-8 text-right" :class="br.healthScore>=70?'navy':'text-gray-500'" x-text="br.healthScore"></span>
                 <span class="text-xs w-8"
                   :class="br.healthTrend.startsWith('+') ? 'text-green-500' : br.healthTrend==='0' ? 'text-gray-400' : 'text-red-500'"
-                  x-text="br.healthTrend==='0'?'±0점':(br.healthTrend.startsWith('+')?'▲':'▼')+br.healthTrend.replace(/[+-]/,'')+'점'"></span>
+                  x-text="br.healthTrend==='0'?'-':(br.healthTrend.startsWith('+')?'▲':'▼')+br.healthTrend.replace(/[+-]/,'')+'점'"></span>
               </div>
             </template>
           </div>
@@ -527,14 +535,11 @@
               <h3 class="font-bold navy text-sm">브랜드 현황</h3>
               <button @click="tab='merged-a'; highlightCard='g'; $nextTick(()=>{ document.getElementById('section-g')?.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>highlightCard=null,2700); renderBrandTrendChart(); })" class="text-xs rose hover:underline">더 보기 →</button>
             </div>
-            <p class="text-xs text-gray-400 mb-3">기준일 현재 · 전 채널 상품수 기준 · 최다 브랜드 대비 상대 비율</p>
+            <p class="text-xs text-gray-400 mb-3">기준일 현재 · 전 채널 상품수 기준</p>
             <template x-for="(br, i) in brandOverview.slice(0,6)" :key="br.name">
-              <div class="flex items-center gap-2 mb-1.5 px-2 py-1 rounded" :class="i<3?'bg-purple-50':''">
-                <span class="text-xs font-semibold navy w-16" x-text="br.name"></span>
-                <div class="flex-1 bg-gray-100 rounded h-2">
-                  <div class="h-2 rounded bg-navy" :style="{width: (br.count/brandOverviewMax*100)+'%'}"></div>
-                </div>
-                <span class="text-xs text-gray-400 w-10 text-right" x-text="br.count.toLocaleString()+'개'"></span>
+              <div class="flex items-center justify-between mb-1.5 px-2 py-1 rounded" :class="i<3?'bg-purple-50':''">
+                <span class="text-xs font-semibold navy" x-text="br.name"></span>
+                <span class="text-xs text-gray-500 font-semibold" x-text="br.count.toLocaleString()+'개'"></span>
               </div>
             </template>
           </div>
@@ -972,6 +977,16 @@
                     <option>전체 카테고리</option><option>스킨케어</option><option>메이크업</option>
                   </select>
                 </div>
+                <!-- 성장 채널 필터 칩 -->
+                <div x-show="channelGrowthFilter" class="flex items-center justify-between px-4 py-2 text-xs border-b" style="background:#F0FFF4; color:#276749">
+                  <span>▶ 성장 채널만 표시 중 · 전주 대비 리뷰 점유율 상승 채널</span>
+                  <button @click="channelGrowthFilter=false" class="ml-3 px-2 py-0.5 rounded font-semibold border border-green-400 hover:bg-green-100 transition">필터 해제</button>
+                </div>
+                <!-- 하락 채널 필터 칩 -->
+                <div x-show="channelDeclineFilter" class="flex items-center justify-between px-4 py-2 text-xs border-b" style="background:#FFF5F5; color:#C53030">
+                  <span>▶ 점유율 하락 채널만 표시 중 · 전주 대비 리뷰 점유율 하락 채널</span>
+                  <button @click="channelDeclineFilter=false" class="ml-3 px-2 py-0.5 rounded font-semibold border border-red-300 hover:bg-red-100 transition">필터 해제</button>
+                </div>
                 <table class="w-full text-xs">
                   <thead class="bg-gray-50">
                     <tr>
@@ -983,11 +998,11 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <template x-for="(ch, i) in channelAll" :key="ch.key">
+                    <template x-for="ch in (channelGrowthFilter ? channelAll.filter(c=>c.chgShare.startsWith('+')) : channelDeclineFilter ? channelAll.filter(c=>c.chgShare.startsWith('-')) : channelAll)" :key="ch.key">
                       <tr class="border-t hover:bg-gray-50 transition">
                         <td class="py-3 px-4">
                           <div class="flex items-center gap-1.5">
-                            <span class="font-bold navy" x-text="i+1"></span>
+                            <span class="font-bold navy" x-text="channelAll.indexOf(ch)+1"></span>
                             <span x-show="ch.rankChg > 0" class="text-xs font-bold" style="color:#4CAF82" x-text="'▲'+ch.rankChg"></span>
                             <span x-show="ch.rankChg < 0" class="text-xs font-bold text-red-400" x-text="'▼'+Math.abs(ch.rankChg)"></span>
                             <span x-show="ch.rankChg === 0" class="text-xs text-gray-300">-</span>
@@ -1072,8 +1087,16 @@
               <!-- 브랜드별 리뷰 변동 -->
               <div class="col-span-3 bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="p-4 border-b">
-                  <h3 class="font-bold navy text-sm" x-text="'\''+currentChannel.name+'\' 브랜드별 성과 비교'"></h3>
-                  <p class="text-xs text-gray-400 mt-0.5">전주 대비 · 변동 규모 내림차순 · 자사 전체 브랜드</p>
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h3 class="font-bold navy text-sm" x-text="'\''+currentChannel.name+'\' 브랜드별 성과 비교'"></h3>
+                      <p class="text-xs text-gray-400 mt-0.5">전주 대비 · 변동 규모 내림차순 · 자사 전체 브랜드</p>
+                    </div>
+                    <div class="flex gap-1">
+                      <button @click="brandPerfFilter='all'" :class="brandPerfFilter==='all'?'text-white':'text-gray-400 hover:bg-gray-100 border'" class="text-xs px-2.5 py-1 rounded-full transition" :style="brandPerfFilter==='all'?'background:#1A2B4A':''">전체</button>
+                      <button @click="brandPerfFilter='growth'" :class="brandPerfFilter==='growth'?'text-white border-green-600':'text-gray-500 hover:bg-gray-100 border'" class="text-xs px-2.5 py-1 rounded-full transition border" :style="brandPerfFilter==='growth'?'background:#16a34a':''">성장 브랜드만</button>
+                    </div>
+                  </div>
                 </div>
                 <table class="w-full text-xs">
                   <thead class="bg-gray-50">
@@ -1085,7 +1108,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <template x-for="br in currentChannelBrandReviews" :key="br.name">
+                    <template x-for="br in (brandPerfFilter==='growth' ? currentChannelBrandReviews.filter(b=>b.chgN.startsWith('+')) : currentChannelBrandReviews)" :key="br.name">
                       <tr class="border-t hover:bg-gray-50 transition">
                         <td class="py-3 px-4 font-semibold navy" x-text="br.name"></td>
                         <td class="py-3 px-4 text-right font-semibold navy" x-text="br.reviews.toLocaleString()+'건'"></td>
@@ -1243,16 +1266,25 @@
             <div class="p-4 border-b flex items-center justify-between">
               <div>
                 <h3 class="font-bold navy text-sm">아모레퍼시픽 브랜드 분석</h3>
-                <span class="text-xs text-gray-400">브랜드 활성도 = 리뷰 수 × 취급 채널 수 × 전주 대비 증감률</span>
               </div>
               <button @click="downloadBrandExcel()" class="text-xs px-3 py-1.5 rounded-lg text-white font-semibold" style="background:#1A2B4A">Excel 다운로드</button>
+            </div>
+            <!-- 성장 브랜드 필터 칩 -->
+            <div x-show="brandHealthFilter==='growth'" class="flex items-center justify-between px-4 py-2 text-xs border-b" style="background:#F0FFF4; color:#276749">
+              <span>▶ 성장 브랜드만 표시 중 · 전주 대비 브랜드 활성도 상승 브랜드</span>
+              <button @click="brandHealthFilter='all'" class="ml-3 px-2 py-0.5 rounded font-semibold border border-green-400 hover:bg-green-100 transition">필터 해제</button>
+            </div>
+            <!-- 하락 브랜드 필터 칩 -->
+            <div x-show="brandHealthFilter==='decline'" class="flex items-center justify-between px-4 py-2 text-xs border-b" style="background:#FFF5F5; color:#C53030">
+              <span>▶ 하락 브랜드만 표시 중 · 전주 대비 브랜드 활성도 하락 브랜드</span>
+              <button @click="brandHealthFilter='all'" class="ml-3 px-2 py-0.5 rounded font-semibold border border-red-300 hover:bg-red-100 transition">필터 해제</button>
             </div>
             <table class="w-full text-xs">
               <thead class="bg-gray-50">
                 <tr>
                   <th class="py-2.5 px-3 text-left navy font-semibold">#</th>
                   <th class="py-2.5 px-3 text-left navy font-semibold">브랜드</th>
-                  <th class="py-2.5 px-3 text-center navy font-semibold">브랜드 활성도</th>
+                  <th class="py-2.5 px-3 text-center navy font-semibold">브랜드 활성도<i class="info-btn" data-tip="이번 주 기준 · 리뷰 볼륨(40%) + 취급 채널 수(30%) + 전주 대비 리뷰 증감(30%) 가중 평균으로 산출한 0~100점 종합 지수. 리뷰 볼륨 점수는 이번 주 전체 브랜드 중 최다 리뷰 기준 상대 점수로 산출됨">i</i></th>
                   <th class="py-2.5 px-3 text-right navy font-semibold">상품수</th>
                   <th class="py-2.5 px-3 text-right navy font-semibold">리뷰 점유율</th>
                   <th class="py-2.5 px-3 text-right navy font-semibold">총 리뷰</th>
@@ -1260,9 +1292,9 @@
                 </tr>
               </thead>
               <tbody>
-                <template x-for="(br,i) in amoreBrandsFull" :key="br.name">
+                <template x-for="br in (brandHealthFilter==='growth' ? amoreBrandsFull.filter(b=>b.healthTrend.startsWith('+')) : brandHealthFilter==='decline' ? amoreBrandsFull.filter(b=>b.healthTrend.startsWith('-')) : amoreBrandsFull)" :key="br.name">
                   <tr class="border-t hover:bg-blue-50 clickable transition" @click="openBrandDrilldown(br)">
-                    <td class="py-2.5 px-3 font-bold navy" x-text="i+1"></td>
+                    <td class="py-2.5 px-3 font-bold navy" x-text="amoreBrandsFull.indexOf(br)+1"></td>
                     <td class="py-2.5 px-3 font-semibold navy">
                       <span x-text="br.name"></span>
                       <span class="text-xs rose ml-1">→ 상세 보기</span>
@@ -1273,7 +1305,7 @@
                         <span class="font-black text-sm" :class="br.healthScore>=70?'navy':br.healthScore>=50?'text-yellow-600':'text-gray-400'" x-text="br.healthScore+'점'"></span>
                         <span class="text-xs font-semibold"
                           :class="br.healthTrend.startsWith('+') ? 'text-green-500' : br.healthTrend === '0' ? 'text-gray-400' : 'text-red-500'"
-                          x-text="br.healthTrend === '0' ? '±0' : (br.healthTrend.startsWith('+') ? '▲' : '▼') + br.healthTrend.replace(/[+-]/,'')"></span>
+                          x-text="br.healthTrend === '0' ? '-' : (br.healthTrend.startsWith('+') ? '▲' : '▼') + br.healthTrend.replace(/[+-]/,'')"></span>
                       </div>
                     </td>
                     <td class="py-2.5 px-3 text-right" x-text="br.products.toLocaleString()"></td>
@@ -1455,7 +1487,13 @@
           <div class="flex items-center gap-3 mb-4">
             <button @click="closeDrilldown()" class="text-xs px-3 py-1.5 border rounded-lg text-gray-500 hover:bg-gray-100 transition">← 브랜드 분석</button>
             <span class="text-base font-bold navy" x-text="selectedBrand?.name"></span>
-            <span class="ap-badge text-xs">자사</span>
+            <div class="ml-auto flex items-center gap-2">
+              <span class="text-xs text-gray-400">브랜드 활성도</span>
+              <span class="text-sm font-black navy" x-text="selectedBrand?.healthScore + '점'"></span>
+              <span class="text-xs font-semibold"
+                :class="selectedBrand?.healthTrend?.startsWith('+') ? 'text-green-600' : selectedBrand?.healthTrend === '0' ? 'text-gray-400' : 'text-red-500'"
+                x-text="selectedBrand?.healthTrend === '0' ? '-' : (selectedBrand?.healthTrend?.startsWith('+') ? '▲' : '▼') + selectedBrand?.healthTrend?.replace(/[+-]/,'') + '점'"></span>
+            </div>
           </div>
           <div class="flex gap-1 mb-5 bg-white rounded-xl shadow-sm p-1">
             <button @click="drilldownTab='products'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition" :style="drilldownTab==='products' ? 'background:#1A2B4A;color:#fff' : 'color:#6b7280'">상품 현황</button>
@@ -1482,15 +1520,7 @@
             <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
               <div class="flex gap-3 items-center flex-wrap">
                 <input x-model="drilldownQuery" placeholder="상품명 검색..." class="flex-1 min-w-36 px-3 py-2 border rounded-lg text-xs focus:outline-none" @input="drilldownPage=1">
-                <select x-model="drilldownCat" class="text-xs border rounded-lg px-3 py-2 text-gray-600" @change="drilldownPage=1">
-                  <option value="">전체 카테고리</option>
-                  <template x-for="cat in categories" :key="cat"><option :value="cat" x-text="cat"></option></template>
-                </select>
-                <select x-model="drilldownChannel" class="text-xs border rounded-lg px-3 py-2 text-gray-600" @change="drilldownPage=1">
-                  <option value="">전체 채널</option>
-                  <template x-for="ch in channels.filter(c=>c.key!=='all')" :key="ch.key"><option :value="ch.key" x-text="ch.name"></option></template>
-                </select>
-                <button @click="drilldownQuery=''; drilldownCat=''; drilldownChannel=''; drilldownPage=1" class="text-xs text-gray-400 hover:text-gray-600">초기화</button>
+                <button @click="drilldownQuery=''; drilldownPage=1" class="text-xs text-gray-400 hover:text-gray-600">초기화</button>
               </div>
             </div>
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -1831,98 +1861,6 @@
       </div>
     </div>
 
-    <!-- 하락 브랜드 모달 -->
-    <div x-show="showDeclineBrandModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showDeclineBrandModal=false">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
-        <button @click="showDeclineBrandModal=false" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl">&times;</button>
-        <h2 class="text-base font-bold navy mb-1">하락 브랜드</h2>
-        <p class="text-xs text-gray-400 mb-4">전주 대비 브랜드 활성도 지수 하락 브랜드</p>
-        <div class="divide-y">
-          <template x-for="br in amoreBrandsFull.filter(b=>b.healthTrend.startsWith('-'))" :key="br.name">
-            <div class="flex items-center justify-between py-3">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold navy" x-text="br.name"></span>
-                <span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-red-100 text-red-600" x-text="'▼ ' + br.healthTrend.replace('-','') + '점'"></span>
-              </div>
-              <button
-                @click="tab='merged-a'; openBrandDrilldown(br); showDeclineBrandModal=false"
-                class="text-xs px-3 py-1.5 rounded-lg font-semibold text-white transition"
-                style="background:#1A2B4A">브랜드 보기</button>
-            </div>
-          </template>
-        </div>
-      </div>
-    </div>
-
-    <!-- 성장 브랜드 모달 -->
-    <div x-show="showGrowthBrandModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showGrowthBrandModal=false">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
-        <button @click="showGrowthBrandModal=false" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl">&times;</button>
-        <h2 class="text-base font-bold navy mb-1">성장 브랜드</h2>
-        <p class="text-xs text-gray-400 mb-4">전주 대비 브랜드 활성도 지수 상승 브랜드</p>
-        <div class="divide-y">
-          <template x-for="br in amoreBrandsFull.filter(b=>b.healthTrend.startsWith('+'))" :key="br.name">
-            <div class="flex items-center justify-between py-3">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold navy" x-text="br.name"></span>
-                <span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-green-100 text-green-700" x-text="'▲ ' + br.healthTrend.replace('+','') + '점'"></span>
-              </div>
-              <button
-                @click="tab='merged-a'; openBrandDrilldown(br); showGrowthBrandModal=false"
-                class="text-xs px-3 py-1.5 rounded-lg font-semibold text-white transition"
-                style="background:#1A2B4A">브랜드 보기</button>
-            </div>
-          </template>
-        </div>
-      </div>
-    </div>
-
-    <!-- 점유율 하락 채널 모달 -->
-    <div x-show="showDeclineModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showDeclineModal=false">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
-        <button @click="showDeclineModal=false" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl">&times;</button>
-        <h2 class="text-base font-bold navy mb-1">점유율 하락 채널</h2>
-        <p class="text-xs text-gray-400 mb-4">전주 대비 리뷰 점유율 하락 채널</p>
-        <div class="divide-y">
-          <template x-for="ch in channelAll.filter(c=>c.chgShare.startsWith('-'))" :key="ch.key">
-            <div class="flex items-center justify-between py-3">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold navy" x-text="ch.name"></span>
-                <span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-red-100 text-red-600" x-text="'▼ ' + ch.chgShare"></span>
-              </div>
-              <button
-                @click="tab='merged-a'; channelTab=ch.key; showDeclineModal=false"
-                class="text-xs px-3 py-1.5 rounded-lg font-semibold text-white transition"
-                style="background:#1A2B4A">채널 보기</button>
-            </div>
-          </template>
-        </div>
-      </div>
-    </div>
-
-    <!-- 성장 채널 모달 -->
-    <div x-show="showGrowthModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="showGrowthModal=false">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
-        <button @click="showGrowthModal=false" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl">&times;</button>
-        <h2 class="text-base font-bold navy mb-1">성장 채널</h2>
-        <p class="text-xs text-gray-400 mb-4">전주 대비 리뷰 점유율 상승 채널</p>
-        <div class="divide-y">
-          <template x-for="ch in channelAll.filter(c=>c.chgShare.startsWith('+'))" :key="ch.key">
-            <div class="flex items-center justify-between py-3">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold navy" x-text="ch.name"></span>
-                <span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-green-100 text-green-700" x-text="'▲ ' + ch.chgShare"></span>
-              </div>
-              <button
-                @click="tab='merged-a'; channelTab=ch.key; showGrowthModal=false"
-                class="text-xs px-3 py-1.5 rounded-lg font-semibold text-white transition"
-                style="background:#1A2B4A">채널 보기</button>
-            </div>
-          </template>
-        </div>
-      </div>
-    </div>
-
     <div x-show="modal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="modal=null; destroyCharts()">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-screen overflow-y-auto p-8 relative">
         <button @click="modal=null; destroyCharts()" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl">&times;</button>
@@ -2020,10 +1958,10 @@
         crossQuery: '', crossResults: [], crossExpanded: {}, crossShowAll: {},
         brandTrendMonths: 6,
         showAlertModal: false,
-        showGrowthModal: false,
-        showDeclineModal: false,
-        showGrowthBrandModal: false,
-        showDeclineBrandModal: false,
+        channelGrowthFilter: false,
+        channelDeclineFilter: false,
+        brandHealthFilter: 'all',
+        brandPerfFilter: 'all',
         highlightCard: null,
         cardOrder: {
           md:        { a:1, cd:2, e:3, g:4, i:5, f:6 },
